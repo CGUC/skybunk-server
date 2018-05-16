@@ -5,7 +5,7 @@ const router = express.Router();
 require('../models/Example');
 const Examplemodel = mongoose.model('Example');
 
-// Any GET request to '/examples/lebron' will get handled here
+// Any GET request to '/examples/<name>' will get handled here
 // In order to properly follow MVC convention, this should just serve as 
 // a mediator between our app and the model, so any business logic should 
 // be performed within the models methods.
