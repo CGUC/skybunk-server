@@ -12,7 +12,6 @@ const Examplemodel = mongoose.model('Example');
 router.get('/:name', (req, res) => {
 	Examplemodel.findOne({name: req.params.name})
 	.then(whatWeFound => {
-		whatWeFound.incrementCounter();
 		res.send(whatWeFound);
 	})
 	.catch(err => {
@@ -20,5 +19,19 @@ router.get('/:name', (req, res) => {
 		res.send('error');
 	});
 });
+
+// Any PUT request to '/examples/<name>' will get handled here. It simply
+// Updates the counter on the retrieved document
+router.put('/:name', (req, rest) => {
+	Examplemodel.findOne({name: req.params.name})
+	.then(whatWeFound => {
+		whatWeFound.incrementCounter();
+		res.redirect(`/examples/${name}`)
+	})
+	.catch(err => {
+		console.log(err)
+		res.send('error');
+	});
+})
 
 module.exports = router;

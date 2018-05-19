@@ -23,7 +23,7 @@ _React native gets compiled to native code upon launch, so it essentially become
 
 ## Structure
 
-The application is split into two sections, ther server (API) and the client (the app). The client fetches data from the server through the use of HTTP requests. More about the architecture of the each part will be added in their own readme soon.
+The application is split into two sections, ther server (API) and the client (the app). The client fetches data from the server through the use of HTTP requests. More about the architecture of the each piece can be found in their respective READMEs
 
 ## Setting up the dev environment
 In order to enable people with very little previous experience to contribute, this section describes how to set up the development environment in fine detail. Luckily, setting up the environment is essentially the same no matter what OS you're using.
