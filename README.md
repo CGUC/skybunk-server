@@ -1,6 +1,8 @@
 # GRAPP
 _Need a better name..._
 
+![](https://johnanngeister.files.wordpress.com/2011/02/conrad-grebel.jpg)
+
 The mobile application for Conrad Grebel University College students.
 
 ## The stack
