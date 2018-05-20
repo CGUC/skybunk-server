@@ -21,11 +21,11 @@ Currently we're trying out [React-native](https://facebook.github.io/react-nativ
 
 _**(Aside)** A little bit about React Native:_
 
-_React native gets compiled to native code upon launch, so it essentially becomes a siwft app for ios or a java app for android. This preserves the feel of a true native application across devices and performs just as well as if we built the apps in their respective native languages._
+_React native gets compiled to native code upon launch, so it essentially becomes a swift app for ios or a java app for android. This preserves the feel of a true native application across devices and performs just as well as if we built the apps in their respective native languages._
 
 ## Structure
 
-The application is split into two sections, ther server (API) and the client (the app). The client fetches data from the server through the use of HTTP requests. More about the architecture of the each piece can be found in their respective READMEs
+The application is split into two sections, the server (API) and the client (the app). The client fetches data from the server through the use of HTTP requests. More about the architecture of the each piece can be found in their respective READMEs
 
 ## Setting up the dev environment
 In order to enable people with very little previous experience to contribute, this section describes how to set up the development environment in fine detail. Luckily, setting up the environment is essentially the same no matter what OS you're using.
