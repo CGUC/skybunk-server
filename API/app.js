@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 // to as routes & routers elsewhere)
 // The first parameter passed into app.use(...) directs all urls starting
 // with this parameter to the controller passed in to the second paramater.
-// Here, everything from the root ('/') will check the exampleController for the matching
+// Here, every request from the uri ('/examples/<ANYTHING>') will check the exampleController for the matching
 // <ANYTHING> route
 const exampleController = require('./controllers/exampleController')
 app.use('/examples', exampleController)
