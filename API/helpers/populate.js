@@ -12,7 +12,18 @@ exampleDocuments = [
 
 mongoose.connect('mongodb://localhost/grapp-dev');
 
-exampleDocuments.map(data => {
+console.log("Working...");
+const promises = exampleDocuments.map(data => {
   const ex = new Examplemodel(data);
-  ex.save();
+  return ex.save().then(ex => {
+  	console.log(`Successfully saved ${ex.name}`)
+  })
+  .catch(err => {
+  	console.log(`Error saving ${ex.name}: ${err.message}`)
+  });
+});
+
+Promise.all(promises).then(results => {
+	console.log("Successfully populated database")
+	mongoose.disconnect();
 });

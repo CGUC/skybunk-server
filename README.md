@@ -45,7 +45,7 @@ In order to enable people with very little previous experience to contribute, th
 
 And you're set!
 
-To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `node helpers/populate.js` to load some dummy data into the database. Once that is finished running (if it's taking a while, just kill the process with ctrl-c), run `nodemon` - this will automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/examples/Mark in your web browser. If all went well, you should be presented with a JSON similar to the following: 
+To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `node helpers/populate.js` to load some dummy data into the database. Once that is finished running, run `nodemon` - this will automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/examples/Mark in your web browser. If all went well, you should be presented with a JSON similar to the following: 
 `{"counter":1,"_id":"5afb90607b209c3008b59ec5","name":"Mark","__v":0}`
 If you have issues, make sure you followed the steps above properly and if all else fails feel free to reach out to the dev team.
 
