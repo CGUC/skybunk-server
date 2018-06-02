@@ -33,8 +33,11 @@ app.use(bodyParser.json());
 // with this parameter to the controller passed in to the second paramater.
 // Here, every request from the uri ('/examples/<ANYTHING>') will check the exampleController for the matching
 // <ANYTHING> route
-const exampleController = require('./controllers/exampleController')
-app.use('/examples', exampleController)
+const exampleController = require('./controllers/exampleController');
+app.use('/examples', exampleController);
+
+const channelController = require('./controllers/channelController');
+app.use('/channel', channelController);
 
 // Start the server on port 3000
 // This will have to be updated once we push to production to use the port
