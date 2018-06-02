@@ -54,7 +54,6 @@ router.get('/:id', (req, res) => {
 
 /**
  * Get posts from a specific channel
- * TODO: Finish once we build out Posts model
  */
 router.get('/:id/posts', (req, res) => {
   Channel.getPosts(req.params.id).then(posts => {

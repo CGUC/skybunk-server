@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+require('./Posts');
+const Post = mongoose.model('Post');
+
 const ChannelSchema = new Schema({
 	name: {
 		type: String,
@@ -18,9 +21,14 @@ const ChannelSchema = new Schema({
 
 ChannelSchema.statics.create = function(channel) {
 	var channelName = channel.name.toLowerCase();
+	var formattedTags = [];
+	channel.tags.forEach((tag) => {
+    formattedTags.push(tag.toLowerCase());
+  });
 	var channelData = {
 		...channel,
 		name: channelName,
+		tags: formattedTags,
 	}
 
 	return new Promise((resolve, reject) => {
@@ -46,12 +54,7 @@ ChannelSchema.statics.create = function(channel) {
 }
 
 ChannelSchema.statics.get = function(id) {
-	var channelId = id;
-	// argument to ObjectId must be string;
-	// assume if not string, id is already ObjectId
-	if (typeof id === 'string'){
-		channelId = mongoose.Types.ObjectId(id);
-	}
+  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
 
 	return new Promise((resolve, reject) => {
 		//this.find({ _id: channelId })
@@ -72,16 +75,7 @@ ChannelSchema.statics.get = function(id) {
 ChannelSchema.statics.getPosts = function(id) {
 	return new Promise((resolve, reject) => {
 		this.get(id).then(channel => {
-			var tags = channel.tags;
-			var filteredPosts = [];
-			/**
-			 * TODO: Integrate with Posts model
-			 * @method PostSchema.statics.findByTags(tags)
-			 * 	=> queries collection for posts containing specified tags
-			 * @returns {Array} of post documents
-			 * (remember to require ./Posts!)
-			 */
-			Post.findByTags(tags).then(posts => {
+			Post.findByTags(channel.tags).then(posts => {
 				if (!posts) posts = [];
 				resolve(posts);
 			})
@@ -96,21 +90,13 @@ ChannelSchema.statics.getPosts = function(id) {
 }
 
 ChannelSchema.statics.updateChannel = function(id, updatedObj) {
-	var channelId = id;
-	if (typeof id === 'string'){
-		channelId = mongoose.Types.ObjectId(id);
-	}
+  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
 
 	if (updatedObj.name) updatedObj.name = updatedObj.name.toLowerCase();
 
 	return new Promise((resolve, reject) => {
-		this.get(id).then(channel => {
-			this.update({ _id: channelId }, updatedObj).then(() => {
-				resolve();
-			})
-			.catch(err => {
-				reject(err);
-			});
+		this.update({ _id: id }, updatedObj).then(() => {
+			resolve();
 		})
 		.catch(err => {
 			reject(err);
@@ -119,19 +105,11 @@ ChannelSchema.statics.updateChannel = function(id, updatedObj) {
 }
 
 ChannelSchema.statics.delete = function(id) {
-	var channelId = id;
-	if (typeof id === 'string'){
-		channelId = mongoose.Types.ObjectId(id);
-	}
+  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
 
 	return new Promise((resolve, reject) => {
-		this.get(id).then(channel => {
-			this.deleteOne({ _id: channelId }).then(() => {
-				resolve("Successfully deleted channel");
-			})
-			.catch(err => {
-				reject(err);
-			});
+		this.deleteOne({ _id: id }).then(() => {
+			resolve(`Successfully deleted channel`);
 		})
 		.catch(err => {
 			reject(err);
