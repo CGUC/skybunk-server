@@ -39,6 +39,9 @@ app.use('/examples', exampleController);
 const channelController = require('./controllers/channelController');
 app.use('/channel', channelController);
 
+const userController = require('./controllers/userController');
+app.use('/users', userController);
+
 // Start the server on port 3000
 // This will have to be updated once we push to production to use the port
 // of whatever we're hosted on
