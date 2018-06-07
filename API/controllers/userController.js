@@ -29,10 +29,12 @@ router.get('/user/:id', (req, res) => {
 
 // Creates a user -- Protect this route with `golden ticket`
 router.post('/', (req, res) => {
-	GoldenTicket.verifyTicket(req.body.goldenTicket).then(result => {
-		if (result) {
+	GoldenTicket.verifyTicket(req.body.goldenTicket).then(ticket => {
+		if (ticket) {
 			User.create(req.body).then(user => {
-				res.json(user);
+				GoldenTicket.deleteOne({_id: ticket.id}).then(() => {
+					res.json(user);
+				});
 			}).catch(err => {
 				res.json(err);
 			});

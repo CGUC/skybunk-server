@@ -13,10 +13,7 @@ const GoldenTicketSchema = new Schema({
 GoldenTicketSchema.statics.verifyTicket = function(ticketNumber) {
 	return new Promise((resolve, reject) => {
 		this.findOne({ticketNumber: ticketNumber}).then(ticket => {
-			if (ticket)
-				resolve(true)
-			else
-				resolve(false)
+			resolve(ticket)
 		}).catch(err => {
 			reject(err);
 		});
