@@ -8,6 +8,9 @@ const router = express.Router();
 require('../models/User');
 const User = mongoose.model('User');
 
+require('../models/GoldenTicket');
+const GoldenTicket = mongoose.model('GoldenTicket');
+
 // Return all users
 router.get('/', (req, res) => {
 	User.find().select('-password').then(users => {
@@ -26,8 +29,19 @@ router.get('/user/:id', (req, res) => {
 
 // Creates a user -- Protect this route with `golden ticket`
 router.post('/', (req, res) => {
-	User.create(req.body).then(user => {
-		res.json(user);
+	GoldenTicket.verifyTicket(req.body.goldenTicket).then(ticket => {
+		if (ticket) {
+			User.create(req.body).then(user => {
+				GoldenTicket.deleteOne({_id: ticket.id}).then(() => {
+					res.json(user);
+				});
+			}).catch(err => {
+				res.json(err);
+			});
+		}
+		else {
+			res.status(400).json({message: 'No valid golden ticket provided'});
+		}
 	}).catch(err => {
 		res.json(err);
 	});
