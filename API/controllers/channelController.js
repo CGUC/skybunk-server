@@ -5,6 +5,8 @@ const _ = require('lodash');
 
 require('../models/Channels');
 const Channel = mongoose.model('Channel');
+const { verifyToken } = require('../helpers/authorization');
+const { classifyError } = require('../helpers/formatters');
 
 /**
  * Methods:
@@ -19,19 +21,13 @@ const Channel = mongoose.model('Channel');
 /**
  * Create a new channel
  */
-router.post('/', (req, res) => {
+router.post('/', verifyToken, (req, res) => {
   Channel.create(req.body).then(channel => {
-    res.json(200, channel);
+    res.json(channel);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      // Actual runtime error
-      res.json(500, err.message);
-    }
-    else {
-      // Purposefully did not complete action, returned message
-      res.json(403, err);
-    }
+    var clf = classifyError(err);
+    res.status(clf.status).json(clf.message);
   });
 });
 
@@ -40,67 +36,62 @@ router.post('/', (req, res) => {
  */
 router.get('/:id', (req, res) => {
   Channel.get(req.params.id).then(channel => {
-    res.json(200, channel);
+    res.json(channel);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    }
-    else {
-      res.json(403, err);
-    }
+    var clf = classifyError(err);
+    res.status(clf.status).json(clf.message);
   });
 });
+
+/**
+ * Get all channels
+ */
+router.get('/', (req, res) => {
+  Channel.getAll().then(channels => {
+    res.json(channels);
+  })
+  .catch(err => {
+    res.status(500).json(err.message);
+  });
+})
 
 /**
  * Get posts from a specific channel
  */
 router.get('/:id/posts', (req, res) => {
   Channel.getPosts(req.params.id).then(posts => {
-    res.json(200, posts);
+    res.json(posts);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    }
-    else {
-      res.json(403, err);
-    }
+    var clf = classifyError(err);
+    res.status(clf.status).json(clf.message);
   });
 });
 
 /**
  * Update a channel
  */
-router.put('/:id', (req, res) => {
-  const id = req.params.id;
-  Channel.updateChannel(id, req.body).then(() => {
-    res.redirect(`/channel/${id}`);
+router.put('/:id', verifyToken, (req, res) => {
+  Channel.updtedChannel(req.params.id, req.body).then(channel => {
+    res.json(channel);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    }
-    else {
-      res.json(403, err);
-    }
+    var clf = classifyError(err);
+    res.status(clf.status).json(clf.message);
   });
 });
 
 /**
  * Delete a channel
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyToken, (req, res) => {
   Channel.delete(req.params.id).then(msg => {
-    res.json(200, msg);
+    res.json(msg);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    }
-    else {
-      res.json(403, err);
-    }
+    var clf = classifyError(err);
+    res.status(clf.status).json(clf.message);
   });
 });
 

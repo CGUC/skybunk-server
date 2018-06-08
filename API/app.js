@@ -37,7 +37,7 @@ const exampleController = require('./controllers/exampleController');
 app.use('/examples', exampleController);
 
 const channelController = require('./controllers/channelController');
-app.use('/channel', channelController);
+app.use('/channels', channelController);
 
 const userController = require('./controllers/userController');
 app.use('/users', userController);

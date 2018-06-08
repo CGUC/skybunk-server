@@ -5,6 +5,8 @@ const _ = require('lodash');
 
 require('../models/Posts');
 const Post = mongoose.model('Post');
+const { verifyToken } = require('../helpers/authorization');
+const { classifyError } = require('../helpers/formatters');
 
 /**
  * Methods:
@@ -13,71 +15,73 @@ const Post = mongoose.model('Post');
  *  put(/:id) => Updates post with given id
  *  delete(/:id) => Deletes post with given id
  *  get(/:id/comments) => Gets all comments for post
- *  post(/:id) => Adds a new comment to the post
+ *  post(/:id/comment) => Adds a new comment to the post
+ *  delete(/:pid/comment/:cid) => Deletes comment with 
+ *    id cid from post with id pid
  */
 
 /**
  * Create new post
  */
-router.post('/', (req, res) => {
+router.post('/', verifyToken, (req, res) => {
   Post.create(req.body).then(post => {
-    res.json(200, post);
+    res.json(post);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    } else {
-      res.json(403, err);
-    }
-  })
-})
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
+  });
+});
 
 /**
  * Get post by id
  */
 router.get('/:id', (req, res) => {
   Post.get(req.params.id).then(post => {
-    res.json(200, post);
+    res.json(post);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.msg);
-    } else {
-      res.json(403, err);
-    }
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
+  });
+});
+
+/**
+ * Get all posts
+ */
+router.get('/', (req, res) => {
+  Post.getAll().then(posts => {
+    res.json(posts);
+  })
+  .catch(err => {
+    res.status(500).json(err.message);
   });
 });
 
 /**
  * Update a post
  */
-router.put('/:id', (req, res) => {
-  const id = req.params.id;
-  Post.updatePost(id, req.body).then(() => {
-    res.redirect(`/posts/${id}`);
+router.put('/:id', verifyToken, (req, res) => {
+
+  Post.updatePost(req.params.id, req.body).then(post => {
+    res.json(post);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    } else {
-      res.json(403, err);
-    }
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
 /**
  * Delete a post
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyToken, (req, res) => {
   Post.delete(req.params.id).then((msg) => {
-    res.json(200, msg);
+    res.json(msg);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    } else {
-      res.json(403, err);
-    }
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
@@ -89,29 +93,50 @@ router.get('/:id/comments', (req, res) => {
     res.json(200, comments);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    }
-    else {
-      res.json(403, err);
-    }
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
 /**
  * Add a new comment to the post
+ * @returns all comments for post
  */
-router.post('/:id', (req, res) => {
+router.post('/:id/comment', verifyToken, (req, res) => {
   Post.addComment(req.params.id, req.body).then(comment => {
-    res.json(200, comment);
+    res.json(comment);
   })
   .catch(err => {
-    if (typeof err === 'object') {
-      res.json(500, err.message);
-    }
-    else {
-      res.json(403, err);
-    }
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
+  });
+});
+
+/**
+ * Update a comment
+ * @param {string} pid - post's id
+ * @param {string} cid - comment's id
+ */
+router.put('/:pid/comment/:cid', verifyToken, (req, res) => {
+  Post.updateComment(req.params.pid, req.params.cid, req.body).then(comment => {
+    res.json(comment);
+  })
+  .catch(err => {
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
+  });
+});
+
+/**
+ * Delete a comment
+ */
+router.delete('/:pid/comment/:cid', verifyToken, (req, res) => {
+  Post.deleteComment(req.params.pid, req.params.cid).then((msg) => {
+    res.json(msg);
+  })
+  .catch(err => {
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 

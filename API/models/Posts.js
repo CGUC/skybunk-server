@@ -1,22 +1,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const ObjectId = mongoose.Types.ObjectId;
+const _ = require('lodash');
 
-// TODO: implement comments model
-// require('./Comments');
-// const Comment = mongoose.model('Comment');
+const { formatTags } = require('../helpers/formatters');
+const config = require('../config/options');
 
+// Schema.Types vs mongoose.Types: https://github.com/Automattic/mongoose/issues/1671
+// Subdocs: http://mongoosejs.com/docs/subdocs.html
 const PostSchema = new Schema({
 	author: {
-    //type: Schema.Types.ObjectId,
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'User'
   },
-  subscribedUsers: {
-    type: Array,
+  subscribedUsers: [{
+    type: Schema.Types.ObjectId,
     default: [],
     ref: 'User'
-  },
+  }],
 	content: {
 		type: String,
 		required: true,
@@ -24,49 +26,38 @@ const PostSchema = new Schema({
   image: {
     type: Buffer,
   },
-	tags: {
-		type: Array,
+	tags: [{
+		type: String,
 		required: true,
-  },
-  comments: {
-    type: Array,
-    ref: 'Comment'
-  },
-  createdAt: {
-    type: Object,
-  },
-  updatedAt: {
-    type: Object,
-  }
-});
+  }],
+  comments: [new Schema({
+    author: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'User'
+    },
+    content: {
+        type: String,
+        required: true,
+    },
+  }, { timestamps: true })],
+}, { timestamps: true });
 
-PostSchema.statics.create = function(post) {
-  // Implement a character limit client-side
-  if (!post.createdAt) {
-    post.createdAt = new Date();
-  }
-	var formattedTags = [];
-	post.tags.forEach((tag) => {
-    formattedTags.push(tag.toLowerCase());
-  });
-  var post = {
-    ...post,
-    subscribedUsers: post.author,
-    tags: formattedTags,
-  }
+PostSchema.statics.create = function(postData) {
+  var formattedTags = formatTags(postData.tags);
+
+  var post = _.pick(postData, ['author', 'content', 'image']);
+  post.subscribedUsers = [postData.author];
+  post.tags = formattedTags;
+
 	return new Promise((resolve, reject) => {
-    this.find({ content: post.content }).then(existingPost => {
-      if (existingPost && existingPost.length) {
-        reject(`Hmm, it looks like a post with the exact same content already exists. Try something new!`);
-      } else {
-        const newPost = new this(post);
-        newPost.save().then(post => {
-          resolve(post);
-        })
-        .catch(err => {
-          reject(err);
-        });
-      }
+    if (post.content.length > config.postCharacterLimit) {
+      reject(`Post cannot be more than ${config.postCharacterLimit} characters`);
+    }
+
+    const newPost = new this(post);
+    newPost.save().then(post => {
+      resolve(post);
     })
     .catch(err => {
       reject(err);
@@ -75,7 +66,7 @@ PostSchema.statics.create = function(post) {
 }
 
 PostSchema.statics.get = function(id) {
-  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
+  id = ObjectId(id);
 
   return new Promise((resolve, reject) => {
     this.findById(id).then(post => {
@@ -83,39 +74,60 @@ PostSchema.statics.get = function(id) {
         resolve(post);
       }
       else {
-        reject(`Couldn't find a post with that ID`);
+        reject('Couldn\'t find a post with that ID');
       }
     })
     .catch(err => {
       reject(err);
     });
-  })
+  });
 }
 
-PostSchema.statics.updatePost = function(id, postObj) {
-  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
+PostSchema.statics.getAll = function() {
+	return new Promise((resolve, reject) => {
+		this.find().then(posts => {
+			resolve(posts);
+		})
+		.catch(err => {
+			reject(err);
+		});
+	});
+}
 
-  postObj = {
-    ...postObj,
-    updatedAt: new Date()
-  }
+PostSchema.statics.updatePost = function(id, postData) {
+  id = ObjectId(id);
+  var formattedTags = formatTags(postData.tags);
 
   return new Promise((resolve, reject) => {
-    this.update({ _id: id }, postObj).then(post => {
-      resolve();
-    })
-    .catch(err => {
-      reject(err);
-    })
+    if (postData.content && postData.content.length > config.postCharacterLimit) {
+      reject(`Post cannot be more than ${config.postCharacterLimit} characters`);
+    }
+
+    this.findById(id).then(post => {
+      if (post) {
+        var updatedPost = _.extend({}, post, _.pick(postData, ['author', 'subscribedUsers', 'content', 'image']));
+        updatedPost.tags = formattedTags;
+
+        updatedPost.save().then(post => {
+          resolve(post);
+        })
+        .catch(err => {
+          reject(err);
+        });
+      }
+      else {
+        reject('Couldn\'t find a post with that ID');
+      }
+    });
   });
 }
 
 PostSchema.statics.delete = function(id) {
-  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
+  id = ObjectId(id);
 
   return new Promise((resolve, reject) => {
     this.deleteOne({ _id: id }).then(() => {
-      resolve(`Successfully deleted post`);
+      resolve('Successfully deleted post');
     })
     .catch(err => {
       reject(err);
@@ -125,19 +137,9 @@ PostSchema.statics.delete = function(id) {
 
 PostSchema.statics.findByTags = function(tags) {
   return new Promise((resolve, reject) => {
-    // format tags into array
-    var tagArray = [];
-    if (typeof tags === 'object') {
-      // likely in format of database query return
-      tags.forEach((tag) => {
-        tagArray.push(tag);
-      });
-    } else if (typeof tags === 'string') {
-      // assume only one tag passed in as string
-      tagArray.push(tags);
-    } else tagArray = tags; // assume already an array
+    var formattedTags = formatTags(tags);
 
-    this.find({ tags: {$in: tags} }).then(posts => {
+    this.find({ tags: {$in: formattedTags} }).then(posts => {
       resolve(posts);
     })
     .catch(err => {
@@ -147,15 +149,37 @@ PostSchema.statics.findByTags = function(tags) {
 }
 
 PostSchema.statics.getComments = function(id) {
-  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
+  id = ObjectId(id);
 
   return new Promise((resolve, reject) => {
     this.get(id).then(post => {
-      if (post.comments) {
-        resolve(post.comments);
-      } else {
-        reject(`No comments found for this post`);
-      }
+      resolve(post.comments);
+    })
+    .catch(err => {
+      reject(err);
+    });
+  });
+}
+
+PostSchema.statics.addComment = function(id, commentData) {
+  id = ObjectId(id);
+
+  var comment = _.pick(commentData, ['author', 'content']);
+
+  return new Promise((resolve, reject) => {
+    if (comment.content.length > config.commentCharacterLimit) {
+      reject(`Comment cannot be more than ${config.commentCharacterLimit} characters`);
+    }
+
+    this.get(id).then(post => {
+      post.comments.push(comment);
+
+      post.save().then(updatedPost => {
+        resolve(updatedPost.comments);
+      })
+      .catch(err => {
+        reject(err);
+      });
     })
     .catch(err => {
       reject(err);
@@ -164,14 +188,58 @@ PostSchema.statics.getComments = function(id) {
 }
 
 /**
- * Add a comment to a post instance.
- * This should call the Comment create method, then add
- * that comment to its own document.
+ * TODO: Currently, updating a comment will update the post's 'updatedAt' timestamp as well,
+ * which is probably something we don't want. This is due to the fact that subdocuments
+ * can only be saved with their parent (in this case, Post)'s save() method.
  */
-PostSchema.statics.addComment = function(id, commentObj){
-/**
- * TODO: implement.
- */
+PostSchema.statics.updateComment = function(postId, commentId, commentData) {
+  postId = ObjectId(postId);
+  commentId = ObjectId(commentId);
+  
+  var comment = _.pick(commentData, ['author', 'content']);
+
+  return new Promise((resolve, reject) => {
+    if (comment.content && comment.content.length > config.commentCharacterLimit) {
+      reject(`Comment cannot be more than ${config.commentCharacterLimit} characters`);
+    }
+
+    this.get(postId).then(post => {
+      const oldComment = post.comments.id(commentId);
+      oldComment.set(comment);
+
+      post.save().then(updatedPost => {
+        resolve(updatedPost.comments.id(commentId));
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      reject(err);
+    });
+  });
+}
+
+PostSchema.statics.deleteComment = function(postId, commentId) {
+  postId = ObjectId(postId);
+  commentId = ObjectId(commentId);
+
+  return new Promise((resolve, reject) => {
+    this.get(postId).then(post => {
+      post.comments.id(commentId).remove();
+      post.save().then(() => {
+        resolve('Sucessfully deleted comment');
+      })
+      .catch(err => {
+        reject(err);
+      });
+    })
+    .catch(err => {
+      reject(err);
+    });
+  });
 }
 
 mongoose.model('Post', PostSchema);
