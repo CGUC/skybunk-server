@@ -1,51 +1,41 @@
 const mongoose = require('mongoose');
+const _ = require('lodash');
 const Schema = mongoose.Schema;
 
 require('./Posts');
 const Post = mongoose.model('Post');
+const { formatTags } = require('../helpers/formatters');
 
 const ChannelSchema = new Schema({
 	name: {
 		type: String,
-		required: true
+		required: true,
+		unique: true,
 	},
 	description: {
 		type: String,
 		required: true,
 	},
-	tags: {
-		type: Array,
+	tags: [{
+		type: String,
 		required: true,
-	},
-});
+	}],
+}, { timestamps: true });
 
 ChannelSchema.statics.create = function(channel) {
 	var channelName = channel.name.toLowerCase();
-	var formattedTags = [];
-	channel.tags.forEach((tag) => {
-    formattedTags.push(tag.toLowerCase());
-  });
+	var formattedTags = formatTags(channel.tags);
+
 	var channelData = {
-		...channel,
 		name: channelName,
+		description: channel.description,
 		tags: formattedTags,
 	}
 
 	return new Promise((resolve, reject) => {
-		// Check if channel by this name already exists
-		this.find({ name: channelName }).then(document => {
-			if (document && document.length) {
-				reject(`${channelName} channel already exists!`);
-			}
-			else {
-				const newChannel = new this(channelData);
-				newChannel.save().then(channel => {
-					resolve(channel);
-				})
-				.catch(err => {
-					reject(err);
-				});
-			}
+		const newChannel = new this(channelData);
+		newChannel.save().then(channel => {
+			resolve(channel);
 		})
 		.catch(err => {
 			reject(err);
@@ -57,19 +47,29 @@ ChannelSchema.statics.get = function(id) {
   if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
 
 	return new Promise((resolve, reject) => {
-		//this.find({ _id: channelId })
 		this.findById(id).then(channel => {
 			if (channel) {
 				resolve(channel);
 			}
 			else {
-				reject(`Couldn't find a channel with that ID`);
+				reject('Couldn\'t find a channel with that ID');
 			}
 		})
 		.catch(err => {
 			reject(err);
 		});
 	})
+}
+
+ChannelSchema.statics.getAll = function() {
+	return new Promise((resolve, reject) => {
+		this.find().then(channels => {
+			resolve(channels);
+		})
+		.catch(err => {
+			reject(err);
+		});
+	});
 }
 
 ChannelSchema.statics.getPosts = function(id) {
@@ -89,19 +89,33 @@ ChannelSchema.statics.getPosts = function(id) {
 	});
 }
 
-ChannelSchema.statics.updateChannel = function(id, updatedObj) {
+ChannelSchema.statics.updateChannel = function(id, updatedChannelObj) {
   if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
 
-	if (updatedObj.name) updatedObj.name = updatedObj.name.toLowerCase();
+	var name;
+	if (updatedChannelObj.name) name = updatedChannelObj.name.toLowerCase();
+
+	var formattedTags = formatTags(updatedChannelObj.tags);
 
 	return new Promise((resolve, reject) => {
-		this.update({ _id: id }, updatedObj).then(() => {
-			resolve();
-		})
-		.catch(err => {
-			reject(err);
-		});
-	});
+    this.findById(id).then(channel => {
+      if (channel) {
+				var channelData = _.extend({}, channel, updatedChannelObj.description);
+				channelData.name = name;
+				channelData.tags = formattedTags;
+				
+        channelData.save().then(updatedChannel => {
+          resolve(updatedChannel);
+        })
+        .catch(err => {
+          reject(err);
+        });
+      }
+      else {
+        reject('Couldn\t find a channel with that ID');
+      }
+    });
+  });
 }
 
 ChannelSchema.statics.delete = function(id) {
@@ -109,7 +123,7 @@ ChannelSchema.statics.delete = function(id) {
 
 	return new Promise((resolve, reject) => {
 		this.deleteOne({ _id: id }).then(() => {
-			resolve(`Successfully deleted channel`);
+			resolve('Successfully deleted channel');
 		})
 		.catch(err => {
 			reject(err);
