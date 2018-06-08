@@ -26,8 +26,8 @@ router.post('/', verifyToken, (req, res) => {
     res.json(channel);
   })
   .catch(err => {
-    var clf = classifyError(err);
-    res.status(clf.status).json(clf.message);
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
@@ -39,8 +39,8 @@ router.get('/:id', (req, res) => {
     res.json(channel);
   })
   .catch(err => {
-    var clf = classifyError(err);
-    res.status(clf.status).json(clf.message);
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
@@ -64,8 +64,8 @@ router.get('/:id/posts', (req, res) => {
     res.json(posts);
   })
   .catch(err => {
-    var clf = classifyError(err);
-    res.status(clf.status).json(clf.message);
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
@@ -77,8 +77,8 @@ router.put('/:id', verifyToken, (req, res) => {
     res.json(channel);
   })
   .catch(err => {
-    var clf = classifyError(err);
-    res.status(clf.status).json(clf.message);
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
@@ -90,8 +90,8 @@ router.delete('/:id', verifyToken, (req, res) => {
     res.json(msg);
   })
   .catch(err => {
-    var clf = classifyError(err);
-    res.status(clf.status).json(clf.message);
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
   });
 });
 
