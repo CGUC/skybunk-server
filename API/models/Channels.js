@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const _ = require('lodash');
+const ObjectId = mongoose.Types.ObjectId;
 const Schema = mongoose.Schema;
+const _ = require('lodash');
 
 require('./Posts');
 const Post = mongoose.model('Post');
@@ -44,7 +45,7 @@ ChannelSchema.statics.create = function(channel) {
 }
 
 ChannelSchema.statics.get = function(id) {
-  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
+  id = ObjectId(id);
 
 	return new Promise((resolve, reject) => {
 		this.findById(id).then(channel => {
@@ -90,11 +91,9 @@ ChannelSchema.statics.getPosts = function(id) {
 }
 
 ChannelSchema.statics.updateChannel = function(id, updatedChannelObj) {
-  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
+	id = ObjectId(id);
 
-	var name;
-	if (updatedChannelObj.name) name = updatedChannelObj.name.toLowerCase();
-
+	var name = updatedChannelObj.name.toLowerCase();
 	var formattedTags = formatTags(updatedChannelObj.tags);
 
 	return new Promise((resolve, reject) => {
@@ -119,8 +118,8 @@ ChannelSchema.statics.updateChannel = function(id, updatedChannelObj) {
 }
 
 ChannelSchema.statics.delete = function(id) {
-  if (typeof id === 'string') id = mongoose.Types.ObjectId(id);
-
+	id = ObjectId(id);
+	
 	return new Promise((resolve, reject) => {
 		this.deleteOne({ _id: id }).then(() => {
 			resolve('Successfully deleted channel');
