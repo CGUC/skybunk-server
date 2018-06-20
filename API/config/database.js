@@ -1,6 +1,6 @@
 if (process.env.NODE_ENV === 'production') {
 	module.exports = {
-		mongoURI: 'GET THIS ONCE WE PUSH TO PROD'
+		mongoURI: process.env.MONGO_URI
 	}
 }
 else {

@@ -46,9 +46,8 @@ const postController = require('./controllers/postController');
 app.use('/posts', postController);
 
 // Start the server on port 3000
-// This will have to be updated once we push to production to use the port
-// of whatever we're hosted on
-const port = 3000;
+// Use the port environment variable (needed for heroku) or 300 (dev)
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
 	console.log(`Server started on port ${port}`);
 });
