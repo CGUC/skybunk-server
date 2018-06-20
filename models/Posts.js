@@ -30,6 +30,10 @@ const PostSchema = new Schema({
 		type: String,
 		required: true,
   }],
+  likes: {
+    type: Number,
+    default: 0
+  },
   comments: [new Schema({
     author: {
       type: Schema.Types.ObjectId,
@@ -105,7 +109,7 @@ PostSchema.statics.updatePost = function(id, postData) {
 
     this.findById(id).then(post => {
       if (post) {
-        var updatedPost = _.extend({}, post, _.pick(postData, ['author', 'subscribedUsers', 'content', 'image']));
+        var updatedPost = _.extend({}, post, _.pick(postData, ['author', 'subscribedUsers', 'content', 'image', 'likes']));
         updatedPost.tags = formattedTags;
 
         updatedPost.save().then(post => {
