@@ -98,7 +98,7 @@ PostSchema.statics.getAll = function () {
   return new Promise((resolve, reject) => {
     this.find()
       .populate({
-        path:'author',
+        path: 'author',
         select: 'firstName lastName username profilePicture'
       })
       .populate({
@@ -158,9 +158,16 @@ PostSchema.statics.findByTags = function (tags) {
   return new Promise((resolve, reject) => {
     var formattedTags = formatTags(tags);
 
-    this.find({ tags: { $in: formattedTags } }).then(posts => {
-      resolve(posts);
-    })
+    this.find({ tags: { $in: formattedTags } })
+      .populate({
+        path: 'author',
+        select: 'firstName lastName username profilePicture',
+      }).populate({
+        path: 'comments.author',
+        select: 'firstName lastName username profilePicture'
+      }).then(posts => {
+        resolve(posts);
+      })
       .catch(err => {
         reject(err);
       });
