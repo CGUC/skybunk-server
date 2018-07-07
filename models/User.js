@@ -73,7 +73,6 @@ UserSchema.methods.update = function(updatedUserData) {
 		this.firstName = updatedUserData.firstName;
 		this.lastName = updatedUserData.lastName;
 		this.username = updatedUserData.username;
-		this.profilePicture = updatedUserData.profilePicture;
 		this.subscribedChannels = updatedUserData.subscribedChannels;
 
 		this.save().then(user => {
@@ -106,5 +105,17 @@ UserSchema.methods.changePassword = function(newPassword) {
 		});
 	});
 };
+
+UserSchema.methods.updateProfilePicture = function(newPictureBase64) {
+	return new Promise((resolve, reject) => {
+		this.profilePicture = newPictureBase64;
+		this.save().then(user => {
+			 resolve(user);
+		})
+		.catch(err => {
+			reject(err);
+		});
+	});
+}
 
 mongoose.model('User', UserSchema);

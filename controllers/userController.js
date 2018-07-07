@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const {jwtSecret} = require('../config/secrets');
 const {verifyToken} = require('../helpers/authorization');
+const multer  = require('multer')
+const upload = multer({ storage: multer.memoryStorage() })
 const router = express.Router();
 
 require('../models/User');
@@ -109,6 +111,23 @@ router.post('/login', (req, res) => {
 		});
 	}).catch(err => {
 		res.json({err: err});
+	});
+});
+
+// Update user profile picture
+router.put('/:id/profilePicture', upload.single('profilePicture'), verifyToken, (req, res) => {
+	if(req.params.id !== req.user._id) {
+		res.status(403);
+	}
+
+	User.findOne({_id: req.user._id}).then(user => {
+		user.updateProfilePicture(req.file.buffer).then(user => {
+			res.json(user.profilePicture);
+		}).catch(err => {
+			res.json(err);
+		});
+	}).catch(err => {
+		res.status(404).json(err);
 	});
 });
 
