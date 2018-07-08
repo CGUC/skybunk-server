@@ -123,14 +123,16 @@ router.put('/:id/profilePicture', upload.single('profilePicture'), verifyToken, 
 		res.status(403);
 	}
 
-	ProfilePicture.findOne({_id: req.user.profilePicture}).then(pic => {
-		pic.update(req.file.buffer).then(pic => {
+	User.findOne({_id: req.params.id})
+	.populate('profilePicture')
+	.then(user => {
+		user.profilePicture.update(req.file.buffer).then(pic => {
 			res.json(pic);
 		}).catch(err => {
 			res.json(err);
 		});
 	}).catch(err => {
-		res.status(404).json(err);
+		res.json(err);
 	});
 });
 
@@ -139,7 +141,6 @@ router.get('/:id/profilePicture', (req, res) => {
 	User.findOne({_id: req.params.id})
 	.populate('profilePicture')
 	.then(user => {
-		console.log(user);
 		res.json(user.profilePicture);
 	}).catch(err => {
 		res.json(err);
