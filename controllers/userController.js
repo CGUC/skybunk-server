@@ -34,6 +34,7 @@ router.get('/user/:id', (req, res) => {
 
 // Creates a user
 router.post('/', (req, res) => {
+	console.log(req.body)
 	GoldenTicket.verifyTicket(req.body.goldenTicket).then(ticket => {
 		if (ticket) {
 			User.create(req.body).then(user => {
@@ -118,7 +119,7 @@ router.post('/login', (req, res) => {
 });
 
 // Update user profile picture
-router.put('/:id/profilePicture', upload.single('profilePicture'), verifyToken, (req, res) => {
+router.put('/:id/profilePicture', verifyToken, upload.single('profilePicture'), (req, res) => {
 	if(req.params.id !== req.user._id) {
 		res.status(403);
 	}
@@ -127,7 +128,7 @@ router.put('/:id/profilePicture', upload.single('profilePicture'), verifyToken, 
 	.populate('profilePicture')
 	.then(user => {
 		user.profilePicture.update(req.file.buffer).then(pic => {
-			res.json(pic);
+			res.json(pic.buffer.toString('base64'));
 		}).catch(err => {
 			res.json(err);
 		});
@@ -141,7 +142,7 @@ router.get('/:id/profilePicture', (req, res) => {
 	User.findOne({_id: req.params.id})
 	.populate('profilePicture')
 	.then(user => {
-		res.json(user.profilePicture);
+		res.json(user.profilePicture.buffer.toString('base64'));
 	}).catch(err => {
 		res.json(err);
 	});
