@@ -13,6 +13,9 @@ const User = mongoose.model('User');
 require('../models/GoldenTicket');
 const GoldenTicket = mongoose.model('GoldenTicket');
 
+require('../models/ProfilePicture');
+const ProfilePicture = mongoose.model('ProfilePicture');
+
 // Return all users
 router.get('/', (req, res) => {
 	User.find().select('-password').then(users => {
@@ -29,7 +32,7 @@ router.get('/user/:id', (req, res) => {
 	});
 });
 
-// Creates a user -- Protect this route with `golden ticket`
+// Creates a user
 router.post('/', (req, res) => {
 	GoldenTicket.verifyTicket(req.body.goldenTicket).then(ticket => {
 		if (ticket) {
@@ -120,9 +123,9 @@ router.put('/:id/profilePicture', upload.single('profilePicture'), verifyToken, 
 		res.status(403);
 	}
 
-	User.findOne({_id: req.user._id}).then(user => {
-		user.updateProfilePicture(req.file.buffer).then(user => {
-			res.json(user.profilePicture);
+	ProfilePicture.findOne({_id: req.user.profilePicture}).then(pic => {
+		pic.update(req.file.buffer).then(pic => {
+			res.json(pic);
 		}).catch(err => {
 			res.json(err);
 		});

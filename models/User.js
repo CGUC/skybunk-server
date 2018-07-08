@@ -2,6 +2,9 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+require('./ProfilePicture');
+const ProfilePicture = mongoose.model('ProfilePicture');
+
 const UserSchema = new Schema({
 	firstName: {
 		type: String,
@@ -22,7 +25,9 @@ const UserSchema = new Schema({
 		dropDups: true
 	},
 	profilePicture: {
-		type: Buffer
+		type: Schema.Types.ObjectId,
+		ref: 'ProfilePicture',
+		required: true,
 	},
 	subscribedChannels: [{
 		type: Schema.Types.ObjectId,
@@ -33,11 +38,16 @@ const UserSchema = new Schema({
 // Create a new user
 UserSchema.statics.create = function(user) {
 	return new Promise((resolve, reject) => {
-		const newUser = new this(user);
-		// Encrypt the password and save
-		newUser.changePassword(newUser.password).then(saltedPassword => {
-			resolve(newUser);
-		}).catch(err => {
+		ProfilePicture.createDefault().then(pic => {
+			user.profilePicture = pic._id;
+			const newUser = new this(user);
+
+			// Encrypt the password and save
+			newUser.changePassword(newUser.password).then(saltedPassword => {
+				resolve(newUser);
+			});
+		})
+		.catch(err => {
 			reject(err);
 		})
 	});

@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 // Initialize express app
 const app = express();
@@ -26,6 +27,7 @@ mongoose.connect(db.mongoURI)
 // for them to work
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Direct the appropriate urls to the respective controller (you may see this referred
 // to as routes & routers elsewhere)

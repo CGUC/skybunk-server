@@ -63,9 +63,9 @@ PostSchema.statics.create = function (postData) {
     newPost.save().then(post => {
       resolve(post);
     })
-      .catch(err => {
-        reject(err);
-      });
+    .catch(err => {
+      reject(err);
+    });
   });
 }
 
