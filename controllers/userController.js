@@ -137,7 +137,6 @@ router.put('/:id/profilePicture', upload.single('profilePicture'), verifyToken, 
 // Get the user profile picture
 router.get('/:id/profilePicture', upload.single('profilePicture'), verifyToken, (req, res) => {
 	User.findOne({_id: req.params.id})
-	.select('-password')
 	.populate('profilePicture')
 	.then(user => {
 		res.json(user.profilePicture);
