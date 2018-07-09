@@ -34,7 +34,6 @@ router.get('/user/:id', (req, res) => {
 
 // Creates a user
 router.post('/', (req, res) => {
-	console.log(req.body)
 	GoldenTicket.verifyTicket(req.body.goldenTicket).then(ticket => {
 		if (ticket) {
 			User.create(req.body).then(user => {
@@ -104,7 +103,11 @@ router.post('/:id/password', verifyToken, (req, res) => {
 
 // Get the logged in user
 router.get('/loggedInUser', verifyToken, (req, res) => {
-	res.json(req.user);
+	User.findOne({_id: req.user._id}).select('-password').then(user => {
+		res.json(user);
+	}).catch(err => {
+		res.json(err);
+	});
 })
 
 // Login a user
