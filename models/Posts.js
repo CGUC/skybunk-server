@@ -76,10 +76,10 @@ PostSchema.statics.get = function (id) {
     this.findById(id)
       .populate({
         path: 'author',
-        select: 'firstName lastName username profilePicture',
+        select: 'firstName lastName username profilePicture _id',
       }).populate({
         path: 'comments.author',
-        select: 'firstName lastName username profilePicture'
+        select: 'firstName lastName username profilePicture _id'
       }).then(post => {
         if (post) {
           resolve(post);
@@ -99,11 +99,11 @@ PostSchema.statics.getAll = function () {
     this.find()
       .populate({
         path: 'author',
-        select: 'firstName lastName username profilePicture'
+        select: 'firstName lastName username profilePicture _id'
       })
       .populate({
         path: 'comments.author',
-        select: 'firstName lastName username profilePicture'
+        select: 'firstName lastName username profilePicture _id'
       }).then(posts => {
         resolve(posts);
       })
@@ -161,10 +161,10 @@ PostSchema.statics.findByTags = function (tags) {
     this.find({ tags: { $in: formattedTags } })
       .populate({
         path: 'author',
-        select: 'firstName lastName username profilePicture',
+        select: 'firstName lastName username profilePicture _id',
       }).populate({
         path: 'comments.author',
-        select: 'firstName lastName username profilePicture'
+        select: 'firstName lastName username profilePicture _id'
       }).then(posts => {
         resolve(posts);
       })
