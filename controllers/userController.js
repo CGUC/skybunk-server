@@ -151,4 +151,21 @@ router.get('/:id/profilePicture', (req, res) => {
 	});
 });
 
+/**
+* Get all posts subbed by requesting user
+*/
+router.get('/:id/subscribedChannels/posts', (req, res) => {
+  User.findOne({_id: req.params.id})
+  .select('-password')
+  .then(user => {
+  	user.getPostsFromSubs().then(posts => {
+  		res.json(posts);
+  	}).catch(err => {
+  		res.json(err);
+  	});
+  }).catch(err => {
+    res.json(err);
+  });
+});
+
 module.exports = router;
