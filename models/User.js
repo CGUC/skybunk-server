@@ -4,6 +4,8 @@ const Schema = mongoose.Schema;
 
 require('./ProfilePicture');
 const ProfilePicture = mongoose.model('ProfilePicture');
+require('../models/Channels');
+const Channel = mongoose.model('Channel');
 
 const UserSchema = new Schema({
 	firstName: {
@@ -123,6 +125,21 @@ UserSchema.methods.updateProfilePicture = function(newPictureBase64) {
 			 resolve(user);
 		})
 		.catch(err => {
+			reject(err);
+		});
+	});
+}
+
+UserSchema.methods.getPostsFromSubs = function() {
+	return new Promise((resolve, reject) => {
+		const postsPromises = this.subscribedChannels.map(channel => {
+			console.log(channel)
+			return Channel.getPosts(channel);
+		});
+
+		Promise.all(postsPromises).then(posts => {
+			resolve([].concat.apply([], posts));
+		}).catch(err => {
 			reject(err);
 		});
 	});
