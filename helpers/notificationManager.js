@@ -1,7 +1,8 @@
 const Expo = require('expo-server-sdk');
 let expo = new Expo();
 
-export function sendNotifications(messages) {
+module.exports = { 
+  sendNotifications: function(messages) {
 	  let chunks = expo.chunkPushNotifications(messages);
 	  let tickets = [];
 
@@ -44,4 +45,5 @@ export function sendNotifications(messages) {
   	    }
   	  }
   	})();
+  }
 }
