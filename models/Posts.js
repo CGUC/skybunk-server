@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
+const NotificationManager = require('../helpers/notificationManager');
 const _ = require('lodash');
 
 const { formatTags } = require('../helpers/formatters');
@@ -47,6 +48,9 @@ const PostSchema = new Schema({
   }, { timestamps: true })],
 }, { timestamps: true });
 
+require('./Channels');
+const Channel = mongoose.model('Channel');
+
 PostSchema.statics.create = function (postData) {
   var formattedTags = formatTags(postData.tags);
 
@@ -61,6 +65,13 @@ PostSchema.statics.create = function (postData) {
 
     const newPost = new this(post);
     newPost.save().then(post => {
+      // Dispatch notifications
+      Channel.findByTags(post.tags).then(channels => {
+        channels.map(channel => {
+          channel.notifyUsersOfPost(post);
+        });
+      }).catch(err => console.log(err));
+
       resolve(post);
     })
     .catch(err => {
@@ -80,7 +91,8 @@ PostSchema.statics.get = function (id) {
       }).populate({
         path: 'comments.author',
         select: 'firstName lastName username profilePicture _id'
-      }).then(post => {
+      }).populate('subscribedUsers')
+      .then(post => {
         if (post) {
           resolve(post);
         }
@@ -201,6 +213,20 @@ PostSchema.statics.addComment = function (id, commentData) {
       post.comments.push(comment);
 
       post.save().then(updatedPost => {
+        let messages = [];
+        post.subscribedUsers.map(user => {
+          user.notificationTokens.map(pushToken => {
+            messages.push({
+              to: pushToken,
+              sound: 'default',
+              body: `${user.firstName} ${user.lastName} commented on a post you're following:\n${comment.content}`,
+              data: { post: post, comment: comment },
+            })
+          });
+        })
+
+        NotificationManager.sendNotifications(messages);
+
         resolve(updatedPost.comments);
       })
         .catch(err => {
