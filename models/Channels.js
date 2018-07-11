@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const Schema = mongoose.Schema;
 const _ = require('lodash');
-
+const NotificationManager = require('../helpers/notificationManager');
 require('./Posts');
 const Post = mongoose.model('Post');
+require('./Users');
+const User = mongoose.model('User');
 const { formatTags } = require('../helpers/formatters');
 
 const ChannelSchema = new Schema({
@@ -42,6 +44,20 @@ ChannelSchema.statics.create = function(channel) {
 			reject(err);
 		});
 	});
+}
+
+ChannelSchema.statics.findByTags = function(tags) {
+	return new Promise((resolve, reject) => {
+    var formattedTags = formatTags(tags);
+
+    this.find({ tags: { $in: formattedTags } })
+      .then(channels => {
+        resolve(channels);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
 }
 
 ChannelSchema.statics.get = function(id) {
@@ -128,6 +144,27 @@ ChannelSchema.statics.delete = function(id) {
 			reject(err);
 		});
 	});
+}
+
+ChannelSchema.methods.notifyUsersOfPost = function(post) {
+	User.find({subscribedChannels: this._id })
+  .select('-password')
+  .then(users => {
+    let messages = [];
+    users.map(user => {
+      user.notificationTokens.map(pushToken => {
+        messages.push({
+          to: pushToken,
+          sound: 'default',
+          body: `${user.firstName} ${user.lastName} posted in ${this.name}:\n${post.content}`,
+          data: { channel: this, post: post, user: user },
+        })
+      })
+    });
+
+    NotificationManager.sendNotifications(messages);
+  })
+  .catch(err => console.log(err));
 }
 
 mongoose.model('Channel', ChannelSchema);

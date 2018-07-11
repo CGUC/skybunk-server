@@ -168,4 +168,21 @@ router.get('/:id/subscribedChannels/posts', (req, res) => {
   });
 });
 
+router.post('/:id/notificationToken', verifyToken, (req, res) => {
+	if(req.params.id !== req.user._id) {
+		res.status(403);
+	}
+
+	User.findOne({_id: req.params.id})
+	.then(user => {
+		user.registerNotificationToken(req.notificationToken).then(token => {
+			res.json(token);
+		}).catch(err => {
+			res.json(err);
+		});
+	}).catch(err => {
+		res.json(err);
+	});
+});
+
 module.exports = router;

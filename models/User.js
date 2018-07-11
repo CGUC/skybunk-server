@@ -34,6 +34,9 @@ const UserSchema = new Schema({
 	subscribedChannels: [{
 		type: Schema.Types.ObjectId,
 		ref: 'Channel'
+	}],
+	notificationTokens: [{
+		type: String,
 	}]
 });
 
@@ -133,7 +136,6 @@ UserSchema.methods.updateProfilePicture = function(newPictureBase64) {
 UserSchema.methods.getPostsFromSubs = function() {
 	return new Promise((resolve, reject) => {
 		const postsPromises = this.subscribedChannels.map(channel => {
-			console.log(channel)
 			return Channel.getPosts(channel);
 		});
 
@@ -143,6 +145,21 @@ UserSchema.methods.getPostsFromSubs = function() {
 			reject(err);
 		});
 	});
+}
+
+UserSchema.methods.registerNotificationToken = function(token) {
+	return new Promise((resolve, reject) => {
+		if (!token) reject({message: 'Password is incorrect'});
+		if (this.notificationTokens.includes(token)) resolve(token);
+
+		this.notificationTokens.push(token);
+		this.save().then(user => {
+			resolve(token);
+		})
+		.catch(err => {
+			reject(err);
+		})
+	})
 }
 
 mongoose.model('User', UserSchema);
