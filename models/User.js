@@ -89,6 +89,7 @@ UserSchema.methods.update = function(updatedUserData) {
 		this.lastName = updatedUserData.lastName;
 		this.username = updatedUserData.username;
 		this.subscribedChannels = updatedUserData.subscribedChannels;
+		this.notificationTokens = updatedUserData.notificationTokens;
 
 		this.save().then(user => {
 			 resolve(user);
@@ -149,16 +150,21 @@ UserSchema.methods.getPostsFromSubs = function() {
 
 UserSchema.methods.registerNotificationToken = function(token) {
 	return new Promise((resolve, reject) => {
-		if (!token) reject({message: 'Invalid token provided'});
-		if (this.notificationTokens.includes(token)) resolve(token);
-
-		this.notificationTokens.push(token);
-		this.save().then(user => {
-			resolve(token);
-		})
-		.catch(err => {
-			reject(err);
-		})
+		if (!token) {
+			reject({message: 'Invalid token provided'});
+		}
+		else if (this.notificationTokens.includes(token)) {
+			reject({message: 'token already exists!'});
+		}
+		else {
+			this.notificationTokens.push(token);
+			this.save().then(user => {
+				resolve(token);
+			})
+			.catch(err => {
+				reject(err);
+			});
+		}
 	})
 }
 
