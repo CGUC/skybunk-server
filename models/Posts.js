@@ -222,7 +222,7 @@ PostSchema.statics.addComment = function (id, commentData, author) {
         let messages = [];
         post.subscribedUsers.map(user => {
           user.notificationTokens.map(pushToken => {
-            if (user._id !== comment.author) {
+            if (user._id.toString !== comment.author.toString()) {
               messages.push({
                 to: pushToken,
                 sound: 'default',

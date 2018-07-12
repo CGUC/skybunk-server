@@ -155,7 +155,7 @@ ChannelSchema.methods.notifyUsersOfPost = function(post, author) {
     let messages = [];
     users.map(user => {
       user.notificationTokens.map(pushToken => {
-      	if (user._id !== post.author) {
+      	if (user._id.toString() !== post.author.toString()) {
 	        messages.push({
 	          to: pushToken,
 	          sound: 'default',
