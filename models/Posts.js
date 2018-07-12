@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
 const NotificationManager = require('../helpers/notificationManager');
 const _ = require('lodash');
-
 const { formatTags } = require('../helpers/formatters');
 const config = require('../config/options');
 
@@ -48,9 +47,6 @@ const PostSchema = new Schema({
   }, { timestamps: true })],
 }, { timestamps: true });
 
-require('./Channels');
-const Channel = mongoose.model('Channel');
-
 PostSchema.statics.create = function (postData) {
   var formattedTags = formatTags(postData.tags);
 
@@ -66,6 +62,8 @@ PostSchema.statics.create = function (postData) {
     const newPost = new this(post);
     newPost.save().then(post => {
       // Dispatch notifications
+      require('./Channels');
+      const Channel = mongoose.model('Channel');
       Channel.findByTags(post.tags).then(channels => {
         channels.map(channel => {
           channel.notifyUsersOfPost(post);

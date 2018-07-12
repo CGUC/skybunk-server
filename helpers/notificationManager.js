@@ -1,19 +1,19 @@
 const Expo = require('expo-server-sdk');
 let expo = new Expo();
 
-module.exports = { 
-  sendNotifications: function(messages) {
+module.exports = {
+  sendNotification: async function(messages) {
 	  let chunks = expo.chunkPushNotifications(messages);
 	  let tickets = [];
 
-    chunks.map(chunk => {
+    for(const chunk of chunks) {
 	    try {
 	      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
 	      tickets.push(...ticketChunk);
 	    } catch (error) {
 	      console.error(error);
 	    }
-  	});
+  	}
 
   	let receiptIds = tickets.map(ticket => ticket.id);
   	let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);

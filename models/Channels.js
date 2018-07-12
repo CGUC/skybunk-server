@@ -3,10 +3,10 @@ const ObjectId = mongoose.Types.ObjectId;
 const Schema = mongoose.Schema;
 const _ = require('lodash');
 const NotificationManager = require('../helpers/notificationManager');
+
 require('./Posts');
 const Post = mongoose.model('Post');
-require('./Users');
-const User = mongoose.model('User');
+
 const { formatTags } = require('../helpers/formatters');
 
 const ChannelSchema = new Schema({
@@ -147,6 +147,8 @@ ChannelSchema.statics.delete = function(id) {
 }
 
 ChannelSchema.methods.notifyUsersOfPost = function(post) {
+	require('./User');
+	const User = mongoose.model('User');
 	User.find({subscribedChannels: this._id })
   .select('-password')
   .then(users => {
