@@ -2,7 +2,7 @@ const Expo = require('expo-server-sdk');
 let expo = new Expo();
 
 module.exports = {
-  sendNotification: async function(messages) {
+  sendNotifications: async function(messages) {
 	  let chunks = expo.chunkPushNotifications(messages);
 	  let tickets = [];
 
