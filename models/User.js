@@ -149,7 +149,7 @@ UserSchema.methods.getPostsFromSubs = function() {
 
 UserSchema.methods.registerNotificationToken = function(token) {
 	return new Promise((resolve, reject) => {
-		if (!token) reject({message: 'Password is incorrect'});
+		if (!token) reject({message: 'Invalid token provided'});
 		if (this.notificationTokens.includes(token)) resolve(token);
 
 		this.notificationTokens.push(token);

@@ -175,7 +175,7 @@ router.post('/:id/notificationToken', verifyToken, (req, res) => {
 
 	User.findOne({_id: req.params.id})
 	.then(user => {
-		user.registerNotificationToken(req.notificationToken).then(token => {
+		user.registerNotificationToken(req.body.notificationToken).then(token => {
 			res.json(token);
 		}).catch(err => {
 			res.json(err);
