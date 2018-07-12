@@ -146,7 +146,7 @@ ChannelSchema.statics.delete = function(id) {
 	});
 }
 
-ChannelSchema.methods.notifyUsersOfPost = function(post) {
+ChannelSchema.methods.notifyUsersOfPost = function(post, author) {
 	require('./User');
 	const User = mongoose.model('User');
 	User.find({subscribedChannels: this._id })
@@ -155,12 +155,15 @@ ChannelSchema.methods.notifyUsersOfPost = function(post) {
     let messages = [];
     users.map(user => {
       user.notificationTokens.map(pushToken => {
-        messages.push({
-          to: pushToken,
-          sound: 'default',
-          body: `${user.firstName} ${user.lastName} posted in ${this.name}:\n${post.content}`,
-          data: { channel: this, post: post, user: user },
-        })
+      	if (user._id !== author._id) {
+	        messages.push({
+	          to: pushToken,
+	          sound: 'default',
+	          title: `${author.firstName} ${author.lastName} posted in ${this.name}`,
+	          body: `${post.content}`,
+	          data: { channel: this, post: post, user: user },
+	        })
+	    }
       })
     });
 

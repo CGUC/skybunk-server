@@ -52,7 +52,7 @@ const PostSchema = new Schema({
   }, { timestamps: true })],
 }, { timestamps: true });
 
-PostSchema.statics.create = function (postData) {
+PostSchema.statics.create = function (postData, author) {
   var formattedTags = formatTags(postData.tags);
 
   var post = _.pick(postData, ['author', 'content', 'image']);
@@ -66,12 +66,13 @@ PostSchema.statics.create = function (postData) {
 
     const newPost = new this(post);
     newPost.save().then(post => {
+
       // Dispatch notifications
       require('./Channels');
       const Channel = mongoose.model('Channel');
       Channel.findByTags(post.tags).then(channels => {
         channels.map(channel => {
-          channel.notifyUsersOfPost(post);
+          channel.notifyUsersOfPost(post, author);
         });
       }).catch(err => console.log(err));
 
@@ -202,7 +203,7 @@ PostSchema.statics.getComments = function (id) {
   });
 }
 
-PostSchema.statics.addComment = function (id, commentData) {
+PostSchema.statics.addComment = function (id, commentData, author) {
   id = ObjectId(id);
 
   var comment = _.pick(commentData, ['author', 'content']);
@@ -214,17 +215,22 @@ PostSchema.statics.addComment = function (id, commentData) {
 
     this.get(id).then(post => {
       post.comments.push(comment);
+      if (!post.subscribedUsers.includes(comment.author))
+        post.subscribedUsers.push(comment.author);
 
       post.save().then(updatedPost => {
         let messages = [];
         post.subscribedUsers.map(user => {
           user.notificationTokens.map(pushToken => {
-            messages.push({
-              to: pushToken,
-              sound: 'default',
-              body: `${user.firstName} ${user.lastName} commented on a post you're following:\n${comment.content}`,
-              data: { post: post, comment: comment },
-            })
+            if (user._id !== comment.author) {
+              messages.push({
+                to: pushToken,
+                sound: 'default',
+                title: `${author.firstName} ${author.lastName} commented on a post you're following`,
+                body: `${comment.content}`,
+                data: { post: post, comment: comment },
+              })
+            }
           });
         })
 

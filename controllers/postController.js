@@ -24,7 +24,7 @@ const { classifyError } = require('../helpers/formatters');
  * Create new post
  */
 router.post('/', verifyToken, (req, res) => {
-  Post.create(req.body).then(post => {
+  Post.create(req.body, req.user).then(post => {
     res.json(post);
   })
   .catch(err => {
