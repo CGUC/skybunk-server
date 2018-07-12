@@ -103,7 +103,7 @@ router.get('/:id/comments', (req, res) => {
  * @returns all comments for post
  */
 router.post('/:id/comment', verifyToken, (req, res) => {
-  Post.addComment(req.params.id, req.body).then(comment => {
+  Post.addComment(req.params.id, req.body, req.user).then(comment => {
     res.json(comment);
   })
   .catch(err => {

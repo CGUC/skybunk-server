@@ -155,7 +155,7 @@ ChannelSchema.methods.notifyUsersOfPost = function(post, author) {
     let messages = [];
     users.map(user => {
       user.notificationTokens.map(pushToken => {
-      	if (user._id !== author._id) {
+      	if (user._id !== post.author) {
 	        messages.push({
 	          to: pushToken,
 	          sound: 'default',
@@ -163,7 +163,7 @@ ChannelSchema.methods.notifyUsersOfPost = function(post, author) {
 	          body: `${post.content}`,
 	          data: { channel: this, post: post, user: user },
 	        })
-	    }
+	    	}
       })
     });
 
