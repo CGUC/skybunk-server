@@ -131,7 +131,6 @@ PostSchema.statics.getAll = function () {
 
 PostSchema.statics.updatePost = function (id, postData) {
   id = ObjectId(id);
-  var formattedTags = formatTags(postData.tags);
 
   return new Promise((resolve, reject) => {
     if (postData.content && postData.content.length > config.postCharacterLimit) {
@@ -140,8 +139,8 @@ PostSchema.statics.updatePost = function (id, postData) {
 
     this.findById(id).then(post => {
       if (post) {
-        var updatedPost = _.extend({}, post, _.pick(postData, ['author', 'subscribedUsers', 'content', 'image', 'likes', 'usersLiked']));
-        updatedPost.tags = formattedTags;
+        var updatedPost = _.extend(post, _.pick(postData, ['author', 'subscribedUsers', 'content', 'image', 'likes', 'usersLiked']));
+        if (postData.tags) updatedPost.tags = formatTags(postData.tags);
 
         updatedPost.save().then(post => {
           resolve(post);
