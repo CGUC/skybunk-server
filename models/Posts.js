@@ -215,8 +215,11 @@ PostSchema.statics.addComment = function (id, commentData, author) {
 
     this.get(id).then(post => {
       post.comments.push(comment);
-      if (!post.subscribedUsers.includes(comment.author))
+
+      const userAlreadySubscribed = post.subscribedUsers.some((user) => user._id.toString() === comment.author.toString());
+      if (!userAlreadySubscribed) {
         post.subscribedUsers.push(comment.author);
+      }
 
       post.save().then(updatedPost => {
         let messages = [];
