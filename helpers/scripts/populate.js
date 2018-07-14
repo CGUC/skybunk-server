@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-require('../models/Example');
+require('../../models/Example');
 const Examplemodel = mongoose.model('Example');
 
 exampleDocuments = [
