@@ -19,7 +19,7 @@ exports.classifyError = (err) => {
 }
 
 /**
- * Ensure tags stored in database are an array of lower-case strings
+ * Ensure tags stored in database are an array of strings
  * @param {iterable} tagsObj
  * @return {array}
  */
@@ -27,10 +27,10 @@ exports.formatTags = (tags) => {
   var formattedTags = [];
   if (typeof tags === 'object') {
     tags.forEach((tag) => {
-      formattedTags.push(tag.toLowerCase());
+      formattedTags.push(tag);
     });
   } else if (typeof tags === 'string') {
-    formattedTags.push(tags.toLowerCase());
+    formattedTags.push(tags);
   } else if (typeof tags === 'number') {
     formattedTags.push(`${tags}`);
   } else return null;
