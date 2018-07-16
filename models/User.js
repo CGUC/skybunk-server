@@ -134,14 +134,18 @@ UserSchema.methods.updateProfilePicture = function(newPictureBase64) {
 	});
 }
 
-UserSchema.methods.getPostsFromSubs = function() {
-	return new Promise((resolve, reject) => {
-		const postsPromises = this.subscribedChannels.map(channel => {
-			return Channel.getPosts(channel);
-		});
+UserSchema.methods.getPostsFromSubs = function(page) {
+	require('../models/Posts');
+	const Post = mongoose.model('Post');
 
-		Promise.all(postsPromises).then(posts => {
-			resolve([].concat.apply([], posts));
+	return new Promise((resolve, reject) => {
+		const tags = this.subscribedChannels.map(channel => {
+			return channel.tags;
+		});
+		const flattenedTags = [].concat.apply([], tags);
+
+		Post.findByTags(flattenedTags, page).then(posts => {
+			resolve(posts);
 		}).catch(err => {
 			reject(err);
 		});
