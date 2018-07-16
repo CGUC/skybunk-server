@@ -6,6 +6,8 @@ const _ = require('lodash');
 const { formatTags } = require('../helpers/formatters');
 const config = require('../config/options');
 
+const LIMIT = 15;
+
 // Schema.Types vs mongoose.Types: https://github.com/Automattic/mongoose/issues/1671
 // Subdocs: http://mongoosejs.com/docs/subdocs.html
 const PostSchema = new Schema({
@@ -110,9 +112,15 @@ PostSchema.statics.get = function (id) {
   });
 }
 
-PostSchema.statics.getAll = function () {
+PostSchema.statics.getAllPaginated = function (page) {
+  if (!page)
+    page = 1;
+
   return new Promise((resolve, reject) => {
     this.find()
+      .sort('-createdAt')
+      .skip(LIMIT*(page-1))
+      .limit(LIMIT)
       .populate({
         path: 'author',
         select: 'firstName lastName username profilePicture _id'
@@ -169,11 +177,17 @@ PostSchema.statics.delete = function (id) {
   });
 }
 
-PostSchema.statics.findByTags = function (tags) {
+PostSchema.statics.findByTags = function (tags, page) {
+  if (!page)
+    page = 1;
+
   return new Promise((resolve, reject) => {
     var formattedTags = formatTags(tags);
 
     this.find({ tags: { $in: formattedTags } })
+      .sort('-createdAt')
+      .skip(LIMIT*(page-1))
+      .limit(LIMIT)
       .populate({
         path: 'author',
         select: 'firstName lastName username profilePicture _id',

@@ -89,10 +89,10 @@ ChannelSchema.statics.getAll = function() {
 	});
 }
 
-ChannelSchema.statics.getPosts = function(id) {
+ChannelSchema.statics.getPosts = function(id, page) {
 	return new Promise((resolve, reject) => {
 		this.get(id).then(channel => {
-			Post.findByTags(channel.tags).then(posts => {
+			Post.findByTags(channel.tags, page).then(posts => {
 				if (!posts) posts = [];
 				resolve(posts);
 			})

@@ -60,7 +60,7 @@ router.get('/', (req, res) => {
  * Get posts from a specific channel
  */
 router.get('/:id/posts', (req, res) => {
-  Channel.getPosts(req.params.id).then(posts => {
+  Channel.getPosts(req.params.id, req.get('page')).then(posts => {
     res.json(posts);
   })
   .catch(err => {

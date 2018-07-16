@@ -50,7 +50,7 @@ router.get('/:id', (req, res) => {
  * Get all posts
  */
 router.get('/', (req, res) => {
-  Post.getAll().then(posts => {
+  Post.getAllPaginated(req.get('page')).then(posts => {
     res.json(posts);
   })
   .catch(err => {

@@ -18,14 +18,14 @@ const ProfilePicture = mongoose.model('ProfilePicture');
 
 // Return all users
 router.get('/', (req, res) => {
-	User.find().select('-password').then(users => {
+	User.find().select('-password -notificationTokens').then(users => {
 		res.json(users);
 	});
 });
 
 // Get specific user
 router.get('/user/:id', (req, res) => {
-	User.findOne({_id: req.params.id}).select('-password').then(user => {
+	User.findOne({_id: req.params.id}).select('-password -notificationTokens').then(user => {
 		res.json(user);
 	}).catch(err => {
 		res.json(err);
@@ -103,7 +103,7 @@ router.post('/:id/password', verifyToken, (req, res) => {
 
 // Get the logged in user
 router.get('/loggedInUser', verifyToken, (req, res) => {
-	User.findOne({_id: req.user._id}).select('-password').then(user => {
+	User.findOne({_id: req.user._id}).select('-password -notificationTokens').then(user => {
 		res.json(user);
 	}).catch(err => {
 		res.json(err);
@@ -157,8 +157,9 @@ router.get('/:id/profilePicture', (req, res) => {
 router.get('/:id/subscribedChannels/posts', (req, res) => {
   User.findOne({_id: req.params.id})
   .select('-password')
+  .populate('subscribedChannels')
   .then(user => {
-  	user.getPostsFromSubs().then(posts => {
+  	user.getPostsFromSubs(req.get('page')).then(posts => {
   		res.json(posts);
   	}).catch(err => {
   		res.json(err);
