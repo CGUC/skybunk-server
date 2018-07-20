@@ -29,7 +29,6 @@ const UserSchema = new Schema({
 	profilePicture: {
 		type: Schema.Types.ObjectId,
 		ref: 'ProfilePicture',
-		required: true,
 	},
 	subscribedChannels: [{
 		type: Schema.Types.ObjectId,
@@ -170,6 +169,18 @@ UserSchema.methods.registerNotificationToken = function(token) {
 			});
 		}
 	})
+}
+
+UserSchema.methods.getProfilePicture = function() {
+	const fs = require('fs');
+	const path = require('path');
+
+	if (this.profilePicture)
+		return this.profilePicture.buffer.toString('base64')
+	else {
+		const imgPath = path.join(__dirname, '..', 'public', 'img', 'default-user.png');
+		return fs.readFileSync(imgPath, 'base64');
+	}
 }
 
 mongoose.model('User', UserSchema);

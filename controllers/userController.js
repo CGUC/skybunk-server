@@ -145,7 +145,7 @@ router.get('/:id/profilePicture', (req, res) => {
 	User.findOne({_id: req.params.id})
 	.populate('profilePicture')
 	.then(user => {
-		res.json(user.profilePicture.buffer.toString('base64'));
+		res.json(user.getProfilePicture());
 	}).catch(err => {
 		res.json(err);
 	});

@@ -1,16 +1,10 @@
-const fs = require('fs');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const path = require('path');
-
-const imgPath = path.join(__dirname, '..', 'public', 'img', 'default-user.png');
-const imageAsBase64 = fs.readFileSync(imgPath, 'base64');
 
 const ProfilePictureSchema = new Schema({
 	buffer: {
 		type: Buffer,
 		required: true,
-		default: imageAsBase64,
 	},
 });
 
