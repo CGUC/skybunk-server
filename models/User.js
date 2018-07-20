@@ -42,18 +42,15 @@ const UserSchema = new Schema({
 // Create a new user
 UserSchema.statics.create = function(user) {
 	return new Promise((resolve, reject) => {
-		ProfilePicture.createDefault().then(pic => {
-			user.profilePicture = pic._id;
-			const newUser = new this(user);
+		const newUser = new this(user);
 
-			// Encrypt the password and save
-			newUser.changePassword(newUser.password).then(saltedPassword => {
-				resolve(newUser);
-			});
+		// Encrypt the password and save
+		newUser.changePassword(newUser.password).then(saltedPassword => {
+			resolve(newUser);
 		})
 		.catch(err => {
 			reject(err);
-		})
+		});
 	});
  };
 

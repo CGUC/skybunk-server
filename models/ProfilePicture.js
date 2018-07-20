@@ -8,19 +8,7 @@ const ProfilePictureSchema = new Schema({
 	},
 });
 
-ProfilePictureSchema.statics.createDefault = function() {
-	return new Promise((resolve, reject) => {
-		const newPic = new this({});
-	    newPic.save().then(pic => {
-	      resolve(pic);
-	    })
-	    .catch(err => {
-	      reject(err);
-	    });
-	});
- };
-
- ProfilePictureSchema.methods.update = function(newBuffer) {
+ProfilePictureSchema.methods.update = function(newBuffer) {
 	return new Promise((resolve, reject) => {
 		this.buffer = newBuffer;
 	    this.save().then(pic => {
@@ -30,7 +18,7 @@ ProfilePictureSchema.statics.createDefault = function() {
 	      reject(err);
 	    });
 	});
- };
+};
 
 
 
