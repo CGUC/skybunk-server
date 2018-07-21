@@ -59,6 +59,18 @@ router.get('/', (req, res) => {
 });
 
 /**
+ * Get all posts from a specific user
+ */
+router.get('/user/:id', (req, res) => {
+  Post.getUserPosts(req.params.id, req.get('page')).then(posts => {
+    res.json(posts);
+  }).catch(err => {
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
+  })
+})
+
+/**
  * Update a post
  */
 router.put('/:id', verifyToken, (req, res) => {
