@@ -118,15 +118,21 @@ UserSchema.methods.changePassword = function(newPassword) {
 	});
 };
 
-UserSchema.methods.updateProfilePicture = function(newPictureBase64) {
+UserSchema.methods.updateProfilePicture = function(newBuffer) {
 	return new Promise((resolve, reject) => {
-		this.profilePicture = newPictureBase64;
-		this.save().then(user => {
-			 resolve(user);
-		})
-		.catch(err => {
-			reject(err);
-		});
+		if (this.profilePicture) {
+			this.profilePicture.update(newBuffer).then(pic => {
+				resolve(pic);
+			})
+			.catch(err => reject(err));
+		}
+		else {
+			this.profilePicture = new ProfilePicture({ buffer: newBuffer });
+			this.save().then(user => {
+				resolve(user.profilePicture);
+			})
+			.catch(err => reject(err));
+		}
 	});
 }
 

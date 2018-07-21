@@ -130,7 +130,7 @@ router.put('/:id/profilePicture', verifyToken, upload.single('profilePicture'), 
 	User.findOne({_id: req.params.id})
 	.populate('profilePicture')
 	.then(user => {
-		user.profilePicture.update(req.file.buffer).then(pic => {
+		user.updateProfilePicture(req.file.buffer).then(pic => {
 			res.json(pic.buffer.toString('base64'));
 		}).catch(err => {
 			res.json(err);
