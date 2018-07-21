@@ -80,9 +80,9 @@ PostSchema.statics.create = function (postData, author) {
 
       resolve(post);
     })
-    .catch(err => {
-      reject(err);
-    });
+      .catch(err => {
+        reject(err);
+      });
   });
 }
 
@@ -119,13 +119,35 @@ PostSchema.statics.getAllPaginated = function (page) {
   return new Promise((resolve, reject) => {
     this.find()
       .sort('-createdAt')
-      .skip(LIMIT*(page-1))
+      .skip(LIMIT * (page - 1))
       .limit(LIMIT)
       .populate({
         path: 'author',
         select: 'firstName lastName username profilePicture _id'
       })
       .populate({
+        path: 'comments.author',
+        select: 'firstName lastName username profilePicture _id'
+      }).then(posts => {
+        resolve(posts);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+
+PostSchema.statics.getUserPosts = function (userId, page) {
+  if (!page) page = 1;
+  return new Promise((resolve, reject) => {
+    this.find({ author: ObjectId(userId) })
+      .sort('-createdAt')
+      .skip(LIMIT * (page - 1))
+      .limit(LIMIT)
+      .populate({
+        path: 'author',
+        select: 'firstName lastName username profilePicture _id',
+      }).populate({
         path: 'comments.author',
         select: 'firstName lastName username profilePicture _id'
       }).then(posts => {
@@ -186,7 +208,7 @@ PostSchema.statics.findByTags = function (tags, page) {
 
     this.find({ tags: { $in: formattedTags } })
       .sort('-createdAt')
-      .skip(LIMIT*(page-1))
+      .skip(LIMIT * (page - 1))
       .limit(LIMIT)
       .populate({
         path: 'author',
