@@ -127,9 +127,13 @@ UserSchema.methods.updateProfilePicture = function(newBuffer) {
 			.catch(err => reject(err));
 		}
 		else {
-			this.profilePicture = new ProfilePicture({ buffer: newBuffer });
-			this.save().then(user => {
-				resolve(user.profilePicture);
+			const newProfilePicture = new ProfilePicture({ buffer: newBuffer });
+			newProfilePicture.save().then(pic => {
+				this.profilePicture = pic;
+				this.save().then(user => {
+					resolve(user.profilePicture);
+				})
+				.catch(err => reject(err));
 			})
 			.catch(err => reject(err));
 		}
