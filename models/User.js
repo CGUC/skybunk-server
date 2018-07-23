@@ -42,6 +42,7 @@ const UserSchema = new Schema({
 // Create a new user
 UserSchema.statics.create = function(user) {
 	return new Promise((resolve, reject) => {
+		user.notificationTokens = [];
 		const newUser = new this(user);
 
 		// Encrypt the password and save
@@ -85,7 +86,6 @@ UserSchema.methods.update = function(updatedUserData) {
 		this.lastName = updatedUserData.lastName;
 		this.username = updatedUserData.username;
 		this.subscribedChannels = updatedUserData.subscribedChannels;
-		this.notificationTokens = updatedUserData.notificationTokens;
 
 		this.save().then(user => {
 			 resolve(user);
@@ -164,10 +164,14 @@ UserSchema.methods.registerNotificationToken = function(token) {
 			reject({message: 'Invalid token provided'});
 		}
 		else if (this.notificationTokens.includes(token)) {
-			reject({message: 'token already exists!'});
+			resolve(token);
 		}
 		else {
-			this.notificationTokens.push(token);
+			if (!this.notificationTokens)
+				this.notificationTokens = [token];
+			else
+				this.notificationTokens.push(token);
+
 			this.save().then(user => {
 				resolve(token);
 			})
