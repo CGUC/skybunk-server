@@ -6,6 +6,9 @@ const _ = require('lodash');
 const { formatTags } = require('../helpers/formatters');
 const config = require('../config/options');
 
+require('./PostPicture');
+const PostPicture = mongoose.model('PostPicture');
+
 const LIMIT = 15;
 
 // Schema.Types vs mongoose.Types: https://github.com/Automattic/mongoose/issues/1671
@@ -26,7 +29,8 @@ const PostSchema = new Schema({
     required: true,
   },
   image: {
-    type: Buffer,
+    type: Schema.Types.ObjectId,
+    ref: 'PostPicture',
   },
   tags: [{
     type: String,
@@ -339,6 +343,24 @@ PostSchema.statics.deleteComment = function (postId, commentId) {
         reject(err);
       });
   });
+}
+
+PostSchema.methods.addImage = function(newBuffer) {
+  return new Promise((resolve, reject) => {
+    const newImage = new PostPicture({ buffer: newBuffer });
+    newImage.save().then(pic => {
+      this.image = pic;
+      this.save().then(post => {
+        resolve(post.image);
+      })
+      .catch(err => reject(err));
+    })
+    .catch(err => reject(err));
+  });
+}
+
+PostSchema.methods.getImage = function() {
+  return this.image.buffer.toString('base64')
 }
 
 mongoose.model('Post', PostSchema);

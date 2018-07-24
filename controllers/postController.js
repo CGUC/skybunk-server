@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const multer  = require('multer')
+const upload = multer({ storage: multer.memoryStorage() })
 const _ = require('lodash');
 
 require('../models/Posts');
@@ -152,4 +154,37 @@ router.delete('/:pid/comment/:cid', verifyToken, (req, res) => {
   });
 });
 
+/**
+ * Add an image
+ */
+router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
+  Post.findOne({_id: req.params.id})
+  .populate('author')
+  .then(post => {
+    if(post.author._id !== req.user._id) {
+      res.status(403);
+    }
+
+    post.addImage(req.file.buffer).then(pic => {
+      res.json(pic.buffer.toString('base64'));
+    }).catch(err => {
+      res.json(err);
+    });
+  }).catch(err => {
+    res.json(err);
+  });
+});
+
+/**
+ * Get the image
+ */
+router.get('/:id/image', (req, res) => {
+  Post.findOne({_id: req.params.id})
+  .populate('image')
+  .then(post => {
+    res.json(post.getImage());
+  }).catch(err => {
+    res.json(err);
+  });
+});
 module.exports = router;
