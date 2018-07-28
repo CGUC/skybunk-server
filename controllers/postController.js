@@ -166,7 +166,7 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
     }
 
     post.addImage(req.file.buffer).then(pic => {
-      res.json(pic);
+      res.json(pic.buffer.toString('base64'));
     }).catch(err => {
       res.json(err);
     });

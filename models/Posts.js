@@ -29,16 +29,8 @@ const PostSchema = new Schema({
     required: true,
   },
   image: {
-    source: {
-      type: Schema.Types.ObjectId,
-      ref: 'PostPicture',
-    },
-    width: {
-      type: Number,
-    },
-    height: {
-      type: Number,
-    }
+    type: Schema.Types.ObjectId,
+    ref: 'PostPicture',
   },
   tags: [{
     type: String,
@@ -72,7 +64,6 @@ PostSchema.statics.create = function (postData, author) {
   var post = _.pick(postData, ['author', 'content', 'image']);
   post.subscribedUsers = [postData.author];
   post.tags = formattedTags;
-  post.image = { source: null, width: postData.imgWidth, height: postData.imgHeight }
 
   return new Promise((resolve, reject) => {
     if (post.content.length > config.postCharacterLimit) {
@@ -358,9 +349,9 @@ PostSchema.methods.addImage = function(newBuffer) {
   return new Promise((resolve, reject) => {
     const newImage = new PostPicture({ buffer: newBuffer });
     newImage.save().then(pic => {
-      this.image.source = pic;
+      this.image = pic;
       this.save().then(post => {
-        resolve(post.getImage());
+        resolve(post.image);
       })
       .catch(err => reject(err));
     })
@@ -369,11 +360,7 @@ PostSchema.methods.addImage = function(newBuffer) {
 }
 
 PostSchema.methods.getImage = function() {
-  return {
-    source: this.image.buffer.toString('base64'),
-    width: this.image.width,
-    height: this.image.height,
-  };
+  return this.image.buffer.toString('base64');
 }
 
 mongoose.model('Post', PostSchema);
