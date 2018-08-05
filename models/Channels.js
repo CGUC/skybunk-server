@@ -153,18 +153,23 @@ ChannelSchema.methods.notifyUsersOfPost = function(post, author) {
   .select('-password')
   .then(users => {
     let messages = [];
-    users.map(user => {
-      user.notificationTokens.map(pushToken => {
-      	if (user._id.toString() !== post.author.toString()) {
+	    users.map(user => {
+	      if (user._id.toString() !== post.author.toString()) {
+	    	const notificationData = {
+	    		title: `${author.firstName} ${author.lastName} posted in ${this.name}`,
+	    		body: `${post.content}`,
+	    		data: { channel: this._id, post: post._id }
+	    	}
+	    	NotificationManager.saveNotificationForUserAsync(notificationData, user);
+
+	      user.notificationTokens.map(pushToken => {
 	        messages.push({
 	          to: pushToken,
 	          sound: 'default',
-	          title: `${author.firstName} ${author.lastName} posted in ${this.name}`,
-	          body: `${post.content}`,
-	          data: { channel: this, post: post, user: user },
+	          ...notificationData
 	        })
-	    	}
-      })
+	      })
+    	}
     });
 
     NotificationManager.sendNotifications(messages);

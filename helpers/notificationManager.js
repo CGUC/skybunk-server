@@ -1,5 +1,9 @@
+const mongoose = require('mongoose');
 const Expo = require('expo-server-sdk');
 let expo = new Expo();
+
+require('../models/Notification');
+const Notification = mongoose.model('Notification');
 
 module.exports = {
   sendNotifications: async function(messages) {
@@ -14,5 +18,14 @@ module.exports = {
 	      console.error(error);
 	    }
   	}
+  },
+  saveNotificationForUserAsync: async function (notificationData, user) {
+  	const notification = new Notification(notificationData);
+  	notification.save().then(notif => {
+  		user.notifications.unshift(notif);
+  		user.save().then(user => {console.log('WPPP')})
+  		.catch(err => console.error(err));
+  	})
+  	.catch(err => console.error(err));
   }
 }
