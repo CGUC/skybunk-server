@@ -15,7 +15,14 @@ rl.question('Name: ', (name) => {
 		rl.question('Database user: ', (user) => {
 			rl.question('password: ', (password) => {
 				console.log('...');
-				mongoose.connect(`mongodb://${user}:${password}@ds163510.mlab.com:63510/grapp`)
+				let mongoUri ;
+				if (user === 'dev') {
+					mongoUri = 'mongodb://localhost/grapp-dev'
+				}
+				else {
+					mongoUri = `mongodb://${user}:${password}@ds163510.mlab.com:63510/grapp`;
+				}
+				mongoose.connect(mongoUri)
 				.then(() => {
 					const channel = new Channel({
 						name,

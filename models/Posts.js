@@ -263,18 +263,30 @@ PostSchema.statics.addComment = function (id, commentData, author) {
       post.save().then(updatedPost => {
         let messages = [];
         post.subscribedUsers.map(user => {
-          user.notificationTokens.map(pushToken => {
-            if (user._id.toString() !== comment.author.toString()) {
-              messages.push({
-                to: pushToken,
-                sound: 'default',
-                title: `${author.firstName} ${author.lastName} commented on a post you're following`,
-                body: `${comment.content}`,
-                data: { post: post, comment: comment },
-              })
+          let title;
+          if (user._id.toString() === post.author._id) {
+            title = `${author.firstName} ${author.lastName} commented on your post`;
+          }
+          else {
+            title = `${author.firstName} ${author.lastName} commented on a post you're following`;
+          }
+          if (user._id.toString() !== comment.author.toString()) {
+            const notificationData = {
+              title,
+              body: `${comment.content}`,
+              data: { post: post._id, comment: comment._id },
             }
-          });
-        })
+            NotificationManager.saveNotificationForUserAsync(notificationData, user);
+
+            user.notificationTokens.map(pushToken => {
+                messages.push({
+                  to: pushToken,
+                  sound: 'default',
+                  ...notificationData
+                })
+            });
+          }
+        });
 
         NotificationManager.sendNotifications(messages);
 

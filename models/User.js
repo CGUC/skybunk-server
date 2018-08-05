@@ -34,6 +34,10 @@ const UserSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Channel'
 	}],
+	notifications: [{
+		type: Schema.Types.ObjectId,
+		ref: 'Notification'
+	}],
 	notificationTokens: [{
 		type: String,
 	}]
