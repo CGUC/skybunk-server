@@ -274,7 +274,7 @@ PostSchema.statics.addComment = function (id, commentData, author) {
             const notificationData = {
               title,
               body: `${comment.content}`,
-              data: { post: post._id, comment: comment._id },
+              data: { post: updatedPost, comment: comment },
             }
             NotificationManager.saveNotificationForUserAsync(notificationData, user);
 

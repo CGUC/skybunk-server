@@ -158,7 +158,7 @@ ChannelSchema.methods.notifyUsersOfPost = function(post, author) {
 	    	const notificationData = {
 	    		title: `${author.firstName} ${author.lastName} posted in ${this.name}`,
 	    		body: `${post.content}`,
-	    		data: { channel: this._id, post: post._id }
+	    		data: { channel: this, post: post}
 	    	}
 	    	NotificationManager.saveNotificationForUserAsync(notificationData, user);
 
