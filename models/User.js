@@ -26,6 +26,20 @@ const UserSchema = new Schema({
 		unique: true,
 		dropDups: true
 	},
+	info: new Schema({
+		program: {
+			type: String
+		},
+		address: {
+			type: String
+		},
+		affiliation: {
+			type: String
+		},
+		bio: {
+			type: String
+		}
+	}),
 	profilePicture: {
 		type: Schema.Types.ObjectId,
 		ref: 'ProfilePicture',
@@ -90,6 +104,7 @@ UserSchema.methods.update = function(updatedUserData) {
 		this.lastName = updatedUserData.lastName;
 		this.username = updatedUserData.username;
 		this.subscribedChannels = updatedUserData.subscribedChannels;
+		this.info = updatedUserData.info;
 
 		this.save().then(user => {
 			 resolve(user);
