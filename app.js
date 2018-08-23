@@ -29,6 +29,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Set preflight headers to allows cors
+app.use('*', (req, res, next) => {
+	res.header('Access-Control-Allow-Headers', 'content-type');
+	res.header('Access-Control-Allow-Origin', '*');
+	next();
+});
+
 // Direct the appropriate urls to the respective controller (you may see this referred
 // to as routes & routers elsewhere)
 // The first parameter passed into app.use(...) directs all urls starting
