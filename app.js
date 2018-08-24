@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Set preflight headers to allows cors
 app.use('*', (req, res, next) => {
-	res.header('Access-Control-Allow-Headers', 'content-type');
+	res.header('Access-Control-Allow-Headers', 'content-type, page');
 	res.header('Access-Control-Allow-Origin', '*');
 	next();
 });
