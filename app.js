@@ -33,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('*', (req, res, next) => {
 	res.header('Access-Control-Allow-Headers', 'content-type, page, authorization');
 	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Methods', 'PUT, DELETE')
 	next();
 });
 
