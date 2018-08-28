@@ -97,10 +97,10 @@ PostSchema.statics.get = function (id) {
     this.findById(id)
       .populate({
         path: 'author',
-        select: 'firstName lastName username profilePicture _id',
+        select: 'firstName lastName username profilePicture info _id',
       }).populate({
         path: 'comments.author',
-        select: 'firstName lastName username profilePicture _id'
+        select: 'firstName lastName username profilePicture info _id'
       }).populate('subscribedUsers')
       .then(post => {
         if (post) {
@@ -127,11 +127,11 @@ PostSchema.statics.getAllPaginated = function (page) {
       .limit(LIMIT)
       .populate({
         path: 'author',
-        select: 'firstName lastName username profilePicture _id'
+        select: 'firstName lastName username profilePicture info _id'
       })
       .populate({
         path: 'comments.author',
-        select: 'firstName lastName username profilePicture _id'
+        select: 'firstName lastName username profilePicture info _id'
       }).then(posts => {
         resolve(posts);
       })
@@ -150,10 +150,10 @@ PostSchema.statics.getUserPosts = function (userId, page) {
       .limit(LIMIT)
       .populate({
         path: 'author',
-        select: 'firstName lastName username profilePicture _id',
+        select: 'firstName lastName username info profilePicture _id',
       }).populate({
         path: 'comments.author',
-        select: 'firstName lastName username profilePicture _id'
+        select: 'firstName lastName username info profilePicture _id'
       }).then(posts => {
         resolve(posts);
       })
@@ -216,10 +216,10 @@ PostSchema.statics.findByTags = function (tags, page) {
       .limit(LIMIT)
       .populate({
         path: 'author',
-        select: 'firstName lastName username profilePicture _id',
+        select: 'firstName lastName username info profilePicture _id',
       }).populate({
         path: 'comments.author',
-        select: 'firstName lastName username profilePicture _id'
+        select: 'firstName lastName username info profilePicture _id'
       }).then(posts => {
         resolve(posts);
       })
