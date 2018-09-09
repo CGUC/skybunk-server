@@ -199,4 +199,14 @@ router.post('/:id/notificationToken', verifyToken, (req, res) => {
 	});
 });
 
+router.post('/:id/markNotifsSeen', verifyToken, (req, res) => {
+	if(req.params.id !== req.user._id) {
+		res.status(403);
+	}
+
+	User.markNotifsSeen(req.user._id)
+	.then(result => res.json(result))
+	.catch(err => res.json(err));
+})
+
 module.exports = router;

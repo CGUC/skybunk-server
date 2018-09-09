@@ -23,7 +23,7 @@ module.exports = {
   	const notification = new Notification(notificationData);
   	notification.save().then(notif => {
   		user.notifications.unshift(notif);
-  		user.save().then(user => {console.log('WPPP')})
+  		user.save().then(user => {console.log('notifCreated')})
   		.catch(err => console.error(err));
   	})
   	.catch(err => console.error(err));
