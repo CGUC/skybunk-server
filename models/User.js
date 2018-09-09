@@ -97,6 +97,38 @@ UserSchema.statics.authenticate = function(username, password) {
 	});
 }
 
+UserSchema.statics.markNotifsSeen = function(id) {
+	return new Promise((resolve, reject) => {
+		this.findOne({
+			_id: id
+		})
+		.populate('notifications')
+		.then(user => {
+			if (!user) {
+				reject({
+					message: 'Could not find user',
+					status: 404
+				});
+			}
+			else {
+				let promises = [];
+				user.notifications.map(notif => {
+					promises.push(notif.markSeen());
+				})
+
+				Promise.all(promises).then(notifs => {
+					resolve(true);
+				})
+				.catch(reject(false));
+			}
+		})
+		.catch(reject({
+			message: 'Could not find user',
+			status: 404
+		}));
+	});
+}
+
 // Update a user
 UserSchema.methods.update = function(updatedUserData) {
 	return new Promise((resolve, reject) => {
