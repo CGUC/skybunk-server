@@ -23,7 +23,10 @@ module.exports = {
   	const notification = new Notification(notificationData);
   	notification.save().then(notif => {
   		user.notifications.unshift(notif);
-  		user.save().then(user => {console.log('notifCreated')})
+      const removed = user.notifications.splice(30);
+  		user.save().then(user => {
+        Notification.deleteMany({ _id: { $in: removed } });
+      })
   		.catch(err => console.error(err));
   	})
   	.catch(err => console.error(err));
