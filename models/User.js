@@ -26,6 +26,10 @@ const UserSchema = new Schema({
 		unique: true,
 		dropDups: true
 	},
+	isAdmin: {
+		type: Boolean,
+		default: false
+	},
 	info: new Schema({
 		program: {
 			type: String
