@@ -101,6 +101,9 @@ PostSchema.statics.get = function (id) {
       }).populate({
         path: 'comments.author',
         select: 'firstName lastName username profilePicture info _id'
+      }).populate({
+        path: 'usersLiked',
+        select: 'firstName lastName _id'
       }).populate('subscribedUsers')
       .then(post => {
         if (post) {
@@ -132,6 +135,9 @@ PostSchema.statics.getAllPaginated = function (page) {
       .populate({
         path: 'comments.author',
         select: 'firstName lastName username profilePicture info _id'
+      }).populate({
+        path: 'usersLiked',
+        select: 'firstName lastName _id'
       }).then(posts => {
         resolve(posts);
       })
@@ -154,6 +160,9 @@ PostSchema.statics.getUserPosts = function (userId, page) {
       }).populate({
         path: 'comments.author',
         select: 'firstName lastName username info profilePicture _id'
+      }).populate({
+        path: 'usersLiked',
+        select: 'firstName lastName _id'
       }).then(posts => {
         resolve(posts);
       })
@@ -220,6 +229,9 @@ PostSchema.statics.findByTags = function (tags, page) {
       }).populate({
         path: 'comments.author',
         select: 'firstName lastName username info profilePicture _id'
+      }).populate({
+        path: 'usersLiked',
+        select: 'firstName lastName _id'
       }).then(posts => {
         resolve(posts);
       })
