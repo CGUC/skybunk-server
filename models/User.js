@@ -26,9 +26,9 @@ const UserSchema = new Schema({
 		unique: true,
 		dropDups: true
 	},
-	isAdmin: {
-		type: Boolean,
-		default: false
+	role: {
+		type: Number,
+		default: 0
 	},
 	info: new Schema({
 		program: {
@@ -58,7 +58,15 @@ const UserSchema = new Schema({
 	}],
 	notificationTokens: [{
 		type: String,
-	}]
+  }],
+  donStatus: {
+    type: Number, //0=off, 1=on, 2=late supper
+    default: 0
+  },
+  donClockOut: {
+    type: String, //timestamp
+    default: 0
+  }
 });
 
 // Create a new user
