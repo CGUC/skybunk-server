@@ -65,7 +65,6 @@ const UserSchema = new Schema({
   },
   donClockOut: {
     type: String, //timestamp
-    default: 0
   }
 });
 
