@@ -102,7 +102,7 @@ UserSchema.statics.create = function(user) {
 UserSchema.statics.authenticate = function(username, password) {
 	return new Promise((resolve, reject) => {
 		this.findOne({
-			username: username,
+			username: new RegExp('\\b' + username + '\\b', 'i'),
 		}).then(user => {
 			if(!user) {
 				reject({message: 'Username does not exist'});
@@ -110,7 +110,7 @@ UserSchema.statics.authenticate = function(username, password) {
 
 			// Match password
 			bcrypt.compare(password, user.password, (err, isMatch) => {
-				if(err) throw err;
+				if(err) throw err
 				if (isMatch) {
 					resolve(user);
 				}

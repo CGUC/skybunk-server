@@ -103,16 +103,22 @@ router.post('/:id/password', verifyToken, (req, res) => {
 
 // Changes a don's information (only accessible by dons)
 router.post('/:id/doninfo', verifyToken, (req, res) => {
-  
-	if((req.params.id !== req.user._id) || (req.user.role&1 != 1)) {
-    console.log('returning 403')
+  console.log("Testn!");
+	if(req.user.role&1 != 1) {
+    console.log("Not a don!");
+    //requestor is not a don
 		res.status(403);
 	}
-  console.log('continuing on')
 	User.findOne({_id: req.params.id}).then(user => {
-    user.donInfo = req.body
-    user.update(user);
-    //console.log(user.donInfo);
+    if(user.role&1 != 1){
+      //user is not a don
+      res.status(403);
+    }else{
+      user.donInfo = req.body
+      user.update(user);
+      console.log(user.donInfo);
+    }
+    
 
 	}).catch(err => {
 		res.status(404).json(err);
