@@ -163,13 +163,13 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
   .then(post => {
     if(post.author._id !== req.user._id) {
       res.status(403);
+    }else{
+      post.addImage(req.file.buffer).then(pic => {
+        res.json(pic.buffer.toString('base64'));
+      }).catch(err => {
+        res.json(err);
+      });
     }
-
-    post.addImage(req.file.buffer).then(pic => {
-      res.json(pic.buffer.toString('base64'));
-    }).catch(err => {
-      res.json(err);
-    });
   }).catch(err => {
     res.json(err);
   });
