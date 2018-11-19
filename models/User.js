@@ -89,7 +89,7 @@ UserSchema.statics.authenticate = function(username, password) {
 
 			// Match password
 			bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (isMatch && !err) {
+				if (isMatch && !err) {
 					resolve(user);
 				}
 				else {
