@@ -36,6 +36,7 @@ In order to enable people with very little previous experience to contribute, th
     - _If you're using linux, I would suggest [installing it through your package manager](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)_
 4. Download the [MongoDB community server](https://www.mongodb.com/download-center?jmp=nav#community) for your OS
 5. Follow the instructions [here](https://docs.mongodb.com/manual/administration/install-community/) to set up MongoDB
+6. Start mongodb by running `mongod`. If you want other devices (such as a phone for skybunk-mobile development), run `mongod --bind_ip_all`. This will let anyone on the network
 6. `cd` into this repository
 7. run `npm install` to install the required node modules
 8. install nodemon by running `npm install -g nodemon`

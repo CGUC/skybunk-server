@@ -101,6 +101,24 @@ router.post('/:id/password', verifyToken, (req, res) => {
 	});
 });
 
+// Changes a don's information (only accessible by dons)
+router.post('/:id/doninfo', verifyToken, (req, res) => {
+  
+	if((req.params.id !== req.user._id) || (req.user.role&1 != 1)) {
+    console.log('returning 403')
+		res.status(403);
+	}
+  console.log('continuing on')
+	User.findOne({_id: req.params.id}).then(user => {
+    user.donInfo = req.body
+    user.update(user);
+    //console.log(user.donInfo);
+
+	}).catch(err => {
+		res.status(404).json(err);
+	});
+});
+
 // Get the logged in user
 router.get('/loggedInUser', verifyToken, (req, res) => {
 	User.findOne({_id: req.user._id})
