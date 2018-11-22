@@ -23,8 +23,6 @@ async function setTimer (timestamp, id, callbackArgs, callback) {
 		callback(callbackArgs);
 	});
 
-	
-
 	await agenda.schedule(timestamp, id);
 	await agenda.start();
 }
