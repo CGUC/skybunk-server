@@ -114,25 +114,25 @@ router.post('/:id/doninfo', verifyToken, (req, res) => {
 		//user is not a don
 		res.status(403);
 		}else{
-		user.donInfo = req.body
-		user.update(user);
-		//set timer to turn off don automagically
-		if(user.donInfo.isOn){
-			setTimer(user.donInfo.clockOut, ''+user._id, {},() =>{
-				console.log(user._id);
-				User.findOne({_id: user._id}).then(user => {
-					console.log("Clock out don " + user.username);
-					if(user.donInfo){
-						
-						user.donInfo.isOn = false;
-						user.update(user);
-					}
-				}).catch(err => {
-					console.error(err)
-				})
-			});
-		}
-		console.log(user.donInfo);
+			user.donInfo = req.body
+			user.update(user);
+			console.log("Updated don " + user.username);
+			//set timer to turn off don automagically
+			if(user.donInfo.isOn){
+				setTimer(user.donInfo.clockOut, ''+user._id, {},() =>{
+					User.findOne({_id: user._id}).then(user => {
+						console.log("Clock out don " + user.username);
+						if(user.donInfo){
+							
+							user.donInfo.isOn = false;
+							user.update(user);
+						}
+					}).catch(err => {
+						console.error(err)
+					})
+				});
+			}
+			res.json(user.donInfo);
 		}
 	}).catch(err => {
 		res.status(404).json(err);

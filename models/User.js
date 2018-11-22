@@ -77,9 +77,7 @@ const UserSchema = new Schema({
 		location: {
 			type: String
 		},
-		
 	}
-	
 });
 
 // Create a new user
