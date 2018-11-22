@@ -42,10 +42,10 @@ const UserSchema = new Schema({
 		},
 		bio: {
 			type: String
-    },
-    phone: {
-      type: String
-    }
+		},
+		phone: {
+			type: String
+		}
 	}),
 	profilePicture: {
 		type: Schema.Types.ObjectId,
@@ -61,25 +61,25 @@ const UserSchema = new Schema({
 	}],
 	notificationTokens: [{
 		type: String,
-  }],
-  donInfo: {
-    isOn: {
-      type: Boolean,
-      default: false
-    },
-    isOnLateSupper: {
-      type: Boolean,
-      default: false
-    },
-    clockOut: {
-      type: String, //timestamp
-    },
-    location: {
-      type: String
-    },
-    
-  }
-  
+	}],
+	donInfo: {
+		isOn: {
+			type: Boolean,
+			default: false
+		},
+		isOnLateSupper: {
+			type: Boolean,
+			default: false
+		},
+		clockOut: {
+			type: String, //timestamp
+		},
+		location: {
+			type: String
+		},
+		
+	}
+	
 });
 
 // Create a new user
@@ -161,8 +161,8 @@ UserSchema.methods.update = function(updatedUserData) {
 		this.lastName = updatedUserData.lastName;
 		this.username = updatedUserData.username;
 		this.subscribedChannels = updatedUserData.subscribedChannels;
-    this.info = updatedUserData.info;
-    this.donInfo = updatedUserData.donInfo;
+		this.info = updatedUserData.info;
+		this.donInfo = updatedUserData.donInfo;
 
 		this.save().then(user => {
 			 resolve(user);
