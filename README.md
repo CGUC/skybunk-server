@@ -36,17 +36,16 @@ In order to enable people with very little previous experience to contribute, th
     - _If you're using linux, I would suggest [installing it through your package manager](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)_
 4. Download the [MongoDB community server](https://www.mongodb.com/download-center?jmp=nav#community) for your OS
 5. Follow the instructions [here](https://docs.mongodb.com/manual/administration/install-community/) to set up MongoDB
-6. Start mongodb by running `mongod`. If you want other devices (such as a phone for skybunk-mobile development), run `mongod --bind_ip_all`. This will let anyone on the network
 6. `cd` into this repository
 7. run `npm install` to install the required node modules
 8. install nodemon by running `npm install -g nodemon`
+9. If you want to have some data to test on, you can run `node helpers/scrips/copy_prod_data.js`. This copies all users, posts, and channels from the production database, and sets all user passwords to 'password'. This does not have the ability to copy pictures to the development repo (though this can be added if someone wants to!).
 
 And you're set!
 
-To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `node helpers/populate.js` to load some dummy data into the database. Once that is finished running, run `nodemon` - this will automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/examples/Mark in your web browser. If all went well, you should be presented with a JSON similar to the following: 
+To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `node helpers/scripts/populate.js` to load some dummy data into the database. Once that is finished running, run `nodemon` - this will automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/examples/Mark in your web browser. If all went well, you should be presented with a JSON similar to the following: 
 `{"counter":1,"_id":"5afb90607b209c3008b59ec5","name":"Mark","__v":0}`
 If you have issues, make sure you followed the steps above properly and if all else fails feel free to reach out to the dev team.
-
 ## Architecture
 We're following traditional [MVC](https://www.tutorialspoint.com/mvc_framework/mvc_framework_introduction.htm) format throughout our application. This means controllers take care of the requests coming in from the views, and translate the input to the models. Therefore, all business logic should be done through the use of methods on the models and the controllers simply serve as a mediator between incoming HTTP requests and actions on the models. Thew View in this case is the app itself.
 
