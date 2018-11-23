@@ -105,25 +105,23 @@ router.post('/:id/password', verifyToken, (req, res) => {
 // Changes a don's information (only accessible by dons)
 router.post('/:id/doninfo', verifyToken, (req, res) => {
 	if(req.user.role&1 != 1) {
-    console.error("User "+ req.user._id +"is requesting don info when user is not a don");
-    //requestor is not a don
+		console.error("User "+ req.user._id +"is requesting don info when user is not a don");
+		//requestor is not a don
 		res.status(403);
 	}
 	User.findOne({_id: req.params.id}).then(user => {
 		if(user.role&1 != 1){
-		//user is not a don
-		res.status(403);
+			//user is not a don
+			res.status(403);
 		}else{
 			user.donInfo = req.body
 			user.update(user);
-			console.log("Updated don " + user.username);
 			//set timer to turn off don automagically
 			if(user.donInfo.isOn){
 				setTimer(user.donInfo.clockOut, ''+user._id, {},() =>{
 					User.findOne({_id: user._id}).then(user => {
 						console.log("Clock out don " + user.username);
 						if(user.donInfo){
-							
 							user.donInfo.isOn = false;
 							user.update(user);
 						}
@@ -216,7 +214,7 @@ router.get('/:id/subscribedChannels/posts', (req, res) => {
   		res.json(err);
   	});
   }).catch(err => {
-    res.json(err);
+	res.json(err);
   });
 });
 

@@ -27,6 +27,10 @@ const UserSchema = new Schema({
 		dropDups: true
 	},
 	role: {
+		//Bitmap of permissions the user has
+		//For example, role=1 is a don, role=3 is a don and admin
+		//bit 0 = don
+		//bit 1 = admin
 		type: Number,
 		default: 0
 	},
@@ -100,7 +104,7 @@ UserSchema.statics.create = function(user) {
 UserSchema.statics.authenticate = function(username, password) {
 	return new Promise((resolve, reject) => {
 		this.findOne({
-			username: new RegExp('\\b' + username + '\\b', 'i'),
+			username: username,
 		}).then(user => {
 			if(!user) {
 				reject({message: 'Username does not exist'});
@@ -108,7 +112,7 @@ UserSchema.statics.authenticate = function(username, password) {
 
 			// Match password
 			bcrypt.compare(password, user.password, (err, isMatch) => {
-				if(err) throw err
+				if(err) throw err;
 				if (isMatch) {
 					resolve(user);
 				}
@@ -160,7 +164,7 @@ UserSchema.methods.update = function(updatedUserData) {
 		this.username = updatedUserData.username;
 		this.subscribedChannels = updatedUserData.subscribedChannels;
 		this.info = updatedUserData.info;
-		this.donInfo = updatedUserData.donInfo;
+		this.donInfo = updatedUserData.donInfo || {};
 
 		this.save().then(user => {
 			 resolve(user);

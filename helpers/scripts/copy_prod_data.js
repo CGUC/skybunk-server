@@ -1,12 +1,10 @@
 var PROD_ADDRESS = 'http://api.grebelife.com'
-var DEV_ADDRESS ='localhost' //'ec2-18-216-251-6.us-east-2.compute.amazonaws.com'
+var DEV_ADDRESS ='localhost'
 var VERSION = '1.5'
 
 const fetch = require("node-fetch");
 const mongoose = require('mongoose');
 
-
-//copied ApiClient from the app, there's probably a better way to do this but it works
 function get(endpoint, headers) {
 	return fetch(`${PROD_ADDRESS}${endpoint}`, {
 			method: 'GET',

@@ -16,9 +16,9 @@ async function setTimer (timestamp, id, callbackArgs, callback) {
 
 	//cancel any current timeouts with this id
 	await agenda.cancel({name: id}, (err, numRemoved) =>{
-		console.log("Removed " + numRemoved)
+		if(err)console.error(err)
 	})
-	
+
 	agenda.define(id, {unique: true}, (job, done) => {
 		callback(callbackArgs);
 	});
