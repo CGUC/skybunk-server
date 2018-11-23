@@ -204,18 +204,18 @@ router.get('/:id/profilePicture', (req, res) => {
 * Get all posts subbed by requesting user
 */
 router.get('/:id/subscribedChannels/posts', (req, res) => {
-  User.findOne({_id: req.params.id})
-  .select('-password')
-  .populate('subscribedChannels')
-  .then(user => {
-  	user.getPostsFromSubs(req.get('page')).then(posts => {
-  		res.json(posts);
-  	}).catch(err => {
-  		res.json(err);
-  	});
-  }).catch(err => {
-	res.json(err);
-  });
+	User.findOne({_id: req.params.id})
+	.select('-password')
+	.populate('subscribedChannels')
+	.then(user => {
+		user.getPostsFromSubs(req.get('page')).then(posts => {
+			res.json(posts);
+		}).catch(err => {
+  			res.json(err);
+		});
+	}).catch(err => {
+		res.json(err);
+	});
 });
 
 router.post('/:id/notificationToken', verifyToken, (req, res) => {
