@@ -26,14 +26,9 @@ const UserSchema = new Schema({
 		unique: true,
 		dropDups: true
 	},
-	role: {
-		//Bitmap of permissions the user has
-		//For example, role=1 is a don, role=3 is a don and admin
-		//bit 0 = don
-		//bit 1 = admin
-		type: Number,
-		default: 0
-	},
+	role: [{
+		type: String,
+	}],
 	info: new Schema({
 		program: {
 			type: String

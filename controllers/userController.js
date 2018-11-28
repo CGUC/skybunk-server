@@ -104,23 +104,22 @@ router.post('/:id/password', verifyToken, (req, res) => {
 
 // Changes a don's information (only accessible by dons)
 router.post('/:id/doninfo', verifyToken, (req, res) => {
-	if(req.user.role&1 != 1) {
+	if(!req.user.role.includes("don")) {
 		console.error("User "+ req.user._id +"is requesting don info when user is not a don");
 		//requestor is not a don
 		res.status(403);
 	}
 	User.findOne({_id: req.params.id}).then(user => {
-		if(user.role&1 != 1){
+		if(!user.role.includes("don")){
 			//user is not a don
-			res.status(403);
+			res.status(400);
 		}else{
 			user.donInfo = req.body
 			user.update(user);
 			//set timer to turn off don automagically
 			if(user.donInfo.isOn){
-				setTimer(user.donInfo.clockOut, ''+user._id, {},() =>{
+				setTimer(user.donInfo.clockOut, user._id.toString(), {},() =>{
 					User.findOne({_id: user._id}).then(user => {
-						console.log("Clock out don " + user.username);
 						if(user.donInfo){
 							user.donInfo.isOn = false;
 							user.update(user);
