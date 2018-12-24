@@ -104,13 +104,13 @@ router.post('/:id/password', verifyToken, (req, res) => {
 
 // Changes a don's information (only accessible by dons)
 router.post('/:id/doninfo', verifyToken, (req, res) => {
-	if(!req.user.role.includes("don")) {
+	if((!req.user.role || !req.user.role.includes("don")) {
 		console.error("User "+ req.user._id +"is requesting don info when user is not a don");
 		//requestor is not a don
 		res.status(403);
 	}else{
 		User.findOne({_id: req.params.id}).then(user => {
-			if(!user.role.includes("don")){
+			if(!user.role || !user.role.includes("don")){
 				//user is not a don
 				res.status(400);
 			}else{
