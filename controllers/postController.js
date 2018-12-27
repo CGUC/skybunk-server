@@ -79,7 +79,6 @@ router.put('/:id', verifyToken, (req, res) => {
   Post.findOne({_id: req.params.id})
   .populate('author')
   .then(post => {
-    console.log(post.author)
     if((req.user.role && req.user.role.includes("admin")) || post.author._id == req.user._id) {
       Post.updatePost(req.params.id, req.body).then(post => {
         res.json(post);
@@ -104,7 +103,6 @@ router.delete('/:id', verifyToken, (req, res) => {
   Post.findOne({_id: req.params.id})
   .populate('author')
   .then(post => {
-    console.log(post.author)
     if((req.user.role && req.user.role.includes("admin")) || post.author._id == req.user._id) {
       Post.delete(req.params.id).then((msg) => {
         res.json(msg);
