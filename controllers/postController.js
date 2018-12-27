@@ -76,27 +76,50 @@ router.get('/user/:id', (req, res) => {
  * Update a post
  */
 router.put('/:id', verifyToken, (req, res) => {
-
-  Post.updatePost(req.params.id, req.body).then(post => {
-    res.json(post);
-  })
-  .catch(err => {
+  Post.findOne({_id: req.params.id})
+  .populate('author')
+  .then(post => {
+    console.log(post.author)
+    if((req.user.role && req.user.role.includes("admin")) || post.author._id == req.user._id) {
+      Post.updatePost(req.params.id, req.body).then(post => {
+        res.json(post);
+      })
+      .catch(err => {
+        var errRes = classifyError(err);
+        res.status(errRes.status).json(errRes.message);
+      });
+    }else{
+      res.status(403);
+    }
+  }).catch(err =>{
     var errRes = classifyError(err);
     res.status(errRes.status).json(errRes.message);
-  });
+  })
 });
 
 /**
  * Delete a post
  */
 router.delete('/:id', verifyToken, (req, res) => {
-  Post.delete(req.params.id).then((msg) => {
-    res.json(msg);
-  })
-  .catch(err => {
+  Post.findOne({_id: req.params.id})
+  .populate('author')
+  .then(post => {
+    console.log(post.author)
+    if((req.user.role && req.user.role.includes("admin")) || post.author._id == req.user._id) {
+      Post.delete(req.params.id).then((msg) => {
+        res.json(msg);
+      })
+      .catch(err => {
+        var errRes = classifyError(err);
+        res.status(errRes.status).json(errRes.message);
+      });
+    }else{
+      res.status(403);
+    }
+  }).catch(err =>{
     var errRes = classifyError(err);
     res.status(errRes.status).json(errRes.message);
-  });
+  })
 });
 
 /**
@@ -132,26 +155,50 @@ router.post('/:id/comment', verifyToken, (req, res) => {
  * @param {string} cid - comment's id
  */
 router.put('/:pid/comment/:cid', verifyToken, (req, res) => {
-  Post.updateComment(req.params.pid, req.params.cid, req.body).then(comment => {
-    res.json(comment);
-  })
-  .catch(err => {
+  Post.findOne({_id: req.params.pid})
+  .then(post => {
+    const userIsCommentAuthor = post.comments.find(obj => {return obj.author == req.user._id});
+
+    if((req.user.role && req.user.role.includes("admin")) || userIsCommentAuthor) {
+      Post.updateComment(req.params.pid, req.params.cid, req.body).then(comment => {
+        res.json(comment);
+      })
+      .catch(err => {
+        var errRes = classifyError(err);
+        res.status(errRes.status).json(errRes.message);
+      });
+    }else{
+      res.status(403);
+    }
+  }).catch(err =>{
     var errRes = classifyError(err);
     res.status(errRes.status).json(errRes.message);
-  });
+  })
 });
 
 /**
  * Delete a comment
  */
 router.delete('/:pid/comment/:cid', verifyToken, (req, res) => {
-  Post.deleteComment(req.params.pid, req.params.cid).then((msg) => {
-    res.json(msg);
-  })
-  .catch(err => {
+  Post.findOne({_id: req.params.pid})
+  .then(post => {
+    const userIsCommentAuthor = post.comments.find(obj => {return obj.author == req.user._id});
+
+    if((req.user.role && req.user.role.includes("admin")) || userIsCommentAuthor) {
+      Post.deleteComment(req.params.pid, req.params.cid).then((msg) => {
+        res.json(msg);
+      })
+      .catch(err => {
+        var errRes = classifyError(err);
+        res.status(errRes.status).json(errRes.message);
+      });
+    }else{
+      res.status(403);
+    }
+  }).catch(err =>{
     var errRes = classifyError(err);
     res.status(errRes.status).json(errRes.message);
-  });
+  })
 });
 
 /**
@@ -163,13 +210,13 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
   .then(post => {
     if(post.author._id !== req.user._id) {
       res.status(403);
+    }else{
+      post.addImage(req.file.buffer).then(pic => {
+        res.json(pic.buffer.toString('base64'));
+      }).catch(err => {
+        res.json(err);
+      });
     }
-
-    post.addImage(req.file.buffer).then(pic => {
-      res.json(pic.buffer.toString('base64'));
-    }).catch(err => {
-      res.json(err);
-    });
   }).catch(err => {
     res.json(err);
   });

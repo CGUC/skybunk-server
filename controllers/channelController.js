@@ -22,26 +22,34 @@ const { classifyError } = require('../helpers/formatters');
  * Create a new channel
  */
 router.post('/', verifyToken, (req, res) => {
-  Channel.create(req.body).then(channel => {
-    res.json(channel);
-  })
-  .catch(err => {
-    var errRes = classifyError(err);
-    res.status(errRes.status).json(errRes.message);
-  });
+  if(req.user.role && req.user.role.includes("admin")){
+    Channel.create(req.body).then(channel => {
+      res.json(channel);
+    })
+    .catch(err => {
+      var errRes = classifyError(err);
+      res.status(errRes.status).json(errRes.message);
+    });
+  }else{
+    res.status(403);
+  }
 });
 
 /**
  * Get a channel by its id
  */
 router.get('/:id', (req, res) => {
-  Channel.get(req.params.id).then(channel => {
-    res.json(channel);
-  })
-  .catch(err => {
-    var errRes = classifyError(err);
-    res.status(errRes.status).json(errRes.message);
-  });
+  if(req.user.role && req.user.role.includes("admin")){
+    Channel.get(req.params.id).then(channel => {
+      res.json(channel);
+    })
+    .catch(err => {
+      var errRes = classifyError(err);
+      res.status(errRes.status).json(errRes.message);
+    })
+  }else{
+    res.status(403);
+  }
 });
 
 /**
@@ -73,26 +81,34 @@ router.get('/:id/posts', (req, res) => {
  * Update a channel
  */
 router.put('/:id', verifyToken, (req, res) => {
-  Channel.updtedChannel(req.params.id, req.body).then(channel => {
-    res.json(channel);
-  })
-  .catch(err => {
-    var errRes = classifyError(err);
-    res.status(errRes.status).json(errRes.message);
-  });
+  if(req.user.role && req.user.role.includes("admin")){
+    Channel.updateChannel(req.params.id, req.body).then(channel => {
+      res.json(channel);
+    })
+    .catch(err => {
+      var errRes = classifyError(err);
+      res.status(errRes.status).json(errRes.message);
+    });
+  }else{
+    res.status(403);
+  }
 });
 
 /**
  * Delete a channel
  */
 router.delete('/:id', verifyToken, (req, res) => {
-  Channel.delete(req.params.id).then(msg => {
-    res.json(msg);
-  })
-  .catch(err => {
-    var errRes = classifyError(err);
-    res.status(errRes.status).json(errRes.message);
-  });
+  if(req.user.role && req.user.role.includes("admin")){
+    Channel.delete(req.params.id).then(msg => {
+      res.json(msg);
+    })
+    .catch(err => {
+      var errRes = classifyError(err);
+      res.status(errRes.status).json(errRes.message);
+    });
+  }else{
+    res.status(403);
+  }
 });
 
 module.exports = router;

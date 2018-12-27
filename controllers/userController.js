@@ -72,34 +72,34 @@ router.delete('/:id', verifyToken, (req, res) => {
 router.put('/:id', verifyToken, (req, res) => {
 	if(req.params.id !== req.user._id) {
 		res.status(403);
-	}
-
-	User.findOne({_id: req.user._id}).then(user => {
-		user.update(req.body).then(user => {
-			res.json(user);
+	}else{
+		User.findOne({_id: req.user._id}).then(user => {
+			user.update(req.body).then(user => {
+				res.json(user);
+			}).catch(err => {
+				res.json(err);
+			});
 		}).catch(err => {
-			res.json(err);
+			res.status(404).json(err);
 		});
-	}).catch(err => {
-		res.status(404).json(err);
-	});
+	}
 });
 
 // Changes a user password
 router.post('/:id/password', verifyToken, (req, res) => {
 	if(req.params.id !== req.user._id) {
 		res.status(403);
-	}
-
-	User.findOne({_id: req.user._id}).then(user => {
-		user.changePassword(req.body.password).then(password => {
-			res.json(password);
+	}else{
+		User.findOne({_id: req.user._id}).then(user => {
+			user.changePassword(req.body.password).then(password => {
+				res.json(password);
+			}).catch(err => {
+				res.json(err);
+			});
 		}).catch(err => {
-			res.json(err);
+			res.status(404).json(err);
 		});
-	}).catch(err => {
-		res.status(404).json(err);
-	});
+	}
 });
 
 // Changes a don's information (only accessible by dons)
@@ -174,19 +174,19 @@ router.post('/login', (req, res) => {
 router.put('/:id/profilePicture', verifyToken, upload.single('profilePicture'), (req, res) => {
 	if(req.params.id !== req.user._id) {
 		res.status(403);
-	}
-
-	User.findOne({_id: req.params.id})
-	.populate('profilePicture')
-	.then(user => {
-		user.updateProfilePicture(req.file.buffer).then(pic => {
-			res.json(pic.buffer.toString('base64'));
+	}else{
+		User.findOne({_id: req.params.id})
+		.populate('profilePicture')
+		.then(user => {
+			user.updateProfilePicture(req.file.buffer).then(pic => {
+				res.json(pic.buffer.toString('base64'));
+			}).catch(err => {
+				res.json(err);
+			});
 		}).catch(err => {
 			res.json(err);
 		});
-	}).catch(err => {
-		res.json(err);
-	});
+	}
 });
 
 // Get the user profile picture
@@ -221,28 +221,28 @@ router.get('/:id/subscribedChannels/posts', (req, res) => {
 router.post('/:id/notificationToken', verifyToken, (req, res) => {
 	if(req.params.id !== req.user._id) {
 		res.status(403);
-	}
-
-	User.findOne({_id: req.params.id})
-	.then(user => {
-		user.registerNotificationToken(req.body.notificationToken).then(token => {
-			res.json(token);
+	}else{
+		User.findOne({_id: req.params.id})
+		.then(user => {
+			user.registerNotificationToken(req.body.notificationToken).then(token => {
+				res.json(token);
+			}).catch(err => {
+				res.json(err);
+			});
 		}).catch(err => {
 			res.json(err);
 		});
-	}).catch(err => {
-		res.json(err);
-	});
+	}
 });
 
 router.post('/:id/markNotifsSeen', verifyToken, (req, res) => {
 	if(req.params.id !== req.user._id) {
 		res.status(403);
+	}else{
+		User.markNotifsSeen(req.user._id)
+		.then(result => res.json(result))
+		.catch(err => res.json(err));
 	}
-
-	User.markNotifsSeen(req.user._id)
-	.then(result => res.json(result))
-	.catch(err => res.json(err));
 })
 
 module.exports = router;
