@@ -12,15 +12,17 @@ module.exports = {
 			jwt.verify(token, jwtSecret, (err, data) => {
 				if (err) {
 					res.sendStatus(403);
+					next(err);
 				}
 				else {
 					req.user = data.user;
+					next();
 				}
 			});
-			next();
 		}
 		else {
 			res.sendStatus(403);
+			next('No authorization token sent');
 		}
 	},
 }
