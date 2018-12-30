@@ -6,6 +6,7 @@ const {verifyToken} = require('../helpers/authorization');
 const multer  = require('multer')
 const upload = multer({ storage: multer.memoryStorage() })
 const router = express.Router();
+const setTimer = require('../helpers/jobScheduler');
 
 require('../models/User');
 const User = mongoose.model('User');
@@ -101,6 +102,41 @@ router.post('/:id/password', verifyToken, (req, res) => {
 	});
 });
 
+// Changes a don's information (only accessible by dons)
+router.post('/:id/doninfo', verifyToken, (req, res) => {
+	if(!req.user.role || !req.user.role.includes("don")) {
+		console.error("User "+ req.user._id +"is requesting don info when user is not a don");
+		//requestor is not a don
+		res.status(403);
+	}else{
+		User.findOne({_id: req.params.id}).then(user => {
+			if(!user.role || !user.role.includes("don")){
+				//user is not a don
+				res.status(400);
+			}else{
+				user.donInfo = req.body
+				user.update(user);
+				//set timer to turn off don automagically
+				if(user.donInfo.isOn){
+					setTimer(user.donInfo.clockOut, user._id.toString(), {},() =>{
+						User.findOne({_id: user._id}).then(user => {
+							if(user.donInfo){
+								user.donInfo.isOn = false;
+								user.update(user);
+							}
+						}).catch(err => {
+							console.error(err)
+						})
+					});
+				}
+				res.json(user.donInfo);
+			}
+		}).catch(err => {
+			res.status(404).json(err);
+		});
+	}
+});
+
 // Get the logged in user
 router.get('/loggedInUser', verifyToken, (req, res) => {
 	User.findOne({_id: req.user._id})
@@ -168,18 +204,18 @@ router.get('/:id/profilePicture', (req, res) => {
 * Get all posts subbed by requesting user
 */
 router.get('/:id/subscribedChannels/posts', (req, res) => {
-  User.findOne({_id: req.params.id})
-  .select('-password')
-  .populate('subscribedChannels')
-  .then(user => {
-  	user.getPostsFromSubs(req.get('page')).then(posts => {
-  		res.json(posts);
-  	}).catch(err => {
-  		res.json(err);
-  	});
-  }).catch(err => {
-    res.json(err);
-  });
+	User.findOne({_id: req.params.id})
+	.select('-password')
+	.populate('subscribedChannels')
+	.then(user => {
+		user.getPostsFromSubs(req.get('page')).then(posts => {
+			res.json(posts);
+		}).catch(err => {
+  			res.json(err);
+		});
+	}).catch(err => {
+		res.json(err);
+	});
 });
 
 router.post('/:id/notificationToken', verifyToken, (req, res) => {
