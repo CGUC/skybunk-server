@@ -31,7 +31,8 @@ In order to enable people with very little previous experience to contribute, th
 
 1. Make sure you have [git installed](https://www.linode.com/docs/development/version-control/how-to-install-git-on-linux-mac-and-windows/) (You'll want to become very familiar with git if interested in any sort of real development role)
     - If on windows I suggest using git bash (which should be installed alongside git) instead of a GUI - but ultimately use whatever you find works best for you
-2. Clone this repository by running `git clone https://github.com/CGUC/grapp-server.git` in your terminal
+2. Fork the repo in Github so you have your own local copy
+3. Clone your forked repository by running `git clone https://github.com/YourGithubUsername/skybunk-server` in your terminal
 3. Install [Node JS](https://nodejs.org/en/) which also installs NPM (Node package manager)
     - _If you're using linux, I would suggest [installing it through your package manager](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)_
 4. Download the [MongoDB community server](https://www.mongodb.com/download-center?jmp=nav#community) for your OS
@@ -43,9 +44,19 @@ In order to enable people with very little previous experience to contribute, th
 
 And you're set!
 
-To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `node helpers/scripts/populate.js` to load some dummy data into the database. Once that is finished running, run `nodemon` - this will automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/examples/Mark in your web browser. If all went well, you should be presented with a JSON similar to the following: 
-`{"counter":1,"_id":"5afb90607b209c3008b59ec5","name":"Mark","__v":0}`
+To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `nodemon` - this will automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/users in your web browser. If all went well, you should be presented with a JSON with the user data in the database.
+
 If you have issues, make sure you followed the steps above properly and if all else fails feel free to reach out to the dev team.
+
+## Connecting Development Server to Development Web and Mobile
+If you are working on a feature that requires both the server and front-end to be changed, you will need to connect your server to your mobile and web development environment. The steps to do such are as follows:
+
+1. Start the server using the above instructions. Verify that it is properly working on port 3000
+2. Install ngrok using `npm install -g ngrok`
+3. Run `ngrok http 3000`. This will forward port 3000 to a URL, which will be printed out when you run the command. Copy the URL that is given.
+4. In the web and mobile clients, modify API_ADDRESS in config.js to the URL that is output from ngrok. This tells your apps to look at your development server instead of looking at the production server.
+5. Make sure to not include the config.js change in your commits, since that URL should remain the same for the app to work in production.
+
 ## Architecture
 We're following traditional [MVC](https://www.tutorialspoint.com/mvc_framework/mvc_framework_introduction.htm) format throughout our application. This means controllers take care of the requests coming in from the views, and translate the input to the models. Therefore, all business logic should be done through the use of methods on the models and the controllers simply serve as a mediator between incoming HTTP requests and actions on the models. Thew View in this case is the app itself.
 
