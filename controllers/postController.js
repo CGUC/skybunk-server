@@ -87,6 +87,20 @@ router.put('/:id', verifyToken, (req, res) => {
 });
 
 /**
+ * Like a post
+ */
+router.post('/:pid/like', verifyToken, (req, res) => {
+  Post.likePost(req.params.pid, req.user._id, req.body.isLiked)
+  .then(post => {
+    res.json(post);
+  })
+  .catch(err => {
+    var errRes = classifyError(err);
+    res.status(errRes.status).json(errRes.message);
+  });
+});
+
+/**
  * Delete a post
  */
 router.delete('/:id', verifyToken, (req, res) => {
