@@ -206,16 +206,16 @@ PostSchema.statics.likePost = function (id, user, isLiked) {
     this.findById(id).then(post => {
       if (post && post.usersLiked) {
         if(isLiked){
-          if(post.usersLiked.includes(user)){
+          if(post.usersLiked.some(e => e == user)){
             reject("Already liked");
           }else{
             post.usersLiked.push(user);
-            post.likes++;
+            post.likes = post.usersLiked.length;
           }
         }else{
-          if(post.usersLiked.includes(user)){
-            post.usersLiked.splice(post.usersLiked.indexOf(user), 1);
-            post.likes--;
+          if(post.usersLiked.some(e => e == user)){
+            post.usersLiked = post.usersLiked.filter(u => u != user)
+            post.likes = post.usersLiked.length;
           }else{
             reject("Already not liked")
           }
