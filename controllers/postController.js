@@ -90,7 +90,7 @@ router.put('/:id', verifyToken, (req, res) => {
  * Like a post
  */
 router.post('/:pid/like', verifyToken, (req, res) => {
-  Post.likePost(req.params.pid, req.user._id, req.body.isLiked)
+  Post.likePost(req.params.pid, req.user._id, req.body.addLike)
   .then(post => {
     res.json(post);
   })
