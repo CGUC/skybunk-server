@@ -23,6 +23,7 @@ const UserSchema = new Schema({
 	username: {
 		type: String,
 		required: true,
+		lowercase: true,
 		unique: true,
 		dropDups: true
 	},
