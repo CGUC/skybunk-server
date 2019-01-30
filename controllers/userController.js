@@ -117,7 +117,7 @@ router.post('/:id/doninfo', verifyToken, (req, res) => {
 				user.donInfo = req.body
 				user.update(user);
 				//set timer to turn off don automagically
-				if(user.donInfo.isOn){
+				/*if(user.donInfo.isOn){
 					setTimer(user.donInfo.clockOut, user._id.toString(), {},() =>{
 						User.findOne({_id: user._id}).then(user => {
 							if(user.donInfo){
@@ -128,7 +128,7 @@ router.post('/:id/doninfo', verifyToken, (req, res) => {
 							console.error(err)
 						})
 					});
-				}
+				}*/
 				res.json(user.donInfo);
 			}
 		}).catch(err => {
