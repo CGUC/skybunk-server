@@ -199,6 +199,43 @@ PostSchema.statics.updatePost = function (id, postData) {
   });
 }
 
+PostSchema.statics.likePost = function (id, user, addLike) {
+  id = ObjectId(id);
+
+  return new Promise((resolve, reject) => {
+    this.findById(id).then(post => {
+      if (post && post.usersLiked) {
+        if(addLike){
+          if(post.usersLiked.some(e => e == user)){
+            reject("Already liked");
+          }else{
+            //add user to list
+            post.usersLiked.push(user);
+            post.likes = post.usersLiked.length;
+          }
+        }else{
+          if(post.usersLiked.some(e => e == user)){
+            //remove every instance of user from list
+            post.usersLiked = post.usersLiked.filter(u => u != user)
+            post.likes = post.usersLiked.length;
+          }else{
+            reject("Already not liked")
+          }
+        }
+        post.save().then(post => {
+          resolve(post);
+        })
+          .catch(err => {
+            reject(err);
+          });
+      }
+      else {
+        reject('Couldn\'t find a post with that ID');
+      }
+    });
+  });
+}
+
 PostSchema.statics.delete = function (id) {
   id = ObjectId(id);
 
