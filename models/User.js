@@ -23,6 +23,7 @@ const UserSchema = new Schema({
 	username: {
 		type: String,
 		required: true,
+		lowercase: true,
 		unique: true,
 		dropDups: true
 	},
@@ -104,16 +105,17 @@ UserSchema.statics.authenticate = function(username, password) {
 			if(!user) {
 				reject({message: 'Username does not exist'});
 			}
-
-			// Match password
-			bcrypt.compare(password, user.password, (err, isMatch) => {
-				if (isMatch && !err) {
-					resolve(user);
-				}
-				else {
-					reject({message: 'Password is incorrect'});
-				}
-			});
+			else {
+				// Match password
+				bcrypt.compare(password, user.password, (err, isMatch) => {
+					if (isMatch && !err) {
+						resolve(user);
+					}
+					else {
+						reject({message: 'Password is incorrect'});
+					}
+				});
+			}
 		});
 	});
 }
