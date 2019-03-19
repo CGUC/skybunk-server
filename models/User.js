@@ -142,13 +142,15 @@ UserSchema.statics.markNotifsSeen = function(id) {
 				Promise.all(promises).then(notifs => {
 					resolve(true);
 				})
-				.catch(reject(false));
+				.catch(err => reject(err));
 			}
 		})
-		.catch(reject({
-			message: 'Could not find user',
-			status: 404
-		}));
+		.catch(err => {
+			reject({
+				message: 'Could not find user',
+				status: 404
+			})
+		});
 	});
 }
 
