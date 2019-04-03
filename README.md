@@ -1,4 +1,4 @@
-# Skybunk Server
+# Skybunk Server [![CircleCI](https://circleci.com/gh/picklechips/skybunk-server.svg?style=svg)](https://circleci.com/gh/picklechips/skybunk-server)
 
 The server to process requests from the Skybunk mobile applicaiton.
 
