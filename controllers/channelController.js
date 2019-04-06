@@ -34,7 +34,7 @@ router.post('/', verifyToken, (req, res) => {
 /**
  * Get a channel by its id
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', verifyToken, (req, res) => {
   Channel.get(req.params.id).then(channel => {
     res.json(channel);
   })
@@ -47,7 +47,7 @@ router.get('/:id', (req, res) => {
 /**
  * Get all channels
  */
-router.get('/', (req, res) => {
+router.get('/', verifyToken, (req, res) => {
   Channel.getAll().then(channels => {
     res.json(channels);
   })
@@ -59,7 +59,7 @@ router.get('/', (req, res) => {
 /**
  * Get posts from a specific channel
  */
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', verifyToken, (req, res) => {
   Channel.getPosts(req.params.id, req.get('page')).then(posts => {
     res.json(posts);
   })

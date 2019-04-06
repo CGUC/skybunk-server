@@ -38,7 +38,7 @@ router.post('/', verifyToken, (req, res) => {
 /**
  * Get post by id
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', verifyToken, (req, res) => {
   Post.get(req.params.id).then(post => {
     res.json(post);
   })
@@ -51,7 +51,7 @@ router.get('/:id', (req, res) => {
 /**
  * Get all posts
  */
-router.get('/', (req, res) => {
+router.get('/', verifyToken, (req, res) => {
   Post.getAllPaginated(req.get('page')).then(posts => {
     res.json(posts);
   })
@@ -63,7 +63,7 @@ router.get('/', (req, res) => {
 /**
  * Get all posts from a specific user
  */
-router.get('/user/:id', (req, res) => {
+router.get('/user/:id', verifyToken, (req, res) => {
   Post.getUserPosts(req.params.id, req.get('page')).then(posts => {
     res.json(posts);
   }).catch(err => {
@@ -116,7 +116,7 @@ router.delete('/:id', verifyToken, (req, res) => {
 /**
  * Get all comments associated with the post
  */
-router.get('/:id/comments', (req, res) => {
+router.get('/:id/comments', verifyToken, (req, res) => {
   Post.getComments(req.params.id).then(comments => {
     res.json(200, comments);
   })
@@ -192,7 +192,7 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
 /**
  * Get the image
  */
-router.get('/:id/image', (req, res) => {
+router.get('/:id/image', verifyToken, (req, res) => {
   Post.findOne({_id: req.params.id})
   .populate('image')
   .then(post => {

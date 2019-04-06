@@ -18,14 +18,14 @@ require('../models/ProfilePicture');
 const ProfilePicture = mongoose.model('ProfilePicture');
 
 // Return all users
-router.get('/', (req, res) => {
+router.get('/', verifyToken, (req, res) => {
 	User.find().select('-password -notificationTokens -notifications').then(users => {
 		res.json(users);
 	});
 });
 
 // Get specific user
-router.get('/user/:id', (req, res) => {
+router.get('/user/:id', verifyToken, (req, res) => {
 	User.findOne({_id: req.params.id}).select('-password -notificationTokens -notifications').then(user => {
 		res.json(user);
 	}).catch(err => {
@@ -190,7 +190,7 @@ router.put('/:id/profilePicture', verifyToken, upload.single('profilePicture'), 
 });
 
 // Get the user profile picture
-router.get('/:id/profilePicture', (req, res) => {
+router.get('/:id/profilePicture', verifyToken, (req, res) => {
 	User.findOne({_id: req.params.id})
 	.populate('profilePicture')
 	.then(user => {
