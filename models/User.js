@@ -23,13 +23,13 @@ const UserSchema = new Schema({
 	username: {
 		type: String,
 		required: true,
+		lowercase: true,
 		unique: true,
 		dropDups: true
 	},
-	isAdmin: {
-		type: Boolean,
-		default: false
-	},
+	role: [{
+		type: String,
+	}],
 	info: new Schema({
 		program: {
 			type: String
@@ -41,6 +41,9 @@ const UserSchema = new Schema({
 			type: String
 		},
 		bio: {
+			type: String
+		},
+		phone: {
 			type: String
 		}
 	}),
@@ -58,7 +61,23 @@ const UserSchema = new Schema({
 	}],
 	notificationTokens: [{
 		type: String,
-	}]
+	}],
+	donInfo: {
+		isOn: {
+			type: Boolean,
+			default: false
+		},
+		isOnLateSupper: {
+			type: Boolean,
+			default: false
+		},
+		clockOut: {
+			type: String, //timestamp
+		},
+		location: {
+			type: String
+		},
+	}
 });
 
 // Create a new user
@@ -86,17 +105,17 @@ UserSchema.statics.authenticate = function(username, password) {
 			if(!user) {
 				reject({message: 'Username does not exist'});
 			}
-
-			// Match password
-			bcrypt.compare(password, user.password, (err, isMatch) => {
-				if(err) throw err;
-				if (isMatch) {
-					resolve(user);
-				}
-				else {
-					reject({message: 'Password is incorrect'});
-				}
-			});
+			else {
+				// Match password
+				bcrypt.compare(password, user.password, (err, isMatch) => {
+					if (isMatch && !err) {
+						resolve(user);
+					}
+					else {
+						reject({message: 'Password is incorrect'});
+					}
+				});
+			}
 		});
 	});
 }
