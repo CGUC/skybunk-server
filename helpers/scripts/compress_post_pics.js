@@ -26,7 +26,7 @@ const rl = readline.createInterface({
 
 function abort( message ) {
 	console.error(message);
-	console.error('Could not update users profile picture.');
+	console.error('Could not update post pictures.');
 	exit();
 }
 
