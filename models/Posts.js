@@ -8,7 +8,7 @@ const config = require('../config/options');
 
 require('./PostPicture');
 const PostPicture = mongoose.model('PostPicture');
-
+const sharp = require('sharp');
 const LIMIT = 15;
 
 // Schema.Types vs mongoose.Types: https://github.com/Automattic/mongoose/issues/1671
@@ -408,15 +408,23 @@ PostSchema.statics.deleteComment = function (postId, commentId) {
 
 PostSchema.methods.addImage = function(newBuffer) {
   return new Promise((resolve, reject) => {
-    const newImage = new PostPicture({ buffer: newBuffer });
-    newImage.save().then(pic => {
-      this.image = pic;
-      this.save().then(post => {
-        resolve(post.image);
+    sharp(newBuffer)
+		.resize({ height: 600, width: 600, withoutEnlargement: true })
+		.jpeg()
+		.toBuffer()
+		.then(outputBuffer => {
+			const newImage = new PostPicture({ buffer: outputBuffer });
+      newImage.save().then(pic => {
+        this.image = pic;
+        this.save().then(post => {
+          resolve(post.image);
+        })
+        .catch(err => reject(err));
       })
       .catch(err => reject(err));
-    })
-    .catch(err => reject(err));
+		}).catch(err => {
+			reject(err)
+		});
   });
 }
 

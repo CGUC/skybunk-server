@@ -6,6 +6,7 @@ require('./ProfilePicture');
 const ProfilePicture = mongoose.model('ProfilePicture');
 require('../models/Channels');
 const Channel = mongoose.model('Channel');
+const sharp = require('sharp');
 
 const UserSchema = new Schema({
 	firstName: {
@@ -196,23 +197,31 @@ UserSchema.methods.changePassword = function(newPassword) {
 
 UserSchema.methods.updateProfilePicture = function(newBuffer) {
 	return new Promise((resolve, reject) => {
-		if (this.profilePicture) {
-			this.profilePicture.update(newBuffer).then(pic => {
-				resolve(pic);
-			})
-			.catch(err => reject(err));
-		}
-		else {
-			const newProfilePicture = new ProfilePicture({ buffer: newBuffer });
-			newProfilePicture.save().then(pic => {
-				this.profilePicture = pic;
-				this.save().then(user => {
-					resolve(user.profilePicture);
+		sharp(newBuffer)
+		.resize({ height: 400, width: 400, withoutEnlargement: true })
+		.jpeg()
+		.toBuffer()
+		.then(outputBuffer => {
+			if (this.profilePicture) {
+				this.profilePicture.update(outputBuffer).then(pic => {
+					resolve(pic);
 				})
 				.catch(err => reject(err));
-			})
-			.catch(err => reject(err));
-		}
+			}
+			else {
+				const newProfilePicture = new ProfilePicture({ buffer: outputBuffer });
+				newProfilePicture.save().then(pic => {
+					this.profilePicture = pic;
+					this.save().then(user => {
+						resolve(user.profilePicture);
+					})
+					.catch(err => reject(err));
+				})
+				.catch(err => reject(err));
+			}
+		}).catch(err => {
+			reject(err)
+		});
 	});
 }
 
