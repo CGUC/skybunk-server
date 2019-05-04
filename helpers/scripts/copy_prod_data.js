@@ -62,57 +62,57 @@ rl.question('Username: ', (username) => {
 			}else{
 				token = jsonResponse.token;
 				console.log("Successfully logged in");
-			}
-		});
 
-		get('/users/', {'Authorization': 'Bearer ' + token}).then(users =>{
-			require('../../models/User');
-			const Usermodel = mongoose.model('User');
-			const promises = users.map(data => {
-				const user = new Usermodel(data);
-				return user.changePassword('password').then(updatedUser => {
-					user.save().then(user => {})
-					.catch(err => {
-						console.log(`Error saving ${user} ${err}`)
+				get('/users/', {'Authorization': 'Bearer ' + token}).then(users =>{
+					require('../../models/User');
+					const Usermodel = mongoose.model('User');
+					const promises = users.map(data => {
+						const user = new Usermodel(data);
+						return user.changePassword('password').then(updatedUser => {
+							user.save().then(user => {})
+							.catch(err => {
+								console.log(`Error saving ${user} ${err}`)
+							});
+						});
+					});
+					console.log("Setting user data")
+					Promise.all(promises).then(results => {
+						console.log("Successfully populated user data")
 					});
 				});
-			});
-			console.log("Setting user data")
-			Promise.all(promises).then(results => {
-				console.log("Successfully populated user data")
-			});
-		});
-
-		get('/channels/', {'Authorization': 'Bearer ' + token}).then(items =>{
-			require('../../models/Channels');
-			const model = mongoose.model('Channel');
-			const promises = items.map(data => {
-				const item = new model(data);
-				return item.save().then(item => {})
-					.catch(err => {
-						console.log(`Error saving ${item} ${err}`)
+		
+				get('/channels/', {'Authorization': 'Bearer ' + token}).then(items =>{
+					require('../../models/Channels');
+					const model = mongoose.model('Channel');
+					const promises = items.map(data => {
+						const item = new model(data);
+						return item.save().then(item => {})
+							.catch(err => {
+								console.log(`Error saving ${item} ${err}`)
+							});
 					});
-			});
-			console.log("Setting channel data")
-			Promise.all(promises).then(results => {
-				console.log("Successfully populated channel data")
-			});
-		});
-
-		get('/posts/', {'Authorization': 'Bearer ' + token}).then(items =>{
-			require('../../models/Posts');
-			const model = mongoose.model('Post');
-			const promises = items.map(data => {
-				const item = new model(data);
-				return item.save().then(item => {})
-					.catch(err => {
-						console.log(`Error saving ${item} ${err}`)
+					console.log("Setting channel data")
+					Promise.all(promises).then(results => {
+						console.log("Successfully populated channel data")
 					});
-			});
-			console.log("Setting post data")
-			Promise.all(promises).then(results => {
-				console.log("Successfully populated post data")
-			});
+				});
+		
+				get('/posts/', {'Authorization': 'Bearer ' + token}).then(items =>{
+					require('../../models/Posts');
+					const model = mongoose.model('Post');
+					const promises = items.map(data => {
+						const item = new model(data);
+						return item.save().then(item => {})
+							.catch(err => {
+								console.log(`Error saving ${item} ${err}`)
+							});
+					});
+					console.log("Setting post data")
+					Promise.all(promises).then(results => {
+						console.log("Successfully populated post data")
+					});
+				});
+			}
 		});
 	})
 })
