@@ -31,7 +31,7 @@ const UserSchema = new Schema({
 	role: [{
 		type: String,
 	}],
-	info: new Schema({
+	info: {
 		program: {
 			type: String
 		},
@@ -47,7 +47,7 @@ const UserSchema = new Schema({
 		phone: {
 			type: String
 		}
-	}),
+	},
 	profilePicture: {
 		type: Schema.Types.ObjectId,
 		ref: 'ProfilePicture',
