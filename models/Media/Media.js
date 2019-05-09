@@ -1,6 +1,5 @@
 require('../../models/Media/PostPicture');
 const mongoose = require('mongoose');
-const sharp = require('sharp');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
 const PostPicture = mongoose.model('PostPicture');
@@ -36,30 +35,15 @@ const MediaSchema = new Schema({
 MediaSchema.statics.create = function (type, data) {
 	return new Promise((resolve, reject) => {
 		if (type === 'image') {
-			sharp(data)
-			.resize({ height: 600, width: 600, withoutEnlargement: true })
-			.jpeg()
-			.toBuffer()
-			.then(outputBuffer => {
-				const newImage = new PostPicture({ buffer: outputBuffer });
-				newImage.save().then(pic => {
-					const newMedia = new this({
-						type,
-						image: newImage
-					});
-					newMedia.save().then(media => {
-				  		resolve(newMedia);
-					})
-					.catch(err => {
-						reject(err)
-					});
+			PostPicture.create(data).then(image => {
+				const newMedia = new this({ type, image });
+				newMedia.save().then(media => {
+			  		resolve(newMedia);
 				})
 				.catch(err => {
 					reject(err)
 				});
-			}).catch(err => {
-				reject(err)
-			});
+			})
 		}
 		else if (type === 'poll') {
 			// TODO

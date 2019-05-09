@@ -13,17 +13,20 @@ const PostPicture = mongoose.model('PostPicture')
 const imgBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=='
 
 describe("Media", () => {
-	let imageSave, mediaSave;
+	let imageSave, mediaSave, buffer;
 	before(() => {
-		imageSave = sinon.stub(PostPicture.prototype, 'save').resolves({});
+		buffer = new Buffer(imgBase64, 'base64');
+		const sampleImage = new PostPicture({ buffer })
+
+		imageCreate = sinon.stub(PostPicture, 'create').resolves(sampleImage);
 		mediaSave = sinon.stub(Media.prototype, 'save').resolves({});
 
 	});
 
 	after(() => {
-		imageSave.restore();
+		imageCreate.restore();
 		mediaSave.restore();
-	})
+	});
 
 	describe("correctly validates", () => {
 		it('if media type does not include proper media', done => {
@@ -35,7 +38,7 @@ describe("Media", () => {
 				expect(err.errors.type.message).to.equal('Type is set to image, yet no image provided.')
 				done()
 			});
-		})
+		});
 		it('if non-image type includes an image', done => {
 			const media = new Media({
 				type: 'dummy',
@@ -46,23 +49,17 @@ describe("Media", () => {
 				expect(err.errors.image.message).to.equal('Type is not set to image, yet image was provided.')
 				done()
 			});
-		})
-	})
+		});
+	});
 
 	describe("can handle", () => {
 		it('images successfully', done => {
-			const buffer = new Buffer(imgBase64, 'base64');
-
-			sharp(buffer)
-			.resize({ height: 600, width: 600, withoutEnlargement: true })
-			.jpeg()
-			.toBuffer()
-			.then(outputBuffer => {
-				Media.create('image', buffer).then(result => {
-					expect(result.type).to.equal('image')
-					expect(result.image.buffer.toString('base64')).to.equal(outputBuffer.toString('base64'))
-					done()
-				})
+			Media.create('image', buffer).then(result => {
+				expect(imageCreate.callCount).to.equal(1)
+				expect(imageCreate.args[0][0]).to.equal(buffer)
+				expect(result.type).to.equal('image')
+				expect(result.image.buffer.toString('base64')).to.equal(buffer.toString('base64'))
+				done()
 			});
 		});
 
@@ -70,7 +67,7 @@ describe("Media", () => {
 			Media.create('invalidType', {}).catch(err => {
 				expect(err.message).to.equal('Invalid media type provided')
 				done()
-			})
-		})
+			});
+		});
 	});
 });
