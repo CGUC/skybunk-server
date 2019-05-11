@@ -21,7 +21,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       
-      - run: /node_modules/.bin/eslint . 
+      - run: npx eslint . 
       - run: npm test
 
   deploy:
