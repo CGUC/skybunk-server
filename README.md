@@ -38,7 +38,7 @@ In order to enable people with very little previous experience to contribute, th
 5. `cd` into this repository
 6. run `npm install` to install the required node modules
 7. install nodemon by running `npm install -g nodemon`
-8. If you want to have some data to test on, you can run `node helpers/scrips/copy_prod_data.js`. This copies all users, posts, and channels from the production database, and sets all user passwords to 'password'. This does not have the ability to copy pictures to the development repo (though this can be added if someone wants to!).
+8. If you want to have some data to test on, you can run `node helpers/scripts/copy_prod_data.js`. This copies all users, posts, and channels from the production database, and sets all user passwords to 'password'. This does not have the ability to copy pictures to the development repo (though this can be added if someone wants to!).
 
 And you're set!
 
