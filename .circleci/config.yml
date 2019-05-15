@@ -20,7 +20,8 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
+      
+      - run: npx eslint . 
       - run: npm test
 
   deploy:
