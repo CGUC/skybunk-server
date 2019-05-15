@@ -1,3 +1,7 @@
+const express = require('express');
+
+const config = require('../config/options');
+
 /**
  * Dispatch errors in an appropriate format corresponding to their type.
  * If error is an object, it is an internal server error (ie something broke).
@@ -7,11 +11,12 @@
 exports.classifyError = (err) => {
   if (typeof err === 'object') {
     return ({ status: 500, message: err.message });
-  } if (typeof err === 'string') {
+  } else if (typeof err === 'string') {
     return ({ status: 403, message: err });
+  } else {
+    raise (new Error(`Invalid error type supplied to errors.classifyError: ${err}`));
   }
-  throw new Error(`Invalid error type supplied to errors.classifyError: ${err}`);
-};
+}
 
 /**
  * Ensure tags stored in database are an array of strings
@@ -19,7 +24,7 @@ exports.classifyError = (err) => {
  * @return {array}
  */
 exports.formatTags = (tags) => {
-  const formattedTags = [];
+  var formattedTags = [];
   if (typeof tags === 'object') {
     tags.forEach((tag) => {
       formattedTags.push(tag);
@@ -30,4 +35,4 @@ exports.formatTags = (tags) => {
     formattedTags.push(`${tags}`);
   } else return null;
   return formattedTags;
-};
+}

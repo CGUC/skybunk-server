@@ -1,185 +1,180 @@
 require('../../models/User');
-require('../../models/Posts');
+require('../../models/Posts')
 require('sinon-mongoose');
 const mongoose = require('mongoose');
 const chai = require('chai');
 const sinon = require('sinon');
-const bcrypt = require('bcryptjs');
 const UserFactory = require('../factories/users');
 const NotificationFactory = require('../factories/notifications');
+const bcrypt = require('bcryptjs');
 
-const { expect } = chai;
+const expect = chai.expect;
 const User = mongoose.model('User');
-const Post = mongoose.model('Post');
-const Notification = mongoose.model('Notification');
-const { fred } = UserFactory;
+const Post = mongoose.model('Post')
+const Notification = mongoose.model('Notification')
+const fred = UserFactory.fred
 
-describe('Users', () => {
-  let save;
-  before(() => {
-    save = sinon.stub(User.prototype, 'save').resolves(this);
-  });
+describe("Users", () => {
+	before(() => {
+		const save = sinon.stub(User.prototype, 'save').resolves(this);
+	});
 
-  after(() => {
-    save.restore();
-  });
+	describe("can be created", () => {
+		it('with no errors', done => {
+			const changePasswordStub = sinon.stub(User.prototype, 'changePassword').resolves(fred);
+			
+			User.create(fred).then(result => {
+				expect(changePasswordStub.callCount).to.equal(1);
+				expect(result.firstName).to.equal('fred');
+				done();
+			});
+			changePasswordStub.restore();
+		});
 
-  describe('can be created', () => {
-    it('with no errors', (done) => {
-      const changePasswordStub = sinon.stub(User.prototype, 'changePassword').resolves(fred);
+		it("with salted/hashed password", done => {
+			User.create(fred).then(result => {
+				expect(result.password).to.not.equal(fred.password)
+				done()
+			});
+		});
+	});
 
-      User.create(fred).then((result) => {
-        expect(changePasswordStub.callCount).to.equal(1);
-        expect(result.firstName).to.equal('fred');
-        done();
-      });
-      changePasswordStub.restore();
-    });
+	describe("can be authenticated", () => {
+		let findOneStub
+		beforeEach(() => {
+			findOneStub = sinon.stub(User.Query.base, 'findOne')
+		})
+		afterEach(() => {
+			findOneStub.restore()
+		})
 
-    it('with salted/hashed password', (done) => {
-      User.create(fred).then((result) => {
-        expect(result.password).to.not.equal(fred.password);
-        done();
-      });
-    });
-  });
+		it("without errors", done => {
+			findOneStub.resolves(fred);
 
-  describe('can be authenticated', () => {
-    let findOneStub;
-    beforeEach(() => {
-      findOneStub = sinon.stub(User.Query.base, 'findOne');
-    });
-    afterEach(() => {
-      findOneStub.restore();
-    });
+			User.authenticate(fred.username, UserFactory.fredData.password).then(user => {
+				expect(user._id).to.equal(fred._id)
+				done()
+			});
+		})
 
-    it('without errors', (done) => {
-      findOneStub.resolves(fred);
+		it("with proper errors when username is wrong", done => {
+			findOneStub.resolves(undefined);
 
-      User.authenticate(fred.username, UserFactory.fredData.password).then((user) => {
-        expect(user._id).to.equal(fred._id);
-        done();
-      });
-    });
+			User.authenticate('NotAUsername', fred.password).catch(err => {
+				expect(err.message).to.equal('Username does not exist')
+				done()
+			});
+		});
 
-    it('with proper errors when username is wrong', (done) => {
-      findOneStub.resolves(undefined);
+		it("with proper errors when password is wrong", done => {
+			findOneStub.resolves(fred);
 
-      User.authenticate('NotAUsername', fred.password).catch((err) => {
-        expect(err.message).to.equal('Username does not exist');
-        done();
-      });
-    });
+			User.authenticate(fred.username, 'wrongPassword').catch(err => {
+				expect(err.message).to.equal('Password is incorrect')
+				done()
+			});
+		});
+	});
 
-    it('with proper errors when password is wrong', (done) => {
-      findOneStub.resolves(fred);
+	describe("can manage notifications", () => {
+		it("by successfully marking notifications as seen", done => {
+			sinon
+				.mock(User)
+				.expects('findOne')
+				.chain('populate')
+				.withArgs('notifications')
+				.resolves(fred);
 
-      User.authenticate(fred.username, 'wrongPassword').catch((err) => {
-        expect(err.message).to.equal('Password is incorrect');
-        done();
-      });
-    });
-  });
+			const markSeenStub = sinon.stub(Notification.prototype, 'markSeen').resolves(NotificationFactory.seenNotification())
+			User.markNotifsSeen(1).then(result => {
+				expect(markSeenStub.callCount).to.equal(fred.notifications.length)
+				expect(result).to.equal(true)
+				done()
+			})
+		});
 
-  describe('can manage notifications', () => {
-    it('by successfully marking notifications as seen', (done) => {
-      sinon
-        .mock(User)
-        .expects('findOne')
-        .chain('populate')
-        .withArgs('notifications')
-        .resolves(fred);
+		it("by successfully registering new notification tokens", done => {
+			fred.notificationTokens = [];
+			
+			sinon.spy(fred, "registerNotificationToken");
 
-      const markSeenStub = sinon.stub(Notification.prototype, 'markSeen').resolves(NotificationFactory.seenNotification());
-      User.markNotifsSeen(1).then((result) => {
-        expect(markSeenStub.callCount).to.equal(fred.notifications.length);
-        expect(result).to.equal(true);
-        done();
-      });
-    });
+			fred.registerNotificationToken('arandomtoken').then(token => {
+				const spyCall = fred.registerNotificationToken.getCall(0);
+				expect(token).to.equal('arandomtoken');
+				expect(spyCall.thisValue.notificationTokens).to.include('arandomtoken');
+				fred.registerNotificationToken.restore();
+				done();
+			})
+		});
 
-    it('by successfully registering new notification tokens', (done) => {
-      fred.notificationTokens = [];
+		it("by not registering duplicate notification tokens", done => {
+			fred.notificationTokens = ['existingToken'];
 
-      sinon.spy(fred, 'registerNotificationToken');
+			sinon.spy(fred, "registerNotificationToken");
 
-      fred.registerNotificationToken('arandomtoken').then((token) => {
-        const spyCall = fred.registerNotificationToken.getCall(0);
-        expect(token).to.equal('arandomtoken');
-        expect(spyCall.thisValue.notificationTokens).to.include('arandomtoken');
-        fred.registerNotificationToken.restore();
-        done();
-      });
-    });
+			fred.registerNotificationToken('existingToken').then(token => {
+				const spyCall = fred.registerNotificationToken.getCall(0);
 
-    it('by not registering duplicate notification tokens', (done) => {
-      fred.notificationTokens = ['existingToken'];
+				expect(token).to.equal('existingToken')
+				expect(spyCall.thisValue.notificationTokens.length).to.equal(1);
+				fred.registerNotificationToken.restore();
+				done()
+			});
+		});
+	})
 
-      sinon.spy(fred, 'registerNotificationToken');
+	describe("can be modified", () => {
+		it("by updating with no errors", done => {			
+			sinon.spy(fred, "update");
 
-      fred.registerNotificationToken('existingToken').then((token) => {
-        const spyCall = fred.registerNotificationToken.getCall(0);
+			const newFred = {};
+			Object.assign(newFred, UserFactory.fredData);
+			newFred.firstName = 'Terrance';
 
-        expect(token).to.equal('existingToken');
-        expect(spyCall.thisValue.notificationTokens.length).to.equal(1);
-        fred.registerNotificationToken.restore();
-        done();
-      });
-    });
-  });
+			fred.update(newFred).then(user => {
+				const spyCall = fred.update.getCall(0);
+				expect(spyCall.thisValue.firstName).to.equal('Terrance');
+				fred.update.restore();
+				done();
+			})
+		});
 
-  describe('can be modified', () => {
-    it('by updating with no errors', (done) => {
-      sinon.spy(fred, 'update');
+		it("by updating the password with no errors", done => {
+			sinon.spy(fred, "changePassword");
 
-      const newFred = {};
-      Object.assign(newFred, UserFactory.fredData);
-      newFred.firstName = 'Terrance';
+			fred.changePassword('notWilma').then(() => {
+				const spyCall = fred.changePassword.getCall(0);
 
-      fred.update(newFred).then(() => {
-        const spyCall = fred.update.getCall(0);
-        expect(spyCall.thisValue.firstName).to.equal('Terrance');
-        fred.update.restore();
-        done();
-      });
-    });
+				bcrypt.compare('notWilma', spyCall.thisValue.password, (err, isMatch) => {
+					expect(isMatch).to.equal(true);
+					expect(err).to.equal(null);
+					done()
+				})
+			})
+		});
 
-    it('by updating the password with no errors', (done) => {
-      sinon.spy(fred, 'changePassword');
+		it("by creating a new profile picture with no errors", () => {
+			// TODO: We're robably gonna change the way we're handling photos anyways
+		});
 
-      fred.changePassword('notWilma').then(() => {
-        const spyCall = fred.changePassword.getCall(0);
+		it("by updating the profile picture with no errors", () => {
+			// TODO: We're robably gonna change the way we're handling photos anyways
+		});
+	})
 
-        bcrypt.compare('notWilma', spyCall.thisValue.password, (err, isMatch) => {
-          expect(isMatch).to.equal(true);
-          expect(err).to.equal(null);
-          done();
-        });
-      });
-    });
+	describe("can retrieve", () => {
+		it("posts from subscribed channels", done => {
+			const getPostsStub = sinon.stub(Post, 'findByTags').resolves([])
 
-    it('by creating a new profile picture with no errors', () => {
-      // TODO: We're robably gonna change the way we're handling photos anyways
-    });
+			fred.getPostsFromSubs(1).then(() => {
+				expect(getPostsStub.callCount).to.equal(1)
+				expect(getPostsStub.args[0][0]).to.eql(['general', 'events'])
+				done()
+			})
+		});
 
-    it('by updating the profile picture with no errors', () => {
-      // TODO: We're robably gonna change the way we're handling photos anyways
-    });
-  });
-
-  describe('can retrieve', () => {
-    it('posts from subscribed channels', (done) => {
-      const getPostsStub = sinon.stub(Post, 'findByTags').resolves([]);
-
-      fred.getPostsFromSubs(1).then(() => {
-        expect(getPostsStub.callCount).to.equal(1);
-        expect(getPostsStub.args[0][0]).to.eql(['general', 'events']);
-        done();
-      });
-    });
-
-    it('profile picture', () => {
-      // TODO: We're probably gonna change the way we're handling photos anyways
-    });
-  });
+		it("profile picture", () => {
+			// TODO: We're probably gonna change the way we're handling photos anyways
+		});
+	})
 });

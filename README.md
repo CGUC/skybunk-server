@@ -21,6 +21,7 @@ These requests are handled by our controllers. For example, A `GET` request at `
 - [Node JS](https://nodejs.org/en/) for the backend
   - [Express JS](https://expressjs.com/) as a web framework
   - [Mongoose](http://mongoosejs.com/) to interact with the database
+  - Although not manditory, you'll want [nodemon](https://nodemon.io/) to avoid manually restarting the server after every change.
 - [MongoDB](https://www.mongodb.com/) for the database
   - MongoDB is not a relational database which is what most people generally think of when they think of databases. MongoDB is a NoSQL database, so it's different than your traditional table-based database. Instead of storing data in tables it's stored in _collections_. You can read more about NoSQL databases [here](https://www.mongodb.com/nosql-explained)
 
@@ -36,11 +37,12 @@ In order to enable people with very little previous experience to contribute, th
 4. Follow the instructions [here](https://docs.mongodb.com/manual/administration/install-community/) to download, set up, and run MongoDB for your operating system
 5. `cd` into this repository
 6. run `npm install` to install the required node modules
-7. If you want to have some data to test on, you can run `node helpers/scripts/copy_prod_data.js`. This copies all users, posts, and channels from the production database, and sets all user passwords to 'password'. This does not have the ability to copy pictures to the development repo (though this can be added if someone wants to!).
+7. install nodemon by running `npm install -g nodemon`
+8. If you want to have some data to test on, you can run `node helpers/scripts/copy_prod_data.js`. This copies all users, posts, and channels from the production database, and sets all user passwords to 'password'. This does not have the ability to copy pictures to the development repo (though this can be added if someone wants to!).
 
 And you're set!
 
-To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `npm start` - this will start your server and automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/users in your web browser. If all went well, you should be presented with a JSON with the user data in the database.
+To make sure everythying worked, let's run the server locally. First, make sure your database is running (instructions for this can be found with the installation walkthrough listed above). Then, run `nodemon` - this will automatically update your server when you edit a file on your computer. With this running, go to http://localhost:3000/users in your web browser. If all went well, you should be presented with a JSON with the user data in the database.
 
 If you have issues, make sure you followed the steps above properly and if all else fails feel free to reach out to the dev team.
 
