@@ -1,3 +1,6 @@
 node_modules
 /.vscode
 /wiki
+/.nyc_output
+*.swp
+*.swo
