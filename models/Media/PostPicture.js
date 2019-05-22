@@ -12,7 +12,7 @@ const PostPictureSchema = new Schema({
 PostPictureSchema.statics.create = function (buffer) {
 	return new Promise((resolve, reject) => {
 		sharp(buffer)
-		.resize({ height: 600, width: 600, withoutEnlargement: true })
+		.resize({ height: 600, width: 600, fit: sharp.fit.inside, withoutEnlargement: true })
 		.jpeg()
 		.toBuffer()
 		.then(outputBuffer => {
