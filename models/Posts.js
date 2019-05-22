@@ -62,8 +62,8 @@ const PostSchema = new Schema({
   }, { timestamps: true })],
   media: {
     type: Schema.Types.ObjectId,
-    ref: 'Media'
-  }
+    ref: 'Media',
+  },
 }, { timestamps: true });
 
 PostSchema.statics.create = function (postData, author) {
@@ -442,20 +442,20 @@ PostSchema.methods.getImage = function () {
 
 PostSchema.methods.addMedia = function (type, data) {
   return new Promise((resolve, reject) => {
-    Media.create(type, data).then(media => {
+    Media.create(type, data).then((media) => {
       this.media = media;
 
-      this.save().then(post => {
+      this.save().then(() => {
         resolve(this.media);
       })
-      .catch(err => {
+        .catch((err) => {
+          reject(err);
+        });
+    })
+      .catch((err) => {
         reject(err);
-      })
-    })
-    .catch(err => {
-      reject(err);
-    })
-  })
-}
+      });
+  });
+};
 
 mongoose.model('Post', PostSchema);
