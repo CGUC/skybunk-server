@@ -18,8 +18,8 @@ describe('Polls', () => {
       multiSelect: false,
       options: [{
         text: 'red',
-        usersVoted: []
-      }]
+        usersVoted: [],
+      }],
     });
 
     pollSave = sinon.stub(Poll.prototype, 'save').resolves(this);
@@ -113,8 +113,8 @@ describe('Polls', () => {
       const pollData = {
         title: 'What is your favourite colour',
         multiSelect: false,
-        options: ['red', 'blue', 'yellow']
-      }
+        options: ['red', 'blue', 'yellow'],
+      };
 
       Poll.create(pollData).then((result) => {
         expect(result.title).to.equal(pollData.title);
@@ -127,11 +127,12 @@ describe('Polls', () => {
     });
 
     it('by finding a the poll and placing a vote', (done) => {
-      Poll.findAndVote(samplePoll._id, UserFactory.fred._id, samplePoll.options[0]._id).then((result) => {
-        expect(result._id).to.equal(samplePoll._id);
-        expect(result.options[0].usersVoted[0]).to.equal(UserFactory.fred._id);
-        done();
-      })
+      Poll.findAndVote(samplePoll._id, UserFactory.fred._id, samplePoll.options[0]._id)
+        .then((result) => {
+          expect(result._id).to.equal(samplePoll._id);
+          expect(result.options[0].usersVoted[0]).to.equal(UserFactory.fred._id);
+          done();
+        });
     });
 
     it('by finding a the poll and adding an option', (done) => {
@@ -141,7 +142,7 @@ describe('Polls', () => {
         expect(result._id).to.equal(samplePoll._id);
         expect(result.options[1].text).to.equal(newOption);
         done();
-      })
+      });
     });
   });
 });
