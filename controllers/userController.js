@@ -161,7 +161,11 @@ router.post('/login', (req, res) => {
       res.json({ token });
     });
   }).catch((err) => {
-    res.json({ err });
+    res.json({
+      err: {
+        message: err.message,
+      },
+    });
   });
 });
 
