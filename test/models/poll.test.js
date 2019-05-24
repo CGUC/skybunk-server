@@ -126,8 +126,8 @@ describe('Polls', () => {
       });
     });
 
-    it('by finding a the poll and placing a vote', (done) => {
-      Poll.findAndVote(samplePoll._id, UserFactory.fred._id, samplePoll.options[0]._id)
+    it('by placing a vote', (done) => {
+      samplePoll.placeVote(UserFactory.fred._id, samplePoll.options[0]._id)
         .then((result) => {
           expect(result._id).to.equal(samplePoll._id);
           expect(result.options[0].usersVoted[0]).to.equal(UserFactory.fred._id);
@@ -135,10 +135,10 @@ describe('Polls', () => {
         });
     });
 
-    it('by finding a the poll and adding an option', (done) => {
+    it('by adding an option', (done) => {
       const newOption = 'This option was added on';
 
-      Poll.findAndAddOption(samplePoll._id, newOption).then((result) => {
+      samplePoll.addOption(newOption).then((result) => {
         expect(result._id).to.equal(samplePoll._id);
         expect(result.options[1].text).to.equal(newOption);
         done();

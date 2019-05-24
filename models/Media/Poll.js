@@ -44,6 +44,10 @@ const PollSchema = new Schema({
       message: 'Poll is not set to multiSelect, but users have selected multiple options.',
     },
   },
+  open: {
+    type: Boolean,
+    default: false,
+  },
   options: {
     type: [PollOptionSchema],
     required: true,
@@ -69,38 +73,6 @@ PollSchema.statics.create = function (pollData) {
 
     newPoll.save().then(() => {
       resolve(newPoll);
-    })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
-PollSchema.statics.findAndAddOption = function (id, option) {
-  return new Promise((resolve, reject) => {
-    this.findById(id).then((poll) => {
-      poll.addOption(option).then((newPoll) => {
-        resolve(newPoll);
-      })
-        .catch((err) => {
-          reject(err);
-        });
-    })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
-PollSchema.statics.findAndVote = function (pollId, userId, optionId) {
-  return new Promise((resolve, reject) => {
-    this.findById(pollId).then((poll) => {
-      poll.placeVote(userId, optionId).then((newPoll) => {
-        resolve(newPoll);
-      })
-        .catch((err) => {
-          reject(err);
-        });
     })
       .catch((err) => {
         reject(err);
