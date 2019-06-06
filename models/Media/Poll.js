@@ -100,7 +100,7 @@ PollSchema.methods.addOption = function (option) {
 PollSchema.methods.placeVote = function (userId, optionId) {
   return new Promise((resolve, reject) => {
     const option = this.options.id(optionId);
-    if (option.usersVoted.includes(ObjectId(userId))) {
+    if (option.usersVoted.some((u) => u.toString() == userId.toString())) {
       reject(Error('User has already voted for this option'));
     }
 
