@@ -99,9 +99,31 @@ PollSchema.methods.addOption = function (option) {
 PollSchema.methods.placeVote = function (userId, optionId) {
   return new Promise((resolve, reject) => {
     const option = this.options.id(optionId);
+    if (option.usersVoted.includes(userId)) {
+      reject(Error('User has already voted for this option'));
+    }
+
     option.set({
       text: option.text,
       usersVoted: [...option.usersVoted, userId],
+    });
+
+    this.save().then(() => {
+      resolve(this);
+    })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+PollSchema.methods.retractVote = function (userId, optionId) {
+  return new Promise((resolve, reject) => {
+    const option = this.options.id(optionId);
+
+    option.set({
+      text: option.text,
+      usersVoted: option.usersVoted.filter((u) => u.toString() != userId.toString())
     });
 
     this.save().then(() => {

@@ -135,6 +135,42 @@ describe('Polls', () => {
         });
     });
 
+    it('by reurning an error when a user voted twice', (done) => {
+      const poll = new Poll({
+        title: 'Colour?',
+        multiSelect: false,
+        options: [{
+          text: 'red',
+          usersVoted: [UserFactory.fred._id],
+        }],
+      });
+
+      samplePoll.placeVote(UserFactory.fred._id, samplePoll.options[0]._id)
+        .catch((err) => {
+          expect(err.message).to.equal("User has already voted for this option");
+          done();
+        });
+    });
+
+    it('by retracting a vote', (done) => {
+      const poll = new Poll({
+        title: 'Colour?',
+        multiSelect: false,
+        options: [{
+          text: 'red',
+          usersVoted: [UserFactory.fred._id],
+        }],
+      });
+
+      expect(poll.options.length).to.equal(1);
+      samplePoll.retractVote(UserFactory.fred._id, samplePoll.options[0]._id)
+        .then((result) => {
+          expect(result._id).to.equal(samplePoll._id);
+          expect(result.options[0].usersVoted.length).to.equal(0);
+          done();
+        });
+    })
+
     it('by adding an option', (done) => {
       const newOption = 'This option was added on';
 
