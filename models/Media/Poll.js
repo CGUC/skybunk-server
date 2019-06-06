@@ -2,7 +2,6 @@ require('../../models/Media/PostPicture');
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
-const { ObjectId } = mongoose.Types;
 
 function hasDuplicates(array) {
   return (new Set(array)).size !== array.length;
@@ -100,7 +99,7 @@ PollSchema.methods.addOption = function (option) {
 PollSchema.methods.placeVote = function (userId, optionId) {
   return new Promise((resolve, reject) => {
     const option = this.options.id(optionId);
-    if (option.usersVoted.some((u) => u.toString() == userId.toString())) {
+    if (option.usersVoted.some(u => u.toString() === userId.toString())) {
       reject(Error('User has already voted for this option'));
       return;
     }
