@@ -102,6 +102,7 @@ PollSchema.methods.placeVote = function (userId, optionId) {
     const option = this.options.id(optionId);
     if (option.usersVoted.some((u) => u.toString() == userId.toString())) {
       reject(Error('User has already voted for this option'));
+      return;
     }
 
     option.set({
