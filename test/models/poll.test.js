@@ -145,9 +145,9 @@ describe('Polls', () => {
         }],
       });
 
-      samplePoll.placeVote(UserFactory.fred._id, samplePoll.options[0]._id)
+      poll.placeVote(UserFactory.fred._id, poll.options[0]._id)
         .catch((err) => {
-          expect(err.message).to.equal("User has already voted for this option");
+          expect(err.message).to.equal('User has already voted for this option');
           done();
         });
     });
@@ -169,7 +169,7 @@ describe('Polls', () => {
           expect(result.options[0].usersVoted.length).to.equal(0);
           done();
         });
-    })
+    });
 
     it('by adding an option', (done) => {
       const newOption = 'This option was added on';

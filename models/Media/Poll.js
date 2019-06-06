@@ -123,7 +123,7 @@ PollSchema.methods.retractVote = function (userId, optionId) {
 
     option.set({
       text: option.text,
-      usersVoted: option.usersVoted.filter((u) => u.toString() != userId.toString())
+      usersVoted: option.usersVoted.filter(u => u.toString() !== userId.toString()),
     });
 
     this.save().then(() => {
