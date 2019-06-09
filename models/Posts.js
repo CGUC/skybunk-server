@@ -217,9 +217,9 @@ PostSchema.statics.likePost = function (id, user, addLike) {
             post.usersLiked.push(user);
             post.likes = post.usersLiked.length;
           }
-        } else if (post.usersLiked.some(e => e === user)) {
+        } else if (post.usersLiked.some(e => e.toString() === user.toString())) {
           // remove every instance of user from list
-          post.usersLiked = post.usersLiked.filter(u => u !== user);
+          post.usersLiked = post.usersLiked.filter(u => u.toString() !== user.toString());
           post.likes = post.usersLiked.length;
         } else {
           reject(Error('Already not liked'));

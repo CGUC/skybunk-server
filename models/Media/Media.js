@@ -1,4 +1,6 @@
 require('../../models/Media/Poll');
+require('../../models/Media/PostPicture');
+
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
@@ -42,6 +44,7 @@ const MediaSchema = new Schema({
 const createImage = (Self, data) => new Promise((resolve, reject) => {
   PostPicture.create(data).then((image) => {
     const newMedia = new Self({ type: 'image', image });
+
     newMedia.save().then(() => {
       resolve(newMedia);
     })
