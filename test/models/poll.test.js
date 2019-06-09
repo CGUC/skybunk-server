@@ -116,7 +116,7 @@ describe('Polls', () => {
         options: ['red', 'blue', 'yellow'],
       };
 
-      Poll.create(pollData).then((result) => {
+      Poll.create(pollData, UserFactory.fred._id.toString()).then((result) => {
         expect(result.title).to.equal(pollData.title);
         expect(result.multiSelect).to.equal(pollData.multiSelect);
         expect(result.options[0].text).to.equal(pollData.options[0]);
@@ -174,7 +174,7 @@ describe('Polls', () => {
     it('by adding an option', (done) => {
       const newOption = 'This option was added on';
 
-      samplePoll.addOption(newOption).then((result) => {
+      samplePoll.addOption(newOption, UserFactory.fred._id.toString()).then((result) => {
         expect(result._id).to.equal(samplePoll._id);
         expect(result.options[1].text).to.equal(newOption);
         done();

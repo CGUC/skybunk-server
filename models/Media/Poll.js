@@ -2,6 +2,7 @@ require('../../models/Media/PostPicture');
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
+const { ObjectId } = mongoose.Types;
 
 function hasDuplicates(array) {
   return (new Set(array)).size !== array.length;
@@ -23,6 +24,10 @@ const PollOptionSchema = new Schema({
   text: {
     type: String,
     required: true,
+  },
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
   usersVoted: [{
     type: Schema.Types.ObjectId,
@@ -58,11 +63,12 @@ const PollSchema = new Schema({
   },
 }, { timestamps: true });
 
-PollSchema.statics.create = function (pollData) {
+PollSchema.statics.create = function (pollData, userId) {
   return new Promise((resolve, reject) => {
     const options = pollData.options.map(option => ({
       text: option,
       usersVoted: [],
+      creator: ObjectId(userId),
     }));
 
     const newPoll = new this({
@@ -80,11 +86,12 @@ PollSchema.statics.create = function (pollData) {
   });
 };
 
-PollSchema.methods.addOption = function (option) {
+PollSchema.methods.addOption = function (option, userId) {
   return new Promise((resolve, reject) => {
     this.options.push({
       text: option,
       usersVoted: [],
+      creator: ObjectId(userId),
     });
 
     this.save().then(() => {
