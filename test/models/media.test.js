@@ -1,4 +1,5 @@
 require('../../models/Media/PostPicture');
+require('../../models/Media/Poll');
 require('sinon-mongoose');
 const mongoose = require('mongoose');
 const chai = require('chai');
@@ -7,22 +8,36 @@ const sinon = require('sinon');
 const { expect } = chai;
 const Media = mongoose.model('Media');
 const PostPicture = mongoose.model('PostPicture');
+const Poll = mongoose.model('Poll');
 
 const imgBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
 describe('Media', () => {
   let imageCreate;
+  let pollCreate;
   let mediaSave;
   let buffer;
+  const pollData = {
+    title: 'What is your favourite Color',
+    options: [
+      'red',
+      'blue',
+      'yellow',
+    ],
+  };
+
   before(() => {
     buffer = Buffer.from(imgBase64, 'base64');
     const sampleImage = new PostPicture({ buffer });
+    const samplePoll = new Poll(pollData);
 
+    pollCreate = sinon.stub(Poll, 'create').resolves(samplePoll);
     imageCreate = sinon.stub(PostPicture, 'create').resolves(sampleImage);
     mediaSave = sinon.stub(Media.prototype, 'save').resolves({});
   });
 
   after(() => {
+    pollCreate.restore();
     imageCreate.restore();
     mediaSave.restore();
   });
@@ -59,6 +74,17 @@ describe('Media', () => {
         expect(result.type).to.equal('image');
         expect(result.image.buffer.toString('base64')).to.equal(buffer.toString('base64'));
         imageCreate.resetHistory();
+        done();
+      });
+    });
+
+    it('polls successfully', (done) => {
+      Media.create('poll', pollData).then((result) => {
+        expect(pollCreate.callCount).to.equal(1);
+        expect(pollCreate.args[0][0]).to.equal(pollData);
+        expect(result.type).to.equal('poll');
+        expect(result.poll.title).to.equal(pollData.title);
+        pollCreate.resetHistory();
         done();
       });
     });

@@ -1,8 +1,11 @@
+require('../../models/Media/Poll');
 require('../../models/Media/PostPicture');
+
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 const PostPicture = mongoose.model('PostPicture');
+const Poll = mongoose.model('Poll');
 
 function typeValidator(type) {
   return this[type] !== null && this[type] !== undefined;
@@ -31,7 +34,11 @@ const MediaSchema = new Schema({
     ref: 'PostPicture',
     validate: mediaValidator.bind(this)('image'),
   },
-  // TODO: poll
+  poll: {
+    type: Schema.Types.ObjectId,
+    ref: 'Poll',
+    validate: mediaValidator.bind(this)('poll'),
+  },
 }, { timestamps: true });
 
 const createImage = (Self, data) => new Promise((resolve, reject) => {
@@ -47,12 +54,25 @@ const createImage = (Self, data) => new Promise((resolve, reject) => {
   });
 });
 
+const createPoll = (Self, data) => new Promise((resolve, reject) => {
+  Poll.create(data).then((poll) => {
+    const newMedia = new Self({ type: 'poll', poll });
+
+    newMedia.save().then(() => {
+      resolve(newMedia);
+    })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+});
+
 MediaSchema.statics.create = function (type, data) {
   if (type === 'image') {
     return createImage(this, data);
   }
   if (type === 'poll') {
-    // TODO
+    return createPoll(this, data);
   }
 
   return new Promise((resolve, reject) => {
