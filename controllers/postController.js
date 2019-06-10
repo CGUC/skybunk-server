@@ -11,6 +11,7 @@ require('../models/Posts');
 const Post = mongoose.model('Post');
 const { verifyToken } = require('../helpers/authorization');
 const { classifyError } = require('../helpers/formatters');
+const { requestValidator } = require('../helpers/formatters');
 
 /**
  * Methods:
@@ -202,4 +203,135 @@ router.get('/:id/image', verifyToken, (req, res) => {
       res.json(err);
     });
 });
+
+// /////////////////////
+//      POLLS
+// /////////////////////
+router.get('/:id/poll', verifyToken, (req, res) => {
+  Post.findById(req.params.id)
+    .populate('author')
+    .populate({
+      path: 'media',
+      populate: {
+        path: 'poll',
+        populate: {
+          path: 'usersVoted',
+        },
+      },
+    })
+    .then((post) => {
+      if (!post.media.poll) {
+        res.status(400).json('Post does not have a poll');
+        return;
+      }
+      res.json(post.media.poll);
+    })
+    .catch((err) => {
+      res.status(500).json(err.toString());
+    });
+});
+
+router.post('/:id/poll', verifyToken, (req, res) => {
+  Post.findById(req.params.id)
+    .populate('author')
+    .then((post) => {
+      if (post.author._id.toString() !== req.user._id.toString()) {
+        res.status(403).json({});
+        return;
+      }
+
+      const validation = requestValidator(['options', 'title', 'multiSelect'], req.body);
+      if (validation.status !== 200) {
+        res.status(validation.status).json(validation.message);
+        return;
+      }
+
+      post.addMedia('poll', { ...req.body, userID: req.user._id }).then((media) => {
+        res.json(media.poll);
+      }).catch((err) => {
+        res.status(500).json(err.toString());
+      });
+    }).catch((err) => {
+      res.status(500).json(err.toString());
+    });
+});
+
+router.post('/:id/poll/option', verifyToken, (req, res) => {
+  Post.findById(req.params.id)
+    .populate('author')
+    .populate({
+      path: 'media',
+      populate: {
+        path: 'poll',
+      },
+    })
+    .then((post) => {
+      if (!post.media.poll) {
+        res.status(400).json('Post does not have a poll');
+        return;
+      }
+
+      if (!post.media.poll.open && post.author._id.toString() !== req.user._id.toString()) {
+        res.status(403).json({});
+        return;
+      }
+
+      const validation = requestValidator(['option'], req.body);
+      if (validation.status !== 200) {
+        res.status(validation.status).json(validation.message);
+      }
+
+      post.media.poll.addOption(req.body.option, req.user._id).then((poll) => {
+        res.json(poll);
+      })
+        .catch((err) => {
+          res.status(500).json(err.toString());
+        });
+    })
+    .catch((err) => {
+      res.status(500).json(err.toString());
+    });
+});
+
+router.post('/:id/poll/vote', verifyToken, (req, res) => {
+  Post.findById(req.params.id)
+    .populate('author')
+    .populate({
+      path: 'media',
+      populate: {
+        path: 'poll',
+      },
+    })
+    .then((post) => {
+      if (!post.media.poll) {
+        res.json(404, 'Post does not have a poll');
+        return;
+      }
+
+      const validation = requestValidator(['optionId'], req.body);
+      if (validation.status !== 200) {
+        res.status(validation.status).json(validation.message);
+      }
+
+      if (req.body.retract) {
+        post.media.poll.retractVote(req.user._id, req.body.optionId).then((poll) => {
+          res.json(poll);
+        })
+          .catch((err) => {
+            res.status(500).json(err.toString());
+          });
+      } else {
+        post.media.poll.placeVote(req.user._id, req.body.optionId).then((poll) => {
+          res.json(poll);
+        })
+          .catch((err) => {
+            res.status(500).json(err.toString());
+          });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json(err.toString());
+    });
+});
+
 module.exports = router;

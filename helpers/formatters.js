@@ -31,3 +31,13 @@ exports.formatTags = (tags) => {
   } else return null;
   return formattedTags;
 };
+
+/**
+ * Validate request has appropriate format
+ */
+exports.requestValidator = (requiredParams, req) => {
+  for (let i = 0; i < requiredParams.length; i++) {
+    if (req[requiredParams[i]] === undefined || req[requiredParams[i]] === null) return { status: 400, message: `${requiredParams[i]} field is required.` };
+  }
+  return { status: 200 };
+};
