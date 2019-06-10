@@ -319,7 +319,7 @@ router.post('/:id/poll/vote', verifyToken, (req, res) => {
         })
           .catch((err) => {
             res.status(500).json(err.toString());
-          }); 
+          });
       } else {
         post.media.poll.placeVote(req.user._id, req.body.optionId).then((poll) => {
           res.json(poll);
