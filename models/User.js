@@ -1,4 +1,4 @@
-import sharp from 'sharp';
+const sharp = require('sharp');
 
 require('./ProfilePicture');
 require('../models/Channels');

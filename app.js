@@ -64,6 +64,10 @@ const notificationsController = require('./controllers/notificationsController')
 
 app.use('/notifications', notificationsController);
 
+const adminController = require('./controllers/adminController');
+
+app.use('/admin', adminController);
+
 // Start the server on port 3000
 // Use the port environment variable (needed for heroku) or 300 (dev)
 const port = process.env.PORT || 3000;
