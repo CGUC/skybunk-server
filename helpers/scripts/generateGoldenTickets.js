@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-require('../models/GoldenTicket');
+require('../../models/GoldenTicket');
 
 const GoldenTicket = mongoose.model('GoldenTicket');
 

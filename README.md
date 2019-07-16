@@ -44,6 +44,9 @@ To make sure everythying worked, let's run the server locally. First, make sure 
 
 If you have issues, make sure you followed the steps above properly and if all else fails feel free to reach out to the dev team.
 
+## Populating and modifying your local database for testing
+Please refer to the [helper scripts documentation](./helpers/scripts/help.md)
+
 ## Connecting Development Server to Development Web and Mobile
 If you are working on a feature that requires both the server and front-end to be changed, you will need to connect your server to your mobile and web development environment. The steps to do such are as follows:
 
