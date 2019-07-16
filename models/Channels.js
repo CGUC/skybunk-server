@@ -8,7 +8,6 @@ const { formatTags } = require('../helpers/formatters');
 const { ObjectId } = mongoose.Types;
 const { Schema } = mongoose;
 
-const User = mongoose.model('User');
 const Post = mongoose.model('Post');
 
 const ChannelSchema = new Schema({
@@ -147,6 +146,8 @@ ChannelSchema.statics.delete = function (id) {
 };
 
 ChannelSchema.methods.notifyUsersOfPost = function (post, author) {
+  const User = mongoose.model('User');
+
   User.find({ subscribedChannels: this._id })
     .select('-password')
     .then((users) => {
