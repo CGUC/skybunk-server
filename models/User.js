@@ -1,8 +1,8 @@
-import sharp from 'sharp';
 
 require('./ProfilePicture');
 require('../models/Channels');
 require('../models/Posts');
+const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
