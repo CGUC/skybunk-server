@@ -19,13 +19,15 @@ rl.question("a - add admin priviledges || r - remove admin priviledges || v - vi
   mongoose.connect(local)
     .then(db => {
       if (['a', 'r'].includes(action)) {
-        rl.question("Enter target user ID: ", id => {
-          UserModel.findOne({ _id: id })
+        rl.question("Enter target username: ", username => {
+          UserModel.findOne({ username })
             .then(target => {
               if (action === 'a') {
-                target.isAdmin = true;
+                if (!target.role.includes('admin')) {
+                  target.role.push('admin');
+                }
               } else if (action === 'r') {
-                target.isAdmin = false;
+                target.role.filter(e => e != 'admin');
               }
 
               target.save().then(() => {
@@ -39,7 +41,7 @@ rl.question("a - add admin priviledges || r - remove admin priviledges || v - vi
 
         })
       } else {
-        UserModel.find({ isAdmin: true }).then(admins => {
+        UserModel.find({ role: 'admin' }).then(admins => {
           console.log("Current Admins:");
           admins.forEach(admin => {
             console.log(`\t- ${admin.firstName} ${admin.lastName} (${admin._id})`);
