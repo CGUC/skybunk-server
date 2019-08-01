@@ -21,4 +21,14 @@ module.exports = {
       res.sendStatus(403);
     }
   },
+
+  verifyAdmin(req, res, next) {
+    const { user } = req;
+
+    if (!user.role.includes('admin')) {
+      res.sendStatus(403);
+    } else {
+      next();
+    }
+  },
 };

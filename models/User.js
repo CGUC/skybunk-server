@@ -158,6 +158,7 @@ UserSchema.methods.update = function (updatedUserData) {
     this.username = updatedUserData.username;
     this.subscribedChannels = updatedUserData.subscribedChannels;
     this.info = updatedUserData.info;
+    this.role = updatedUserData.role;
 
     this.save().then((user) => {
       resolve(user);
