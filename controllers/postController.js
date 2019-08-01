@@ -177,8 +177,9 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
   Post.findOne({ _id: req.params.id })
     .populate('author')
     .then((post) => {
-      if (post.author._id !== req.user._id) {
+      if (post.author._id.toString() !== req.user._id.toString()) {
         res.status(403);
+        return;
       }
 
       post.addImage(req.file.buffer).then((pic) => {
