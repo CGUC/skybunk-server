@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { authServerAddress } = require('../config/options');
+const { accessKey } = require('../config/secrets');
 const fetch = require("node-fetch");
 
 require('../models/GoldenTicket');
@@ -11,6 +12,7 @@ module.exports.generateTickets = (count) => {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      'AccessKey': accessKey
     },
     body: JSON.stringify({count})
   }).then(response => response.json()).then(async jsonResponse => {
