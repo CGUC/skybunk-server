@@ -1,4 +1,3 @@
-
 require('./ProfilePicture');
 require('../models/Channels');
 require('../models/Posts');
