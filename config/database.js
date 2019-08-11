@@ -4,6 +4,6 @@ if (process.env.NODE_ENV === 'production') {
   };
 } else {
   module.exports = {
-    mongoURI: `mongodb://localhost/${process.env.MONGO_DB}`
+    mongoURI: `mongodb://localhost/grapp-dev`
   };
 }
