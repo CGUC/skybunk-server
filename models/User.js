@@ -1,5 +1,3 @@
-const sharp = require('sharp');
-
 require('./ProfilePicture');
 require('../models/Channels');
 require('../models/Posts');
