@@ -1,7 +1,6 @@
 require('./User');
 require('./Posts');
 const mongoose = require('mongoose');
-const _ = require('lodash');
 const NotificationManager = require('../helpers/notificationManager');
 const { formatTags } = require('../helpers/formatters');
 
@@ -115,11 +114,11 @@ ChannelSchema.statics.updateChannel = function (id, updatedChannelObj) {
   return new Promise((resolve, reject) => {
     this.findById(id).then((channel) => {
       if (channel) {
-        const channelData = _.extend({}, channel, updatedChannelObj.description);
-        channelData.name = name;
-        channelData.tags = formattedTags;
+        channel.description = updatedChannelObj.description;
+        channel.name = name;
+        channel.tags = formattedTags;
 
-        channelData.save().then((updatedChannel) => {
+        channel.save().then((updatedChannel) => {
           resolve(updatedChannel);
         })
           .catch((err) => {

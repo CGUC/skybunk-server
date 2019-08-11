@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 require('../models/Channels');
 
 const Channel = mongoose.model('Channel');
-const { verifyToken } = require('../helpers/authorization');
+const { verifyToken, verifyAdmin } = require('../helpers/authorization');
 const { classifyError } = require('../helpers/formatters');
 
 /**
@@ -22,7 +22,7 @@ const { classifyError } = require('../helpers/formatters');
 /**
  * Create a new channel
  */
-router.post('/', verifyToken, (req, res) => {
+router.post('/', verifyToken, verifyAdmin, (req, res) => {
   Channel.create(req.body).then((channel) => {
     res.json(channel);
   })
@@ -73,8 +73,8 @@ router.get('/:id/posts', verifyToken, (req, res) => {
 /**
  * Update a channel
  */
-router.put('/:id', verifyToken, (req, res) => {
-  Channel.updtedChannel(req.params.id, req.body).then((channel) => {
+router.put('/:id', verifyToken, verifyAdmin, (req, res) => {
+  Channel.updateChannel(req.params.id, req.body).then((channel) => {
     res.json(channel);
   })
     .catch((err) => {
@@ -86,7 +86,7 @@ router.put('/:id', verifyToken, (req, res) => {
 /**
  * Delete a channel
  */
-router.delete('/:id', verifyToken, (req, res) => {
+router.delete('/:id', verifyToken, verifyAdmin, (req, res) => {
   Channel.delete(req.params.id).then((msg) => {
     res.json(msg);
   })

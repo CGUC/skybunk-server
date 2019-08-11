@@ -50,7 +50,7 @@ router.post('/', (req, res) => {
 
 // Deletes a user
 router.delete('/:id', verifyToken, (req, res) => {
-  if (req.params.id !== req.user._id) {
+  if (!req.user.role.includes('admin') && req.params.id !== req.user._id) {
     res.status(403);
   } else {
     User.deleteOne({ _id: req.params.id })
@@ -62,13 +62,14 @@ router.delete('/:id', verifyToken, (req, res) => {
   }
 });
 
-// Updates logged in user
+// Updates a user
 router.put('/:id', verifyToken, (req, res) => {
-  if (req.params.id !== req.user._id) {
+  if (!req.user.role.includes('admin') && req.params.id.toString() !== req.user._id.toString()) {
     res.status(403);
+    return;
   }
 
-  User.findOne({ _id: req.user._id }).then((user) => {
+  User.findOne({ _id: req.params.id }).then((user) => {
     user.update(req.body).then((user) => {
       res.json(user);
     }).catch((err) => {
@@ -81,8 +82,9 @@ router.put('/:id', verifyToken, (req, res) => {
 
 // Changes a user password
 router.post('/:id/password', verifyToken, (req, res) => {
-  if (req.params.id !== req.user._id) {
+  if (req.params.id.toString() !== req.user._id.toString()) {
     res.status(403);
+    return;
   }
 
   User.findOne({ _id: req.user._id }).then((user) => {
@@ -171,8 +173,9 @@ router.post('/login', (req, res) => {
 
 // Update user profile picture
 router.put('/:id/profilePicture', verifyToken, upload.single('profilePicture'), (req, res) => {
-  if (req.params.id !== req.user._id) {
+  if (req.params.id.toString() !== req.user._id.toString()) {
     res.status(403);
+    return;
   }
 
   User.findOne({ _id: req.params.id })
@@ -219,8 +222,9 @@ router.get('/:id/subscribedChannels/posts', (req, res) => {
 });
 
 router.post('/:id/notificationToken', verifyToken, (req, res) => {
-  if (req.params.id !== req.user._id) {
+  if (req.params.id.toString() !== req.user._id.toString()) {
     res.status(403);
+    return;
   }
 
   User.findOne({ _id: req.params.id })
@@ -236,8 +240,9 @@ router.post('/:id/notificationToken', verifyToken, (req, res) => {
 });
 
 router.post('/:id/markNotifsSeen', verifyToken, (req, res) => {
-  if (req.params.id !== req.user._id) {
+  if (req.params.id.toString() !== req.user._id.toString()) {
     res.status(403);
+    return;
   }
 
   User.markNotifsSeen(req.user._id)
