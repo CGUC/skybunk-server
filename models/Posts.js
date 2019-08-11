@@ -1,4 +1,5 @@
-require('./PostPicture');
+require('./Media/PostPicture');
+require('./Media/Media');
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const sharp = require('sharp');
@@ -9,6 +10,7 @@ const config = require('../config/options');
 const { Schema } = mongoose;
 const { ObjectId } = mongoose.Types;
 const PostPicture = mongoose.model('PostPicture');
+const Media = mongoose.model('Media');
 
 const LIMIT = 15;
 
@@ -29,6 +31,7 @@ const PostSchema = new Schema({
     type: String,
     required: true,
   },
+  // For legacy posts, remove once posts have been updated to use 'media'
   image: {
     type: Schema.Types.ObjectId,
     ref: 'PostPicture',
@@ -57,6 +60,10 @@ const PostSchema = new Schema({
       required: true,
     },
   }, { timestamps: true })],
+  media: {
+    type: Schema.Types.ObjectId,
+    ref: 'Media',
+  },
 }, { timestamps: true });
 
 PostSchema.statics.create = function (postData, author) {
@@ -404,6 +411,7 @@ PostSchema.statics.deleteComment = function (postId, commentId) {
   });
 };
 
+// For Legacy posts. Remove once all posts have been updated to use 'media'
 PostSchema.methods.addImage = function (newBuffer) {
   return new Promise((resolve, reject) => {
     sharp(newBuffer)
@@ -427,8 +435,27 @@ PostSchema.methods.addImage = function (newBuffer) {
   });
 };
 
+// For Legacy posts. Remove once all posts have been updated to use 'media'
 PostSchema.methods.getImage = function () {
   return this.image.buffer.toString('base64');
+};
+
+PostSchema.methods.addMedia = function (type, data) {
+  return new Promise((resolve, reject) => {
+    Media.create(type, data).then((media) => {
+      this.media = media;
+
+      this.save().then(() => {
+        resolve(this.media);
+      })
+        .catch((err) => {
+          reject(err);
+        });
+    })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 };
 
 mongoose.model('Post', PostSchema);
