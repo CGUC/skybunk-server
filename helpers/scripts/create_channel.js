@@ -17,7 +17,7 @@ rl.question('Name: ', (name) => {
 				console.log('...');
 				let mongoUri ;
 				if (user === 'dev') {
-					mongoUri = `mongodb://localhost/${process.env.MONGO_DB}`;
+					mongoUri = `mongodb://localhost/grap-dev`;
 				}
 				else {
 					mongoUri = `mongodb://${user}:${password}@ds163510.mlab.com:63510/grapp`;
