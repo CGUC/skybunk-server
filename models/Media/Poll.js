@@ -66,14 +66,15 @@ const PollSchema = new Schema({
 PollSchema.statics.create = function (pollData, userId) {
   return new Promise((resolve, reject) => {
     const options = pollData.options.map(option => ({
-      text: option,
-      usersVoted: [],
+      text: option.text,
+      usersVoted: option.usersVoted || [],
       creator: ObjectId(userId),
     }));
 
     const newPoll = new this({
       title: pollData.title,
       multiSelect: pollData.multiSelect,
+      open: !!pollData.open,
       options,
     });
 
