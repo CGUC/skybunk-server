@@ -113,15 +113,23 @@ describe('Polls', () => {
       const pollData = {
         title: 'What is your favourite colour',
         multiSelect: false,
-        options: ['red', 'blue', 'yellow'],
+        options: [{
+          text: 'red',
+        }, {
+          text: 'blue',
+          usersVoted: [UserFactory.fred._id],
+        }, {
+          text: 'yellow',
+        }],
       };
 
       Poll.create(pollData, UserFactory.fred._id.toString()).then((result) => {
         expect(result.title).to.equal(pollData.title);
         expect(result.multiSelect).to.equal(pollData.multiSelect);
-        expect(result.options[0].text).to.equal(pollData.options[0]);
-        expect(result.options[1].text).to.equal(pollData.options[1]);
-        expect(result.options[2].text).to.equal(pollData.options[2]);
+        expect(result.options[0].text).to.equal(pollData.options[0].text);
+        expect(result.options[1].text).to.equal(pollData.options[1].text);
+        expect(result.options[2].text).to.equal(pollData.options[2].text);
+        expect(result.options[1].usersVoted[0]).to.equal(UserFactory.fred._id);
         done();
       });
     });
