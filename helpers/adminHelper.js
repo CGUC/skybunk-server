@@ -49,19 +49,26 @@ module.exports.generateTickets = count => fetch(`${authServerAddress}/servers/${
     AccessKey: accessKey,
   },
   body: JSON.stringify({ count }),
-}).then(response => response.json()).then(async (jsonResponse) => {
+}).then((response) => {
+  if (response.status !== 200) throw response;
+
+  return response.json();
+}).then(async (jsonResponse) => {
   await GoldenTicket.insertMany(jsonResponse.map(ticketNumber => ({ ticketNumber })));
 
   return jsonResponse;
 }).catch((err) => {
   console.error(err);
+  return err;
 });
 
 module.exports.inviteUsers = async (users) => {
   let tickets = [];
   try {
     tickets = await module.exports.generateTickets(users.length);
+    if (!(tickets.length)) throw tickets;
   } catch (e) {
+    console.error(e);
     return { errors: { err: 'Could not generate golden tickets.' } };
   }
 
