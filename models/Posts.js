@@ -59,6 +59,11 @@ const PostSchema = new Schema({
       type: String,
       required: true,
     },
+    usersLiked: [{
+      type: Schema.Types.ObjectId,
+      default: [],
+      ref: 'User',
+    }]
   }, { timestamps: true })],
   media: {
     type: Schema.Types.ObjectId,
@@ -390,6 +395,44 @@ PostSchema.statics.updateComment = function (postId, commentId, commentData) {
       });
   });
 };
+
+PostSchema.statics.likeComment = function (postId, commentId, user, addLike) {
+  postId = ObjectId(postId);
+  commentId = ObjectId(commentId);
+
+    return this.get(postId).then((post) => {
+      const comment = post.comments.id(commentId);
+      return new Promise((resolve, reject) => {
+        console.log("Add")
+        if (addLike) {
+          if (comment.usersLiked.some(e => e.toString() == user.toString())) {
+            reject(Error('Already liked'));
+          } else {
+            // add user to list
+            comment.usersLiked.push(user);
+            comment.likes = comment.usersLiked.length;
+          }
+        } else if (comment.usersLiked.some(e => e.toString() === user.toString())) {
+          // remove every instance of user from list
+          comment.usersLiked = comment.usersLiked.filter(u => u.toString() !== user.toString());
+          comment.likes = comment.usersLiked.length;
+        } else {
+          reject(Error('Already not liked'));
+        }
+        post.save().then((updatedPost) => {
+          resolve(updatedPost.comments.id(commentId));
+        })
+          .catch((err) => {
+            console.error(err);
+            reject(err);
+          });
+    })
+      .catch((err) => {
+        console.error(err);
+        reject(err);
+      });
+  });
+}
 
 PostSchema.statics.deleteComment = function (postId, commentId) {
   postId = ObjectId(postId);
