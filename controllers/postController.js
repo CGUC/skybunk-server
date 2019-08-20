@@ -162,15 +162,15 @@ router.put('/:pid/comment/:cid', verifyToken, (req, res) => {
  * @param {string} pid - post's id
  * @param {string} cid - comment's id
  */
-router.post('/:pid/comment/:cid/like', verifyToken, (req,res) => {
+router.post('/:pid/comment/:cid/like', verifyToken, (req, res) => {
   Post.likeComment(req.params.pid, req.params.cid, req.user._id, req.body.addLike)
-  .then((post) => {
-    res.json(post);
-  })
-  .catch((err) => {
-    const errRes = classifyError(err);
-    res.status(errRes.status).json(errRes.message);
-  });
+    .then((post) => {
+      res.json(post);
+    })
+    .catch((err) => {
+      const errRes = classifyError(err);
+      res.status(errRes.status).json(errRes.message);
+    });
 });
 
 /**
