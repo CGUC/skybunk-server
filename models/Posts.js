@@ -405,7 +405,7 @@ PostSchema.statics.likeComment = function (postId, commentId, user, addLike) {
     return new Promise((resolve, reject) => {
       console.log('Add');
       if (addLike) {
-        if (comment.usersLiked.some(e => e.toString() == user.toString())) {
+        if (comment.usersLiked.some(e => e.toString() === user.toString())) {
           reject(Error('Already liked'));
         } else {
           // add user to list
@@ -426,11 +426,7 @@ PostSchema.statics.likeComment = function (postId, commentId, user, addLike) {
           console.error(err);
           reject(err);
         });
-    })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
+    });
   });
 };
 
