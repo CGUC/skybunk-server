@@ -113,7 +113,7 @@ PollSchema.methods.removeOption = function (opt, userId) {
       return;
     }
 
-    var optIndex = this.options.findIndex(o => o._id.toString() === option._id.toString());
+    const optIndex = this.options.findIndex(o => o._id.toString() === option._id.toString());
     this.options.splice(optIndex, 1);
 
     this.save().then(() => {
