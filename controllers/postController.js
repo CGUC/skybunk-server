@@ -320,7 +320,7 @@ router.post('/:id/poll/option/delete', verifyToken, (req, res) => {
         res.status(validation.status).json(validation.message);
       }
 
-      post.media.poll.removeOption(req.body, req.user._id).then((poll) => {
+      post.media.poll.removeOption(req.body).then((poll) => {
         res.json(poll);
       })
         .catch((err) => {

@@ -104,7 +104,7 @@ PollSchema.methods.addOption = function (option, userId) {
   });
 };
 
-PollSchema.methods.removeOption = function (opt, userId) {
+PollSchema.methods.removeOption = function (opt) {
   return new Promise((resolve, reject) => {
     const option = this.options.id(opt._id);
 

@@ -193,7 +193,7 @@ describe('Polls', () => {
       samplePoll.addOption('Option added by fred', UserFactory.fred._id.toString()).then((pollWithOption) => {
         const option = {
           _id: pollWithOption.options[1]._id,
-          creator: UserFactory.fred._id.toString()
+          creator: UserFactory.fred._id.toString(),
         };
 
         pollWithOption.removeOption(option, UserFactory.fred._id.toString()).then((result) => {
