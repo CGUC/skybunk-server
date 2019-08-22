@@ -190,18 +190,11 @@ describe('Polls', () => {
     });
 
     it('by removing an option', (done) => {
-      samplePoll.addOption('Option added by fred', UserFactory.fred._id.toString()).then((pollWithOption) => {
-        const option = {
-          _id: pollWithOption.options[1]._id,
-          creator: UserFactory.fred._id.toString(),
-        };
-
-        pollWithOption.removeOption(option).then((result) => {
-          expect(result._id).to.equal(pollWithOption._id);
-          expect(result.options.length).to.equal(pollWithOption.options.length - 1);
-          expect(result.options[0]._id.toString()).to.equal(samplePoll.options[0]._id.toString());
-          done();
-        });
+      const initialOptionLength = samplePoll.options.length;
+      samplePoll.removeOption(samplePoll.options[0]).then((result) => {
+        expect(result._id).to.equal(samplePoll._id);
+        expect(result.options.length).to.equal(initialOptionLength - 1);
+        done();
       });
     });
   });
