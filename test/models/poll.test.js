@@ -198,7 +198,7 @@ describe('Polls', () => {
 
         pollWithOption.removeOption(option, UserFactory.fred._id.toString()).then((result) => {
           expect(result._id).to.equal(pollWithOption._id);
-          expect(result.options.length).to.equal(1);
+          expect(result.options.length).to.equal(pollWithOption.options.length - 1);
           expect(result.options[0]._id.toString()).to.equal(samplePoll.options[0]._id.toString());
           done();
         });
