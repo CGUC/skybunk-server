@@ -104,6 +104,27 @@ PollSchema.methods.addOption = function (option, userId) {
   });
 };
 
+PollSchema.methods.removeOption = function (opt) {
+  return new Promise((resolve, reject) => {
+    const option = this.options.id(opt._id);
+
+    if (!option) {
+      reject(Error('Option not found'));
+      return;
+    }
+
+    const optIndex = this.options.findIndex(o => o._id.toString() === option._id.toString());
+    this.options.splice(optIndex, 1);
+
+    this.save().then(() => {
+      resolve(this);
+    })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 PollSchema.methods.placeVote = function (userId, optionId) {
   return new Promise((resolve, reject) => {
     const option = this.options.id(optionId);

@@ -188,5 +188,14 @@ describe('Polls', () => {
         done();
       });
     });
+
+    it('by removing an option', (done) => {
+      const initialOptionLength = samplePoll.options.length;
+      samplePoll.removeOption(samplePoll.options[0]).then((result) => {
+        expect(result._id).to.equal(samplePoll._id);
+        expect(result.options.length).to.equal(initialOptionLength - 1);
+        done();
+      });
+    });
   });
 });

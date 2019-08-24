@@ -294,6 +294,44 @@ router.post('/:id/poll/option', verifyToken, (req, res) => {
     });
 });
 
+router.post('/:id/poll/option/delete', verifyToken, (req, res) => {
+  Post.findById(req.params.id)
+    .populate('author')
+    .populate({
+      path: 'media',
+      populate: {
+        path: 'poll',
+      },
+    })
+    .then((post) => {
+      if (!post.media.poll) {
+        res.status(400).json('Post does not have a poll');
+        return;
+      }
+
+      if (post.author._id.toString() !== req.user._id.toString() && !req.user.role.includes('admin')
+          && !(req.body.creator && req.body.creator.toString() === req.user._id.toString())) {
+        res.status(403).json({});
+        return;
+      }
+
+      const validation = requestValidator(['_id', 'creator'], req.body);
+      if (validation.status !== 200) {
+        res.status(validation.status).json(validation.message);
+      }
+
+      post.media.poll.removeOption(req.body).then((poll) => {
+        res.json(poll);
+      })
+        .catch((err) => {
+          res.status(500).json(err.toString());
+        });
+    })
+    .catch((err) => {
+      res.status(500).json(err.toString());
+    });
+});
+
 router.post('/:id/poll/vote', verifyToken, (req, res) => {
   Post.findById(req.params.id)
     .populate('author')
