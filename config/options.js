@@ -1,6 +1,10 @@
-const authServerAddress = 'https://skybunk-auth-dev.herokuapp.com';
+let authServerAddress = 'https://skybunk-auth-dev.herokuapp.com';
 
-// TODO: Use production auth server URL once exists
+if (process.env.NODE_ENV === 'production') {
+  authServerAddress = 'https://skybunk-auth-production.herokuapp.com';
+} else if (process.env.NODE_ENV === 'staging') {
+  authServerAddress = 'https://skybunk-auth-staging.herokuapp.com';
+}
 
 module.exports = {
   postCharacterLimit: 1000,
