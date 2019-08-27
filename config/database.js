@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV !== 'local') {
   module.exports = {
     mongoURI: process.env.MONGO_URI,
   };
