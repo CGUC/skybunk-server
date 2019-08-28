@@ -469,7 +469,13 @@ PostSchema.statics.count = function() {
 };
 
 // Return counts for all posts, likes, and comments
-// Should return an object of the form { _id, post_count, like_count, comment_count }
+// Return object looks something like this:
+// {
+//   _id: 0,
+//    post_count: 10,
+//    like_count: 20,
+//    comment_count: 30
+// }
 PostSchema.statics.countMultiple = function() {
   return new Promise((resolve, reject) => {
     this.aggregate([
@@ -483,6 +489,92 @@ PostSchema.statics.countMultiple = function() {
       }
     ]).then((result) => {
       resolve(result[0]); // result of aggregation is an array containing 1 object
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
+// Return object is an array that looks something like this:
+// [{
+//   _id: { tags: ["test"] },
+//   post_count: 1,
+//   like_count: 2,
+//   comment_count: 3,
+// }, ...]
+PostSchema.statics.countByChannel = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $group: {
+          _id: {
+            tags: "$tags",
+          },
+          post_count: { $sum: 1 },
+          like_count: { $sum: "$likes"},
+          comment_count: { $sum: { $size: "$comments" } },
+        }
+      }
+    ]).then((result) => {
+      resolve(result);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
+// Return object is an array that looks something like this:
+// [{
+//   _id: { year: 2019, month: 12, day: 31 },
+//   post_count: 1,
+// }, ...]
+PostSchema.statics.countByDate = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $group: {
+          _id: {
+            year: {$year: "$createdAt"},
+            month: {$month: "$createdAt"},
+            day: {$dayOfMonth: "$createdAt"},
+          },
+          post_count: { $sum: 1 },
+        }
+      }
+    ]).then((result) => {
+      resolve(result);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
+// Return object is an array that looks something like this:
+// [{
+//   _id: { year: 2019, month: 12, day: 31 },
+//   comment_count: 3,
+// }, ...]
+PostSchema.statics.countCommentsByDate = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $project: { "comments": 1 } // extract only the comments field for each document
+      },
+      {
+        $unwind: "$comments" // for every comment in a post, output its own separate document
+      },
+      {
+        $group: { // group by date
+          _id: {
+            year: {$year: "$comments.createdAt"},
+            month: {$month: "$comments.createdAt"},
+            day: {$dayOfMonth: "$comments.createdAt"},
+          },
+          comment_count: { $sum: 1 },
+        }
+      }
+    ]).then((result) => {
+      resolve(result);
     }).catch((err) => {
       reject(err);
     });
