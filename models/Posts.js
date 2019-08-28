@@ -458,4 +458,35 @@ PostSchema.methods.addMedia = function (type, data) {
   });
 };
 
+PostSchema.statics.count = function() {
+  return new Promise((resolve, reject) => {
+    this.countDocuments().then((count) => {
+      resolve(count);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
+// Return counts for all posts, likes, and comments
+// Should return an object of the form { _id, post_count, like_count, comment_count }
+PostSchema.statics.countMultiple = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $group: {
+          _id: 0,
+          post_count: { $sum: 1 },
+          like_count: { $sum: "$likes" },
+          comment_count: { $sum: { $size: "$comments" } },
+        }
+      }
+    ]).then((result) => {
+      resolve(result[0]); // result of aggregation is an array containing 1 object
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
 mongoose.model('Post', PostSchema);

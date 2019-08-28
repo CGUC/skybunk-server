@@ -259,4 +259,14 @@ UserSchema.methods.getProfilePicture = function () {
   return fs.readFileSync(imgPath, 'base64');
 };
 
+UserSchema.statics.count = function() {
+  return new Promise((resolve, reject) => {
+    this.countDocuments().then((count) => {
+      resolve(count);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
 mongoose.model('User', UserSchema);
