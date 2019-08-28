@@ -33,7 +33,7 @@
   },
   "scripts": {
     "test": "nyc mocha --recursive",
-    "start": "NODE_ENV=local nodemon app.js"
+    "start": "nodemon app.js"
   },
   "author": "",
   "license": "ISC"
