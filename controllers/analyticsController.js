@@ -24,6 +24,8 @@ router.get('/eyes', verifyToken, verifyAdmin, async (req, res) => {
     let posts_by_dayOfWeek_and_hour = await Post.countByDayOfWeekAndHour();
     let comments_by_dayOfWeek_and_hour = await Post.countCommentsByDayOfWeekAndHour();
     let user_subscriptions_by_channel = await User.countSubscriptionsByChannel();
+    let users_by_role = await User.countByRole();
+    let users_active_by_date = await Post.countActiveUsers(); // either posts or comments
 
     res.json({
       counts: {
@@ -44,6 +46,8 @@ router.get('/eyes', verifyToken, verifyAdmin, async (req, res) => {
       },
       users: {
         subscriptions_by_channel: user_subscriptions_by_channel,
+        by_role: users_by_role,
+        active_by_date: users_active_by_date,
       }
     });
   } catch (err) {

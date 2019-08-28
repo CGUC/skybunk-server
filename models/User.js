@@ -302,4 +302,21 @@ UserSchema.statics.countSubscriptionsByChannel = function() {
   });
 }
 
+UserSchema.statics.countByRole = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $group: {
+          _id: { role: "$role" },
+          count: { $sum: 1 }
+        }
+      }
+    ]).then((result) => {
+      resolve(result);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+}
+
 mongoose.model('User', UserSchema);
