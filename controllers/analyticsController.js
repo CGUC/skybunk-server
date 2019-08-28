@@ -21,6 +21,9 @@ router.get('/eyes', verifyToken, verifyAdmin, async (req, res) => {
     let posts_by_channels = await Post.countByChannel();
     let posts_by_date = await Post.countByDate();
     let comments_by_date = await Post.countCommentsByDate();
+    let posts_by_dayOfWeek_and_hour = await Post.countByDayOfWeekAndHour();
+    let comments_by_dayOfWeek_and_hour = await Post.countCommentsByDayOfWeekAndHour();
+    let user_subscriptions_by_channel = await User.countSubscriptionsByChannel();
 
     res.json({
       counts: {
@@ -33,9 +36,14 @@ router.get('/eyes', verifyToken, verifyAdmin, async (req, res) => {
       posts: {
         by_channel: posts_by_channels,
         by_date: posts_by_date,
+        by_dayOfWeek_and_hour: posts_by_dayOfWeek_and_hour,
       },
       comments: {
         by_date: comments_by_date,
+        by_dayOfWeek_and_hour: comments_by_dayOfWeek_and_hour,
+      },
+      users: {
+        subscriptions_by_channel: user_subscriptions_by_channel,
       }
     });
   } catch (err) {

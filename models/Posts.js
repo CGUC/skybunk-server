@@ -581,4 +581,60 @@ PostSchema.statics.countCommentsByDate = function() {
   });
 };
 
+// Return object is an array that looks something like this:
+// [{
+//   _id: { dayOfWeek: 7, hour: 22 },
+//   post_count: 121,
+// }, ...]
+PostSchema.statics.countByDayOfWeekAndHour = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $group: { // group by date
+          _id: {
+            dayOfWeek: {$dayOfWeek: "$createdAt"}, // 1 = Sunday, 7 = Saturday
+            hour: {$hour: "$createdAt"}, // between 0 and 23, UTC time zone
+          },
+          post_count: { $sum: 1 },
+        }
+      }
+    ]).then((result) => {
+      resolve(result);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
+// Return object is an array that looks something like this:
+// [{
+//   _id: { dayOfWeek: 7, hour: 22 },
+//   comment_count: 121,
+// }, ...]
+PostSchema.statics.countCommentsByDayOfWeekAndHour = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $project: { "comments": 1 } // extract only the comments field for each document
+      },
+      {
+        $unwind: "$comments" // for every comment in a post, output its own separate document
+      },
+      {
+        $group: { // group by date
+          _id: {
+            dayOfWeek: {$dayOfWeek: "$comments.createdAt"}, // 1 = Sunday, 7 = Saturday
+            hour: {$hour: "$comments.createdAt"}, // between 0 and 23, UTC time zone
+          },
+          comment_count: { $sum: 1 },
+        }
+      }
+    ]).then((result) => {
+      resolve(result);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
 mongoose.model('Post', PostSchema);

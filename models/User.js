@@ -269,4 +269,37 @@ UserSchema.statics.count = function() {
   });
 };
 
+// Return object is an array that looks something like this:
+// [{
+//   _id: { channel_name: "Test", channel_tags: ["Test"] },
+//   subscriber_count: 2
+// }, ...]
+UserSchema.statics.countSubscriptionsByChannel = function() {
+  return new Promise((resolve, reject) => {
+    this.aggregate([
+      {
+        $lookup: { 
+          from: "channels",
+          localField: "subscribedChannels",
+          foreignField: "_id",
+          as: "channels"
+        }
+      },
+      { $project: { "channels": 1, "_id": 0 } },
+      { $unwind: "$channels" },
+      { $project: { "channels.name": 1, "channels.tags": 1 } },
+      { 
+        $group: { 
+          _id: { channel_name: "$channels.name", channel_tags: "$channels.tags" },
+          subscriber_count: { $sum: 1 }
+        }
+      }
+    ]).then((result) => {
+      resolve(result);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+}
+
 mongoose.model('User', UserSchema);
