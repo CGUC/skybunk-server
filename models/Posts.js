@@ -596,9 +596,10 @@ PostSchema.statics.countByChannel = function() {
 
 // Return object is an array that looks something like this:
 // [{
-//   _id: { year: 2019, month: 12, day: 31 },
+//   date: Date(2019-12-31T00:00:00.000Z),
 //   post_count: 1,
 // }, ...]
+// Array is sorted in ascending order by date.
 PostSchema.statics.countByDate = function() {
   return new Promise((resolve, reject) => {
     this.aggregate([
@@ -611,6 +612,15 @@ PostSchema.statics.countByDate = function() {
           },
           post_count: { $sum: 1 },
         }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: { $dateFromParts: { year: "$_id.year", month: "$_id.month", day: "$_id.day"} },
+          post_count: 1,
+        }
+      }, {
+        $sort: { date: 1 }
       }
     ]).then((result) => {
       resolve(result);
@@ -622,7 +632,7 @@ PostSchema.statics.countByDate = function() {
 
 // Return object is an array that looks something like this:
 // [{
-//   _id: { year: 2019, month: 12, day: 31 },
+//   date: Date(2019-12-31T00:00:00.000Z),
 //   comment_count: 3,
 // }, ...]
 PostSchema.statics.countCommentsByDate = function() {
@@ -643,6 +653,15 @@ PostSchema.statics.countCommentsByDate = function() {
           },
           comment_count: { $sum: 1 },
         }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: { $dateFromParts: { year: "$_id.year", month: "$_id.month", day: "$_id.day"} },
+          comment_count: 1,
+        }
+      }, {
+        $sort: { date: 1 }
       }
     ]).then((result) => {
       resolve(result);
@@ -711,7 +730,7 @@ PostSchema.statics.countCommentsByDayOfWeekAndHour = function() {
 // For now, active user means user made a post or comment on that day. Days are UTC.
 // Return object is an array that looks something like this:
 // [{
-//   _id: { year: 2019, month: 12, day: 31 },
+//   date: Date(2019-12-31T00:00:00.000Z),
 //   active_user_count: 2,
 // }, ...]
 //
@@ -769,6 +788,15 @@ PostSchema.statics.countActiveUsers = function() {
           active_user_count: { $sum: 1 },
         }
       },
+      {
+        $project: {
+          _id: 0,
+          date: { $dateFromParts: { year: "$_id.year", month: "$_id.month", day: "$_id.day"} },
+          active_user_count: 1,
+        }
+      }, {
+        $sort: { date: 1 }
+      }
     ]).then((result) => {
       resolve(result);
     }).catch((err) => {
