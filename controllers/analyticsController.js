@@ -36,11 +36,13 @@ router.get('/eyes', verifyToken, verifyAdmin, async (req, res) => {
         comments: post_counts.comment_count,
       },
       posts: {
+        recent_counts: post_counts.recent_post_counts,
         by_channel: posts_by_channels,
         by_date: posts_by_date,
         by_dayOfWeek_and_hour: posts_by_dayOfWeek_and_hour,
       },
       comments: {
+        recent_counts: post_counts.recent_comment_counts,
         by_date: comments_by_date,
         by_dayOfWeek_and_hour: comments_by_dayOfWeek_and_hour,
       },

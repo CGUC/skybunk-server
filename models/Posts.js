@@ -475,16 +475,87 @@ PostSchema.statics.count = function() {
 //    post_count: 10,
 //    like_count: 20,
 //    comment_count: 30
+//    recent_post_counts: {
+//      past_24h: 1,
+//      past_3d: 2,
+//      past_7d: 3,
+//      past_30d: 4,
+//    }
+//    recent_comment_counts: {
+//      past_24h: 1,
+//      past_3d: 2,
+//      past_7d: 3,
+//      past_30d: 4,
+//    }
 // }
 PostSchema.statics.countMultiple = function() {
   return new Promise((resolve, reject) => {
+    let now = Date.now();
+    let past_24h = new Date(now - 1000 * 60 * 60 * 24);
+    let past_3d = new Date(now - 1000 * 60 * 60 * 24 * 3);
+    let past_7d = new Date(now - 1000 * 60 * 60 * 24 * 7);
+    let past_30d = new Date(now - 1000 * 60 * 60 * 24 * 30);
+
     this.aggregate([
       {
+        $project: {
+          likes: 1,
+          comments: 1,
+          _posts: {
+            past_24h: { $cond: [{$gte: ["$createdAt", past_24h]}, 1, 0] },
+            past_3d: { $cond: [{$gte: ["$createdAt", past_3d]}, 1, 0] },
+            past_7d: { $cond: [{$gte: ["$createdAt", past_7d]}, 1, 0] },
+            past_30d: { $cond: [{$gte: ["$createdAt", past_30d]}, 1, 0] },
+          }, 
+          _comments: {
+            past_24h: { $size: { $filter: {
+              input: "$comments", cond: { $gte: ["$$this.createdAt", past_24h] } } } 
+            },
+            past_3d: { $size: { $filter: {
+              input: "$comments", cond: { $gte: ["$$this.createdAt", past_3d] } } } 
+            },
+            past_7d: { $size: { $filter: {
+              input: "$comments", cond: { $gte: ["$$this.createdAt", past_7d] } } } 
+            },
+            past_30d: { $size: { $filter: {
+              input: "$comments", cond: { $gte: ["$$this.createdAt", past_30d] } } } 
+            },
+          }
+        } 
+      },
+      { 
         $group: {
           _id: 0,
           post_count: { $sum: 1 },
           like_count: { $sum: "$likes" },
           comment_count: { $sum: { $size: "$comments" } },
+          posts_past_24h: { $sum: "$_posts.past_24h" },
+          posts_past_3d: { $sum: "$_posts.past_3d" },
+          posts_past_7d: { $sum: "$_posts.past_7d" },
+          posts_past_30d: { $sum: "$_posts.past_30d" },
+          comments_past_24h: { $sum: "$_comments.past_24h" },
+          comments_past_3d: { $sum: "$_comments.past_3d" },
+          comments_past_7d: { $sum: "$_comments.past_7d" },
+          comments_past_30d: { $sum: "$_comments.past_30d" },
+        }
+      },
+      {
+        $project: {
+          post_count: 1,
+          like_count: 1,
+          comment_count: 1,
+          recent_post_counts: {
+            past_24h: "$posts_past_24h",
+            past_3d: "$posts_past_3d",
+            past_7d: "$posts_past_7d",
+            past_30d: "$posts_past_30d"
+          },
+          recent_comment_counts: {
+            past_24h: "$comments_past_24h",
+            past_3d: "$comments_past_3d",
+            past_7d: "$comments_past_7d",
+            past_30d: "$comments_past_30d"
+          },
         }
       }
     ]).then((result) => {
