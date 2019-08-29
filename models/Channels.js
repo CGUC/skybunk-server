@@ -175,7 +175,7 @@ ChannelSchema.methods.notifyUsersOfPost = function (post, author) {
     .catch(err => console.log(err));
 };
 
-ChannelSchema.statics.count = function() {
+ChannelSchema.statics.count = function () {
   return new Promise((resolve, reject) => {
     this.countDocuments().then((count) => {
       resolve(count);

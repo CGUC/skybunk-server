@@ -458,7 +458,7 @@ PostSchema.methods.addMedia = function (type, data) {
   });
 };
 
-PostSchema.statics.count = function() {
+PostSchema.statics.count = function () {
   return new Promise((resolve, reject) => {
     this.countDocuments().then((count) => {
       resolve(count);
@@ -488,13 +488,13 @@ PostSchema.statics.count = function() {
 //      past_30d: 4,
 //    }
 // }
-PostSchema.statics.countMultiple = function() {
+PostSchema.statics.countMultiple = function () {
   return new Promise((resolve, reject) => {
-    let now = Date.now();
-    let past_24h = new Date(now - 1000 * 60 * 60 * 24);
-    let past_3d = new Date(now - 1000 * 60 * 60 * 24 * 3);
-    let past_7d = new Date(now - 1000 * 60 * 60 * 24 * 7);
-    let past_30d = new Date(now - 1000 * 60 * 60 * 24 * 30);
+    const now = Date.now();
+    const past24h = new Date(now - 1000 * 60 * 60 * 24);
+    const past3d = new Date(now - 1000 * 60 * 60 * 24 * 3);
+    const past7d = new Date(now - 1000 * 60 * 60 * 24 * 7);
+    const past30d = new Date(now - 1000 * 60 * 60 * 24 * 30);
 
     this.aggregate([
       {
@@ -502,42 +502,42 @@ PostSchema.statics.countMultiple = function() {
           likes: 1,
           comments: 1,
           _posts: {
-            past_24h: { $cond: [{$gte: ["$createdAt", past_24h]}, 1, 0] },
-            past_3d: { $cond: [{$gte: ["$createdAt", past_3d]}, 1, 0] },
-            past_7d: { $cond: [{$gte: ["$createdAt", past_7d]}, 1, 0] },
-            past_30d: { $cond: [{$gte: ["$createdAt", past_30d]}, 1, 0] },
-          }, 
+            past_24h: { $cond: [{ $gte: ['$createdAt', past24h] }, 1, 0] },
+            past_3d: { $cond: [{ $gte: ['$createdAt', past3d] }, 1, 0] },
+            past_7d: { $cond: [{ $gte: ['$createdAt', past7d] }, 1, 0] },
+            past_30d: { $cond: [{ $gte: ['$createdAt', past30d] }, 1, 0] },
+          },
           _comments: {
-            past_24h: { $size: { $filter: {
-              input: "$comments", cond: { $gte: ["$$this.createdAt", past_24h] } } } 
+            past_24h: {
+              $size: { $filter: { input: '$comments', cond: { $gte: ['$$this.createdAt', past24h] } } },
             },
-            past_3d: { $size: { $filter: {
-              input: "$comments", cond: { $gte: ["$$this.createdAt", past_3d] } } } 
+            past_3d: {
+              $size: { $filter: { input: '$comments', cond: { $gte: ['$$this.createdAt', past3d] } } },
             },
-            past_7d: { $size: { $filter: {
-              input: "$comments", cond: { $gte: ["$$this.createdAt", past_7d] } } } 
+            past_7d: {
+              $size: { $filter: { input: '$comments', cond: { $gte: ['$$this.createdAt', past7d] } } },
             },
-            past_30d: { $size: { $filter: {
-              input: "$comments", cond: { $gte: ["$$this.createdAt", past_30d] } } } 
+            past_30d: {
+              $size: { $filter: { input: '$comments', cond: { $gte: ['$$this.createdAt', past30d] } } },
             },
-          }
-        } 
+          },
+        },
       },
-      { 
+      {
         $group: {
           _id: 0,
           post_count: { $sum: 1 },
-          like_count: { $sum: "$likes" },
-          comment_count: { $sum: { $size: "$comments" } },
-          posts_past_24h: { $sum: "$_posts.past_24h" },
-          posts_past_3d: { $sum: "$_posts.past_3d" },
-          posts_past_7d: { $sum: "$_posts.past_7d" },
-          posts_past_30d: { $sum: "$_posts.past_30d" },
-          comments_past_24h: { $sum: "$_comments.past_24h" },
-          comments_past_3d: { $sum: "$_comments.past_3d" },
-          comments_past_7d: { $sum: "$_comments.past_7d" },
-          comments_past_30d: { $sum: "$_comments.past_30d" },
-        }
+          like_count: { $sum: '$likes' },
+          comment_count: { $sum: { $size: '$comments' } },
+          posts_past_24h: { $sum: '$_posts.past_24h' },
+          posts_past_3d: { $sum: '$_posts.past_3d' },
+          posts_past_7d: { $sum: '$_posts.past_7d' },
+          posts_past_30d: { $sum: '$_posts.past_30d' },
+          comments_past_24h: { $sum: '$_comments.past_24h' },
+          comments_past_3d: { $sum: '$_comments.past_3d' },
+          comments_past_7d: { $sum: '$_comments.past_7d' },
+          comments_past_30d: { $sum: '$_comments.past_30d' },
+        },
       },
       {
         $project: {
@@ -545,19 +545,19 @@ PostSchema.statics.countMultiple = function() {
           like_count: 1,
           comment_count: 1,
           recent_post_counts: {
-            past_24h: "$posts_past_24h",
-            past_3d: "$posts_past_3d",
-            past_7d: "$posts_past_7d",
-            past_30d: "$posts_past_30d"
+            past_24h: '$posts_past_24h',
+            past_3d: '$posts_past_3d',
+            past_7d: '$posts_past_7d',
+            past_30d: '$posts_past_30d',
           },
           recent_comment_counts: {
-            past_24h: "$comments_past_24h",
-            past_3d: "$comments_past_3d",
-            past_7d: "$comments_past_7d",
-            past_30d: "$comments_past_30d"
+            past_24h: '$comments_past_24h',
+            past_3d: '$comments_past_3d',
+            past_7d: '$comments_past_7d',
+            past_30d: '$comments_past_30d',
           },
-        }
-      }
+        },
+      },
     ]).then((result) => {
       resolve(result[0]); // result of aggregation is an array containing 1 object
     }).catch((err) => {
@@ -568,24 +568,24 @@ PostSchema.statics.countMultiple = function() {
 
 // Return object is an array that looks something like this:
 // [{
-//   _id: { tags: ["test"] },
+//   _id: { tags: ['test'] },
 //   post_count: 1,
 //   like_count: 2,
 //   comment_count: 3,
 // }, ...]
-PostSchema.statics.countByChannel = function() {
+PostSchema.statics.countByChannel = function () {
   return new Promise((resolve, reject) => {
     this.aggregate([
       {
         $group: {
           _id: {
-            tags: "$tags",
+            tags: '$tags',
           },
           post_count: { $sum: 1 },
-          like_count: { $sum: "$likes"},
-          comment_count: { $sum: { $size: "$comments" } },
-        }
-      }
+          like_count: { $sum: '$likes' },
+          comment_count: { $sum: { $size: '$comments' } },
+        },
+      },
     ]).then((result) => {
       resolve(result);
     }).catch((err) => {
@@ -600,28 +600,28 @@ PostSchema.statics.countByChannel = function() {
 //   post_count: 1,
 // }, ...]
 // Array is sorted in ascending order by date.
-PostSchema.statics.countByDate = function() {
+PostSchema.statics.countByDate = function () {
   return new Promise((resolve, reject) => {
     this.aggregate([
       {
         $group: {
           _id: {
-            year: {$year: "$createdAt"},
-            month: {$month: "$createdAt"},
-            day: {$dayOfMonth: "$createdAt"},
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
           },
           post_count: { $sum: 1 },
-        }
+        },
       },
       {
         $project: {
           _id: 0,
-          date: { $dateFromParts: { year: "$_id.year", month: "$_id.month", day: "$_id.day"} },
+          date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
           post_count: 1,
-        }
+        },
       }, {
-        $sort: { date: 1 }
-      }
+        $sort: { date: 1 },
+      },
     ]).then((result) => {
       resolve(result);
     }).catch((err) => {
@@ -635,34 +635,34 @@ PostSchema.statics.countByDate = function() {
 //   date: Date(2019-12-31T00:00:00.000Z),
 //   comment_count: 3,
 // }, ...]
-PostSchema.statics.countCommentsByDate = function() {
+PostSchema.statics.countCommentsByDate = function () {
   return new Promise((resolve, reject) => {
     this.aggregate([
       {
-        $project: { "comments": 1 } // extract only the comments field for each document
+        $project: { comments: 1 }, // extract only the comments field for each document
       },
       {
-        $unwind: "$comments" // for every comment in a post, output its own separate document
+        $unwind: '$comments', // for every comment in a post, output its own separate document
       },
       {
         $group: { // group by date
           _id: {
-            year: {$year: "$comments.createdAt"},
-            month: {$month: "$comments.createdAt"},
-            day: {$dayOfMonth: "$comments.createdAt"},
+            year: { $year: '$comments.createdAt' },
+            month: { $month: '$comments.createdAt' },
+            day: { $dayOfMonth: '$comments.createdAt' },
           },
           comment_count: { $sum: 1 },
-        }
+        },
       },
       {
         $project: {
           _id: 0,
-          date: { $dateFromParts: { year: "$_id.year", month: "$_id.month", day: "$_id.day"} },
+          date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
           comment_count: 1,
-        }
+        },
       }, {
-        $sort: { date: 1 }
-      }
+        $sort: { date: 1 },
+      },
     ]).then((result) => {
       resolve(result);
     }).catch((err) => {
@@ -676,18 +676,18 @@ PostSchema.statics.countCommentsByDate = function() {
 //   _id: { dayOfWeek: 7, hour: 22 },
 //   post_count: 121,
 // }, ...]
-PostSchema.statics.countByDayOfWeekAndHour = function() {
+PostSchema.statics.countByDayOfWeekAndHour = function () {
   return new Promise((resolve, reject) => {
     this.aggregate([
       {
         $group: { // group by date
           _id: {
-            dayOfWeek: {$dayOfWeek: "$createdAt"}, // 1 = Sunday, 7 = Saturday
-            hour: {$hour: "$createdAt"}, // between 0 and 23, UTC time zone
+            dayOfWeek: { $dayOfWeek: '$createdAt' }, // 1 = Sunday, 7 = Saturday
+            hour: { $hour: '$createdAt' }, // between 0 and 23, UTC time zone
           },
           post_count: { $sum: 1 },
-        }
-      }
+        },
+      },
     ]).then((result) => {
       resolve(result);
     }).catch((err) => {
@@ -701,24 +701,24 @@ PostSchema.statics.countByDayOfWeekAndHour = function() {
 //   _id: { dayOfWeek: 7, hour: 22 },
 //   comment_count: 121,
 // }, ...]
-PostSchema.statics.countCommentsByDayOfWeekAndHour = function() {
+PostSchema.statics.countCommentsByDayOfWeekAndHour = function () {
   return new Promise((resolve, reject) => {
     this.aggregate([
       {
-        $project: { "comments": 1 } // extract only the comments field for each document
+        $project: { comments: 1 }, // extract only the comments field for each document
       },
       {
-        $unwind: "$comments" // for every comment in a post, output its own separate document
+        $unwind: '$comments', // for every comment in a post, output its own separate document
       },
       {
         $group: { // group by date
           _id: {
-            dayOfWeek: {$dayOfWeek: "$comments.createdAt"}, // 1 = Sunday, 7 = Saturday
-            hour: {$hour: "$comments.createdAt"}, // between 0 and 23, UTC time zone
+            dayOfWeek: { $dayOfWeek: '$comments.createdAt' }, // 1 = Sunday, 7 = Saturday
+            hour: { $hour: '$comments.createdAt' }, // between 0 and 23, UTC time zone
           },
           comment_count: { $sum: 1 },
-        }
-      }
+        },
+      },
     ]).then((result) => {
       resolve(result);
     }).catch((err) => {
@@ -737,7 +737,7 @@ PostSchema.statics.countCommentsByDayOfWeekAndHour = function() {
 // This query is really long-winded, not sure if there's a better way to do this.
 // Maybe it might be a better idea to do posts and comments in separate queries, and
 // merge the two lists in application logic?
-PostSchema.statics.countContributingUsers = function() {
+PostSchema.statics.countContributingUsers = function () {
   return new Promise((resolve, reject) => {
     this.aggregate([
       {
@@ -746,7 +746,7 @@ PostSchema.statics.countContributingUsers = function() {
           comments: 1,
           createdAt: 1,
           _is_post: { $literal: [true, false] },
-        }
+        },
       },
       {
         $unwind: '$_is_post',
@@ -754,49 +754,50 @@ PostSchema.statics.countContributingUsers = function() {
       {
         $project: {
           author: 1,
-          comments: { $cond: { if: "$_is_post", then: "not_a_comment", else: "$comments"} },
+          comments: { $cond: { if: '$_is_post', then: 'not_a_comment', else: '$comments' } },
           createdAt: 1,
-          _is_post: 1
-        }
+          _is_post: 1,
+        },
       },
       {
-        $unwind: "$comments"
+        $unwind: '$comments',
       },
       {
         $group: {
-          _id: { $cond: {
-              if: "$_is_post",
+          _id: {
+            $cond: {
+              if: '$_is_post',
               then: {
-                year: { $year: "$createdAt" },
-                month: { $month: "$createdAt" },
-                day: { $dayOfMonth: "$createdAt" },
-                author: "$author",
+                year: { $year: '$createdAt' },
+                month: { $month: '$createdAt' },
+                day: { $dayOfMonth: '$createdAt' },
+                author: '$author',
               },
               else: {
-                year: { $year: "$comments.createdAt" },
-                month: { $month: "$comments.createdAt" },
-                day: { $dayOfMonth: "$comments.createdAt" },
-                author: "$comments.author",
-              }
-            }
-          }
-        }
+                year: { $year: '$comments.createdAt' },
+                month: { $month: '$comments.createdAt' },
+                day: { $dayOfMonth: '$comments.createdAt' },
+                author: '$comments.author',
+              },
+            },
+          },
+        },
       },
       {
         $group: {
-          _id: { year: "$_id.year", month: "$_id.month", day: "$_id.day"},
+          _id: { year: '$_id.year', month: '$_id.month', day: '$_id.day' },
           contributing_user_count: { $sum: 1 },
-        }
+        },
       },
       {
         $project: {
           _id: 0,
-          date: { $dateFromParts: { year: "$_id.year", month: "$_id.month", day: "$_id.day"} },
+          date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
           contributing_user_count: 1,
-        }
+        },
       }, {
-        $sort: { date: 1 }
-      }
+        $sort: { date: 1 },
+      },
     ]).then((result) => {
       resolve(result);
     }).catch((err) => {

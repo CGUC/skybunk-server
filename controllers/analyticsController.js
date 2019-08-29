@@ -5,56 +5,55 @@ const router = express.Router();
 const { verifyToken, verifyAdmin } = require('../helpers/authorization');
 
 require('../models/Channels');
-const Channel = mongoose.model('Channel');
-
 require('../models/Posts');
-const Post = mongoose.model('Post');
-
 require('../models/User');
+
+const Channel = mongoose.model('Channel');
+const Post = mongoose.model('Post');
 const User = mongoose.model('User');
 
 router.get('/eyes', verifyToken, verifyAdmin, async (req, res) => {
   try {
-    let user_count = await User.count();
-    let channel_count = await Channel.count();
-    let post_counts = await Post.countMultiple();
-    let posts_by_channels = await Post.countByChannel();
-    let posts_by_date = await Post.countByDate();
-    let comments_by_date = await Post.countCommentsByDate();
-    let posts_by_dayOfWeek_and_hour = await Post.countByDayOfWeekAndHour();
-    let comments_by_dayOfWeek_and_hour = await Post.countCommentsByDayOfWeekAndHour();
-    let user_subscriptions_by_channel = await User.countSubscriptionsByChannel();
-    let users_by_role = await User.countByRole();
-    let users_contributing_by_date = await Post.countContributingUsers(); // either posts or comments
+    const userCount = await User.count();
+    const channelCount = await Channel.count();
+    const postCounts = await Post.countMultiple();
+    const postsByChannels = await Post.countByChannel();
+    const postsByDate = await Post.countByDate();
+    const commentsByDate = await Post.countCommentsByDate();
+    const postsByDayOfWeekAndHour = await Post.countByDayOfWeekAndHour();
+    const commentsByDayOfWeekAndHour = await Post.countCommentsByDayOfWeekAndHour();
+    const userSubscriptionsByChannel = await User.countSubscriptionsByChannel();
+    const usersByRole = await User.countByRole();
+    const usersContributingByDate = await Post.countContributingUsers(); // either posts or comments
 
     res.json({
       counts: {
-        users: user_count,
-        channels: channel_count,
-        posts: post_counts.post_count,
-        likes: post_counts.like_count,
-        comments: post_counts.comment_count,
+        users: userCount,
+        channels: channelCount,
+        posts: postCounts.post_count,
+        likes: postCounts.like_count,
+        comments: postCounts.comment_count,
       },
       posts: {
-        recent_counts: post_counts.recent_post_counts,
-        by_channel: posts_by_channels,
-        by_date: posts_by_date,
-        by_dayOfWeek_and_hour: posts_by_dayOfWeek_and_hour,
+        recent_counts: postCounts.recent_post_counts,
+        by_channel: postsByChannels,
+        by_date: postsByDate,
+        by_dayOfWeek_and_hour: postsByDayOfWeekAndHour,
       },
       comments: {
-        recent_counts: post_counts.recent_comment_counts,
-        by_date: comments_by_date,
-        by_dayOfWeek_and_hour: comments_by_dayOfWeek_and_hour,
+        recent_counts: postCounts.recent_comment_counts,
+        by_date: commentsByDate,
+        by_dayOfWeek_and_hour: commentsByDayOfWeekAndHour,
       },
       users: {
-        subscriptions_by_channel: user_subscriptions_by_channel,
-        by_role: users_by_role,
-        contributing_by_date: users_contributing_by_date,
-      }
+        subscriptions_by_channel: userSubscriptionsByChannel,
+        by_role: usersByRole,
+        contributing_by_date: usersContributingByDate,
+      },
     });
   } catch (err) {
-     console.error(err);
-     res.status(500).send('error');
+    console.error(err);
+    res.status(500).send('error');
   }
 });
 
