@@ -105,6 +105,9 @@ PostSchema.statics.get = function (id) {
       }).populate({
         path: 'usersLiked',
         select: 'firstName lastName _id',
+      }).populate({
+        path: 'media',
+        select: 'type',
       })
       .populate('subscribedUsers')
       .then((post) => {
@@ -139,6 +142,9 @@ PostSchema.statics.getAllPaginated = function (page) {
       .populate({
         path: 'usersLiked',
         select: 'firstName lastName _id',
+      }).populate({
+        path: 'media',
+        select: 'type',
       })
       .then((posts) => {
         resolve(posts);
@@ -163,6 +169,9 @@ PostSchema.statics.getUserPosts = function (userId, page) {
       .populate({
         path: 'comments.author',
         select: 'firstName lastName username info profilePicture _id',
+      }).populate({
+        path: 'media',
+        select: 'type',
       })
       .populate({
         path: 'usersLiked',
@@ -271,6 +280,9 @@ PostSchema.statics.findByTags = function (tags, page) {
       .populate({
         path: 'usersLiked',
         select: 'firstName lastName _id',
+      }).populate({
+        path: 'media',
+        select: 'type',
       })
       .then((posts) => {
         resolve(posts);
@@ -455,6 +467,30 @@ PostSchema.methods.addMedia = function (type, data) {
       .catch((err) => {
         reject(err);
       });
+  });
+};
+
+PostSchema.methods.getMedia = function (type) {
+  return new Promise((resolve, reject) => {
+    Media.findOne({ _id: this.media._id })
+    .then((media) => {
+      resolve(media.getMedia(type))
+    }).catch(err => {
+      reject(err);
+    })
+  });
+};
+
+PostSchema.methods.removeMedia = function () {
+  return new Promise((resolve, reject) => {
+    this.media = null;
+
+    this.save().then(() => {
+      resolve(this.media);
+    })
+    .catch((err) => {
+      reject(err);
+    });
   });
 };
 

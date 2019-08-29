@@ -80,6 +80,27 @@ MediaSchema.statics.create = function (type, data) {
   });
 };
 
+MediaSchema.methods.getMedia = function (type) {
+  if (type === 'image') {
+    return new Promise((resolve, reject) => {
+      PostPicture.findOne({ _id: this.image._id }).then((image) =>{
+        resolve(image.buffer.toString('base64'))
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+  if (type === 'poll') {
+    return new Promise((resolve, reject) => {
+      Poll.findOne({ _id: this.poll._id }).then((poll) =>{
+        resolve(poll)
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+};
+
 mongoose.model('Media', MediaSchema);
 
 module.exports = {

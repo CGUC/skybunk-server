@@ -37,10 +37,6 @@ const PollOptionSchema = new Schema({
 });
 
 const PollSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
   multiSelect: {
     type: Boolean,
     required: true,
@@ -72,7 +68,6 @@ PollSchema.statics.create = function (pollData, userId) {
     }));
 
     const newPoll = new this({
-      title: pollData.title,
       multiSelect: pollData.multiSelect,
       open: !!pollData.open,
       options,
