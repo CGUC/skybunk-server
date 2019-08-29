@@ -727,17 +727,17 @@ PostSchema.statics.countCommentsByDayOfWeekAndHour = function() {
   });
 };
 
-// For now, active user means user made a post or comment on that day. Days are UTC.
+// For now, contributing user means user made a post or comment on that day. Days are UTC.
 // Return object is an array that looks something like this:
 // [{
 //   date: Date(2019-12-31T00:00:00.000Z),
-//   active_user_count: 2,
+//   contributing_user_count: 2,
 // }, ...]
 //
 // This query is really long-winded, not sure if there's a better way to do this.
 // Maybe it might be a better idea to do posts and comments in separate queries, and
 // merge the two lists in application logic?
-PostSchema.statics.countActiveUsers = function() {
+PostSchema.statics.countContributingUsers = function() {
   return new Promise((resolve, reject) => {
     this.aggregate([
       {
@@ -785,14 +785,14 @@ PostSchema.statics.countActiveUsers = function() {
       {
         $group: {
           _id: { year: "$_id.year", month: "$_id.month", day: "$_id.day"},
-          active_user_count: { $sum: 1 },
+          contributing_user_count: { $sum: 1 },
         }
       },
       {
         $project: {
           _id: 0,
           date: { $dateFromParts: { year: "$_id.year", month: "$_id.month", day: "$_id.day"} },
-          active_user_count: 1,
+          contributing_user_count: 1,
         }
       }, {
         $sort: { date: 1 }
