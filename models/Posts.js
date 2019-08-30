@@ -196,7 +196,7 @@ PostSchema.statics.updatePost = function (id, postData) {
 
     this.findById(id).then((post) => {
       if (post) {
-        const updatedPost = _.extend(post, _.pick(postData, ['author', 'subscribedUsers', 'content', 'image', 'likes', 'usersLiked']));
+        const updatedPost = _.extend(post, _.pick(postData, ['content', 'tags']));
         if (postData.tags) updatedPost.tags = formatTags(postData.tags);
 
         updatedPost.save().then((post) => {
