@@ -200,9 +200,9 @@ router.get('/:id/image', verifyToken, (req, res) => {
     .then((post) => {
       post.getMedia('image').then((image) => {
         res.json(image);
-      })
+      });
     }).catch((err) => {
-      console.log(err)
+      console.log(err);
       res.json(err);
     });
 });
@@ -221,11 +221,11 @@ router.delete('/:id/image', verifyToken, (req, res) => {
       post.removeMedia().then(() => {
         res.json();
       }).catch((err) => {
-        console.error(err)
+        console.error(err);
         res.json(err);
       });
     }).catch((err) => {
-      console.error(err)
+      console.error(err);
       res.json(err);
     });
 });
