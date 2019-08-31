@@ -20,7 +20,7 @@ function dispatchEmail(user, ticket, transporter) {
       <p>Please register using the following golden ticket: ${ticket}</p>
       <h4>Download the app!</h4>
       <p>Android: <a href="https://play.google.com/store/apps/details?id=com.grebel.skybunk&hl=en_CA">https://play.google.com/store/apps/details?id=com.grebel.skybunk&hl=en_CA</a><br></br>
-      iOS: <a href="https://apps.apple.com/ca/app/skybunk/id1411727712">https://apps.apple.com/ca/app/skybunk/id1411727712</a></p><br></br>
+      iOS: <a href="https://apps.apple.com/ca/app/skybunk/id1411727712">https://apps.apple.com/ca/app/skybunk/id1411727712</a><br></br>
       web: <a href="https://skybunk.xyz">skybunk.xyz</a></p>
     `,
   };
