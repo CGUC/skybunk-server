@@ -461,6 +461,11 @@ PostSchema.methods.addMedia = function (type, data) {
     Media.create(type, data).then((media) => {
       this.media = media;
 
+      //Legacy code, please remove in future
+      if(this.media.type === 'image'){
+        this.image = media.image
+      }
+
       this.save().then(() => {
         resolve(this.media);
       })
@@ -488,6 +493,7 @@ PostSchema.methods.getMedia = function (type) {
 PostSchema.methods.removeMedia = function () {
   return new Promise((resolve, reject) => {
     this.media = null;
+    this.image = null; //Legacy code, please remove in future
 
     this.save().then(() => {
       resolve(this.media);
