@@ -18,7 +18,6 @@ describe('Media', () => {
   let mediaSave;
   let buffer;
   const pollData = {
-    title: 'What is your favourite Color',
     options: [
       'red',
       'blue',
@@ -83,7 +82,6 @@ describe('Media', () => {
         expect(pollCreate.callCount).to.equal(1);
         expect(pollCreate.args[0][0]).to.equal(pollData);
         expect(result.type).to.equal('poll');
-        expect(result.poll.title).to.equal(pollData.title);
         pollCreate.resetHistory();
         done();
       });
