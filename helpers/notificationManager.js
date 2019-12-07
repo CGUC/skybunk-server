@@ -19,7 +19,7 @@ module.exports = {
   },
 
   async sendNotifications(messages) {
-    console.log(messages);
+    const tickets = [];
     for(const message of messages){
       try {
         const ticketChunk   = await expo.sendPushNotificationsAsync([message]);
