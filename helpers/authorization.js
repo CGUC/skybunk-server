@@ -38,11 +38,11 @@ module.exports = {
     const token = req.params.token;
     User.findById(req.params.id).then((user) => {
       if(user == undefined){
-        res.sendStatus(400).json("No user found");
+        res.status(400).json("No user found");
       } else if(token !== user.resetPasswordToken){
-        res.sendStatus(403).json("Incorrect token");
+        res.status(403).json("Incorrect token");
       } else if(Date.now() > user.resetPasswordExpiration){
-        res.sendStatus(403).json("Expired token");
+        res.status(403).json("Expired token");
       }else{
         //success!
         req.user = user;

@@ -37,21 +37,21 @@ router.post('/reset', (req, res) => {
   //query by name or by username
   if(body.username != undefined && body.username != ''){
     query = {username: body.username};
-  }else if(body.lastName != undefined && body.firstName !=undefined){
+  }else if(body.lastName != undefined && body.firstName !=undefined && body.lastName != '' && body.firstName !=''){
     query = {firstName: body.firstName, lastName: body.lastName};
   }else{
-    res.status(400);
+    res.status(400).json("No user found");
     return;
   }
 
   User.findOne(query).then((user) => {
     if(user == undefined){
-      res.status(400).json("no valid user found");
+      res.status(400).json("No user found");
       return;
     }
     if(user.info.email != undefined && user.info.email != '' && user.info.email.toLowerCase() != body.email.toLowerCase()){
       //given email does not match stored email, so return forbidden
-      res.status(403);
+      res.status(403).json("Given email is invalid");
       return;
     } else{
       //either given email matches, or no email is on file
@@ -64,6 +64,7 @@ router.post('/reset', (req, res) => {
       });
     }
   }).catch((err) => {
+    console.error(err);
     res.json(err);
   });
 });

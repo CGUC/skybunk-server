@@ -17,7 +17,7 @@ module.exports = {
 					to: config.webmasterEmail,
 					subject: `Skybunk Password Reset for ${user.firstName} ${user.lastName}`,
 					text:
-					`You are receiving this because ${user.firstName} ${user.lastName}  has requested the reset of the password for your Skybunk account. `
+					`You are receiving this because ${user.firstName} ${user.lastName} has requested the reset of the password for your Skybunk account. `
 					+ `They do not have a registered email address, so the password reset request must be manually verified.\n\n`
 					+ `Please manually verify ${user.firstName} requested this reset. If they did, forward this email to ${email}\n\n\n`
 					+ '-------------------------\n\n'
@@ -58,7 +58,12 @@ module.exports = {
 				console.error(err);
 				rej(err);
 			} else {
-				res('Successfully sent email');
+				if(user.info.email == undefined || user.info.email == ''){
+					res('An email was sent to webmasters to verify your request');
+				}else{
+					res('An email was sent to the given email');
+				}
+				
 			}
 			});
 		});
