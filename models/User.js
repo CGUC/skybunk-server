@@ -7,6 +7,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
+const passwordReset = require('../helpers/passwordReset');
 const { Schema } = mongoose;
 const ProfilePicture = mongoose.model('ProfilePicture');
 const Post = mongoose.model('Post');
@@ -50,6 +51,9 @@ const UserSchema = new Schema({
     phone: {
       type: String,
     },
+    email: {
+      type: String,
+    }
   },
   profilePicture: {
     type: Schema.Types.ObjectId,
@@ -81,6 +85,12 @@ const UserSchema = new Schema({
     location: {
       type: String,
     },
+  },
+  resetPasswordToken: {
+    type:String,
+  },
+  resetPasswordExpiration: {
+    type: Date,
   },
 });
 
@@ -177,6 +187,7 @@ UserSchema.methods.changePassword = function (newPassword) {
           reject(err);
         } else {
           this.password = hash;
+          this.resetPasswordExpiration = 0; //expire any password reset tokens
           this.save().then(() => {
             resolve(hash);
           })
@@ -187,6 +198,11 @@ UserSchema.methods.changePassword = function (newPassword) {
       });
     });
   });
+};
+
+// Send a reset email to user
+UserSchema.methods.sendPasswordResetEmail = function (email) {
+  return passwordReset.sendPasswordResetEmail(this, email);
 };
 
 UserSchema.methods.updateProfilePicture = function (newBuffer) {

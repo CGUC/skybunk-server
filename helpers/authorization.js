@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../config/secrets');
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
 
 module.exports = {
   verifyToken(req, res, next) {
@@ -31,4 +33,23 @@ module.exports = {
       next();
     }
   },
+
+  verifyPasswordResetToken(req, res, next) {
+    const token = req.params.token;
+    User.findById(req.params.id).then((user) => {
+      if(user == undefined){
+        res.sendStatus(400).json("No user found");
+      } else if(token !== user.resetPasswordToken){
+        res.sendStatus(403).json("Incorrect token");
+      } else if(Date.now() > user.resetPasswordExpiration){
+        res.sendStatus(403).json("Expired token");
+      }else{
+        //success!
+        req.user = user;
+        next();
+      }
+    }).catch((err) => {
+      res.json(err);
+    });
+	},
 };
