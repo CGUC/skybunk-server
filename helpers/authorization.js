@@ -39,7 +39,9 @@ module.exports = {
     User.findById(req.params.id).then((user) => {
       if(user == undefined){
         res.status(400).json("No user found");
-      } else if(token !== user.resetPasswordToken){
+      } else if(req.body.username.toLowerCase() != user.username.toLowerCase()){
+        res.status(403).json("Invalid username");
+      }else if(token !== user.resetPasswordToken){
         res.status(403).json("Incorrect token");
       } else if(Date.now() > user.resetPasswordExpiration){
         res.status(403).json("Expired token");
