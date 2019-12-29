@@ -824,7 +824,8 @@ PostSchema.statics.countContributingUsers = function () {
     }).catch((err) => {
       reject(err);
     });
- };
+   });
+  }
                      
 PostSchema.methods.getMedia = function (type) {
   return new Promise((resolve, reject) => {
