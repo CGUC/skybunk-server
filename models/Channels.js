@@ -26,7 +26,7 @@ const ChannelSchema = new Schema({
 }, { timestamps: true });
 
 ChannelSchema.statics.create = function (channel) {
-  const channelName = channel.name.toLowerCase();
+  const channelName = channel.name;
   const formattedTags = formatTags(channel.tags);
 
   const channelData = {
