@@ -26,7 +26,7 @@ const ChannelSchema = new Schema({
 }, { timestamps: true });
 
 ChannelSchema.statics.create = function (channel) {
-  const channelName = channel.name.toLowerCase();
+  const channelName = channel.name;
   const formattedTags = formatTags(channel.tags);
 
   const channelData = {
@@ -108,7 +108,7 @@ ChannelSchema.statics.getPosts = function (id, page) {
 ChannelSchema.statics.updateChannel = function (id, updatedChannelObj) {
   id = ObjectId(id);
 
-  const name = updatedChannelObj.name.toLowerCase();
+  const name = updatedChannelObj.name;
   const formattedTags = formatTags(updatedChannelObj.tags);
 
   return new Promise((resolve, reject) => {
