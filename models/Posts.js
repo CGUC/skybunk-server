@@ -108,6 +108,9 @@ PostSchema.statics.get = function (id) {
         path: 'comments.author',
         select: 'firstName lastName username profilePicture info _id',
       }).populate({
+        path: 'comments.usersLiked',
+        select: 'firstName lastName _id',
+      }).populate({
         path: 'usersLiked',
         select: 'firstName lastName _id',
       })
@@ -142,6 +145,10 @@ PostSchema.statics.getAllPaginated = function (page) {
         select: 'firstName lastName username profilePicture info _id',
       })
       .populate({
+        path: 'comments.usersLiked',
+        select: 'firstName lastName _id',
+      })
+      .populate({
         path: 'usersLiked',
         select: 'firstName lastName _id',
       })
@@ -168,6 +175,10 @@ PostSchema.statics.getUserPosts = function (userId, page) {
       .populate({
         path: 'comments.author',
         select: 'firstName lastName username info profilePicture _id',
+      })
+      .populate({
+        path: 'comments.usersLiked',
+        select: 'firstName lastName _id',
       })
       .populate({
         path: 'usersLiked',
@@ -274,6 +285,10 @@ PostSchema.statics.findByTags = function (tags, page) {
         select: 'firstName lastName username info profilePicture _id',
       })
       .populate({
+        path: 'comments.usersLiked',
+        select: 'firstName lastName _id',
+      })
+      .populate({
         path: 'usersLiked',
         select: 'firstName lastName _id',
       })
@@ -290,7 +305,11 @@ PostSchema.statics.getComments = function (id) {
   id = ObjectId(id);
 
   return new Promise((resolve, reject) => {
-    this.get(id).then((post) => {
+    this.get(id).populate({
+      path: 'comments.usersLiked',
+      select: 'firstName lastName _id',
+    }).then((post) => {
+      console.log(post.comments)
       resolve(post.comments);
     })
       .catch((err) => {
@@ -403,18 +422,17 @@ PostSchema.statics.likeComment = function (postId, commentId, user, addLike) {
   return this.get(postId).then((post) => {
     const comment = post.comments.id(commentId);
     return new Promise((resolve, reject) => {
-      console.log('Add');
       if (addLike) {
-        if (comment.usersLiked.some(e => e.toString() === user.toString())) {
+        if (comment.usersLiked.some(e => e._id.toString() === user._id.toString())) {
           reject(Error('Already liked'));
         } else {
           // add user to list
           comment.usersLiked.push(user);
           comment.likes = comment.usersLiked.length;
         }
-      } else if (comment.usersLiked.some(e => e.toString() === user.toString())) {
+      } else if (comment.usersLiked.some(e => e._id.toString() === user._id.toString())) {
         // remove every instance of user from list
-        comment.usersLiked = comment.usersLiked.filter(u => u.toString() !== user.toString());
+        comment.usersLiked = comment.usersLiked.filter(u => u._id.toString() !== user._id.toString());
         comment.likes = comment.usersLiked.length;
       } else {
         reject(Error('Already not liked'));

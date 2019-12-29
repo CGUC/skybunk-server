@@ -163,7 +163,7 @@ router.put('/:pid/comment/:cid', verifyToken, (req, res) => {
  * @param {string} cid - comment's id
  */
 router.post('/:pid/comment/:cid/like', verifyToken, (req, res) => {
-  Post.likeComment(req.params.pid, req.params.cid, req.user._id, req.body.addLike)
+  Post.likeComment(req.params.pid, req.params.cid, req.user, req.body.addLike)
     .then((post) => {
       res.json(post);
     })
