@@ -60,3 +60,84 @@ If you are working on a feature that requires both the server and front-end to b
 We're following traditional [MVC](https://www.tutorialspoint.com/mvc_framework/mvc_framework_introduction.htm) format throughout our application. This means controllers take care of the requests coming in from the views, and translate the input to the models. Therefore, all business logic should be done through the use of methods on the models and the controllers simply serve as a mediator between incoming HTTP requests and actions on the models. Thew View in this case is the app itself.
 
 We'll place all controllers in the `controllers` folder, and all model definitions in the `models` folder. Example models and controllers exist so you can see how they are implemented.
+
+## Server administration
+There are a few administrative tools that are useful to make sure the production server is running and verifying or editting production data.
+
+These tools are behind password protection, so talk to one of the current admins to discuss if you need access to these tools. If you do have access to these tools, use them responsibly or your permissions will be revoked.
+
+### MLab [https://mlab.com](https://mlab.com)
+Mlab is a cloud-hosted MongoDB server where all of production skybunk data is stored . It is useful to view data that is not publically accessible such as object IDs or subscribed channels. It can also be used to mutate the data, such as deleting a user. 
+
+**It is important that you never share this data publicly, since it contains private information like password hashes and noticiation tokens, which can be used maliciously.**
+
+With that disclaimer out of the way, on to a few more details of what to do in MLabs.
+
+
+#### Instances
+There are multiple databases instances, and they will likely change over time. Below is a summary of their uses.
+
+* grapp: Contains the main production data for Grebel, including user, posts, pictures, etc.
+* skybunk-staging: Used to test code changes before their final push to production.
+* skybunk-dev: Used as a sandbox where developers can do whatever they need to implement a new feature
+* skybunk-auth: The auth database stores user login information and associates an account to a server (in Grebel's case, the user will be directed to grapp). There is a prod, dev, and staging versions of this server as well.
+
+#### Editting a Document
+To edit a document such as a post or user, follow the following instructions.
+
+1. Navigate to the desired instance.
+2. Find the collection where the document of interest is located.
+3. Find the document, either by scrolling through the pages or by creating a search using MongoDB syntax.
+4. A JSON edittor will appear. You can edit whatever text needed in the JSON document, then save using the buttons in the bottom right corner.
+
+#### Backing up the Server
+To backup the server:
+
+1. login to MLabs and navigate to the instance you want to backup
+2. Click on the "Tools" tab.
+3. Copy the "Export Database" command.
+4. Open a terminal on your local machine and paste the command. Replace the username and password with your MLab credentials, and replace the <output directory> with the filepath to the folder you want to save the information. If you want to use your current directory to dump the data, you can use "." as the output directory.
+  
+The command should look similar to this:
+
+` mongodump -h <server address> -d <database instance> -u <MLabs username> -p <password> -o <output directory> `
+
+` mongodump -h ds123456.mlab.com:12345 -d grapp -u conrad_grebel -p my_strong_password -o . `
+
+#### Reseting Posts
+At the beginning of each term, the posts from the previous term are deleted to give incoming students a clean slate to start the term with. This is managed though MLabs.
+
+1. Backup the server
+2. Navigate to "Collections"
+3. Navigate to "Posts" collection.
+4. Double check you actually backed everything up
+5. Click on "Delete all documents in collection"
+6. Repeat steps 3-5 for PostPictures, Polls, and Media.
+
+### Heroku [https://dashboard.heroku.com](https://dashboard.heroku.com)
+Heroku is the server that the server code runs on. The Heroku server recieves the HTTP requests from the clients, processes them, and then updates or reads MLabs based on the request. The Heroku server also hosts the website and auth server.
+
+* grebel-app: this is the main production server, hosted at [api.grebelife.com](http://api.grebelife.com/).
+* skybunk-staging: this server is used to stage releases before going to production. Is it located at [https://skybunk-staging.herokuapp.com/](https://skybunk-staging.herokuapp.com/)
+* skybunk-development: this is linked to the master branch on Github, meaning that whatever is on master will be deployed to this server. It is located at [https://skybunk-development.herokuapp.com/](https://skybunk-development.herokuapp.com/)
+
+#### Restarting the Server
+Our code is great, but it isn't perfect. Sometimes the server crashes and doesn't recover. When this happens, you can following the following steps.
+
+1. Login to Heroku and click on the instance that is crashed (e.g. skybunk-server).
+2. Click on the name of the pipeline that has crashed (e.g. grebel-app).
+3. In the top right corner, click on "More", then select "Restart all dynos"
+4. Confirm that you want to restart the dynos when the warning dialog pops up.
+
+#### Getting logs
+Nothing ever breaks in production. But how do we debug when something breaks in production? We can pull the logs from Heroku, which records the last 2000 lines of console output and HTTP transactions. To access this, you first need to setup the Heroku CLI. The instructions for installation can be found [here](https://devcenter.heroku.com/articles/heroku-cli).
+
+Once the CLI is install, [you will need to login](https://devcenter.heroku.com/articles/authentication) to the CLI using your Heroku credentials. You can then run the following command to get the logs.
+
+`heroku logs -a grebel-app -n 2000`
+
+To see a live stream of the logs, use the -t option:
+
+`heroku logs -a grebel-app -t`
+
+

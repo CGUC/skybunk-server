@@ -1,9 +1,7 @@
 let authServerAddress = 'https://skybunk-auth-dev.herokuapp.com';
 
-if (process.env.NODE_ENV === 'production') {
-  authServerAddress = 'https://skybunk-auth-production.herokuapp.com';
-} else if (process.env.NODE_ENV === 'staging') {
-  authServerAddress = 'https://skybunk-auth-staging.herokuapp.com';
+if (process.env.AUTH_SERVER_URI) {
+  authServerAddress = process.env.AUTH_SERVER_URI;
 }
 
 module.exports = {
