@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV === 'production') {
+if (process.env.MONGO_URI) {
   module.exports = {
     mongoURI: process.env.MONGO_URI,
   };

@@ -198,8 +198,8 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
         return;
       }
 
-      post.addImage(req.file.buffer).then((pic) => {
-        res.json(pic.buffer.toString('base64'));
+      post.addMedia('image', req.file.buffer).then((media) => {
+        res.json(media.image.buffer.toString('base64'));
       }).catch((err) => {
         res.json(err);
       });
@@ -213,10 +213,35 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
  */
 router.get('/:id/image', verifyToken, (req, res) => {
   Post.findOne({ _id: req.params.id })
-    .populate('image')
     .then((post) => {
-      res.json(post.getImage());
+      post.getMedia('image').then((image) => {
+        res.json(image);
+      });
     }).catch((err) => {
+      console.log(err);
+      res.json(err);
+    });
+});
+
+/**
+ * Delete the image
+ */
+router.delete('/:id/image', verifyToken, (req, res) => {
+  Post.findOne({ _id: req.params.id })
+    .populate('author')
+    .then((post) => {
+      if (!req.user.role.includes('admin') && post.author._id.toString() !== req.user._id.toString()) {
+        res.status(403);
+        return;
+      }
+      post.removeMedia().then(() => {
+        res.json();
+      }).catch((err) => {
+        console.error(err);
+        res.json(err);
+      });
+    }).catch((err) => {
+      console.error(err);
       res.json(err);
     });
 });
@@ -238,7 +263,7 @@ router.get('/:id/poll', verifyToken, (req, res) => {
     })
     .then((post) => {
       if (!post.media.poll) {
-        res.status(400).json('Post does not have a poll');
+        res.status(404).json();
         return;
       }
       res.json(post.media.poll);
@@ -257,7 +282,7 @@ router.post('/:id/poll', verifyToken, (req, res) => {
         return;
       }
 
-      const validation = requestValidator(['options', 'title', 'multiSelect'], req.body);
+      const validation = requestValidator(['options', 'multiSelect'], req.body);
       if (validation.status !== 200) {
         res.status(validation.status).json(validation.message);
         return;
@@ -284,7 +309,7 @@ router.post('/:id/poll/option', verifyToken, (req, res) => {
     })
     .then((post) => {
       if (!post.media.poll) {
-        res.status(400).json('Post does not have a poll');
+        res.status(404).json();
         return;
       }
 
@@ -310,6 +335,44 @@ router.post('/:id/poll/option', verifyToken, (req, res) => {
     });
 });
 
+router.post('/:id/poll/option/delete', verifyToken, (req, res) => {
+  Post.findById(req.params.id)
+    .populate('author')
+    .populate({
+      path: 'media',
+      populate: {
+        path: 'poll',
+      },
+    })
+    .then((post) => {
+      if (!post.media.poll) {
+        res.status(404).json();
+        return;
+      }
+
+      if (post.author._id.toString() !== req.user._id.toString() && !req.user.role.includes('admin')
+          && !(req.body.creator && req.body.creator.toString() === req.user._id.toString())) {
+        res.status(403).json({});
+        return;
+      }
+
+      const validation = requestValidator(['_id', 'creator'], req.body);
+      if (validation.status !== 200) {
+        res.status(validation.status).json(validation.message);
+      }
+
+      post.media.poll.removeOption(req.body).then((poll) => {
+        res.json(poll);
+      })
+        .catch((err) => {
+          res.status(500).json(err.toString());
+        });
+    })
+    .catch((err) => {
+      res.status(500).json(err.toString());
+    });
+});
+
 router.post('/:id/poll/vote', verifyToken, (req, res) => {
   Post.findById(req.params.id)
     .populate('author')
@@ -321,7 +384,7 @@ router.post('/:id/poll/vote', verifyToken, (req, res) => {
     })
     .then((post) => {
       if (!post.media.poll) {
-        res.json(404, 'Post does not have a poll');
+        res.json(404);
         return;
       }
 
@@ -348,6 +411,28 @@ router.post('/:id/poll/vote', verifyToken, (req, res) => {
     })
     .catch((err) => {
       res.status(500).json(err.toString());
+    });
+});
+
+/**
+ * Delete the poll
+ */
+router.delete('/:id/poll', verifyToken, (req, res) => {
+  Post.findOne({ _id: req.params.id })
+    .populate('author')
+    .then((post) => {
+      if (!req.user.role.includes('admin') && post.author._id.toString() !== req.user._id.toString()) {
+        res.status(403);
+        return;
+      }
+
+      post.removeMedia().then(() => {
+        res.status(200);
+      }).catch((err) => {
+        res.json(err);
+      });
+    }).catch((err) => {
+      res.json(err);
     });
 });
 

@@ -37,10 +37,6 @@ const PollOptionSchema = new Schema({
 });
 
 const PollSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
   multiSelect: {
     type: Boolean,
     required: true,
@@ -72,7 +68,6 @@ PollSchema.statics.create = function (pollData, userId) {
     }));
 
     const newPoll = new this({
-      title: pollData.title,
       multiSelect: pollData.multiSelect,
       open: !!pollData.open,
       options,
@@ -94,6 +89,27 @@ PollSchema.methods.addOption = function (option, userId) {
       usersVoted: [],
       creator: ObjectId(userId),
     });
+
+    this.save().then(() => {
+      resolve(this);
+    })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+PollSchema.methods.removeOption = function (opt) {
+  return new Promise((resolve, reject) => {
+    const option = this.options.id(opt._id);
+
+    if (!option) {
+      reject(Error('Option not found'));
+      return;
+    }
+
+    const optIndex = this.options.findIndex(o => o._id.toString() === option._id.toString());
+    this.options.splice(optIndex, 1);
 
     this.save().then(() => {
       resolve(this);

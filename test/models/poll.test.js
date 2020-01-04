@@ -14,7 +14,6 @@ describe('Polls', () => {
   let samplePoll;
   before(() => {
     samplePoll = new Poll({
-      title: 'Colour?',
       multiSelect: false,
       options: [{
         text: 'red',
@@ -32,21 +31,8 @@ describe('Polls', () => {
   });
 
   describe('correctly validate', () => {
-    it('if poll has no title', (done) => {
-      const poll = new Poll({
-        multiSelect: true,
-        options: ['red, blue'],
-      });
-
-      poll.validate((err) => {
-        expect(err.errors.title.message).to.equal('Path `title` is required.');
-        done();
-      });
-    });
-
     it('if poll does not specify multiSelect', (done) => {
       const poll = new Poll({
-        title: 'Hello',
         options: ['red', 'blue'],
       });
 
@@ -62,7 +48,6 @@ describe('Polls', () => {
         usersVoted: [],
       };
       const poll = new Poll({
-        title: 'Hello',
         multiSelect: true,
         options: [opt, opt, opt, opt, opt, opt, opt, opt, opt, opt, opt],
       });
@@ -80,7 +65,6 @@ describe('Polls', () => {
       };
 
       const poll = new Poll({
-        title: 'Hello',
         multiSelect: false,
         options: [opt, opt],
       });
@@ -93,7 +77,6 @@ describe('Polls', () => {
 
     it('if a valid poll', (done) => {
       const poll = new Poll({
-        title: 'Hello',
         multiSelect: false,
         options: [{
           text: 'Option 1',
@@ -111,7 +94,6 @@ describe('Polls', () => {
   describe('can be modified', () => {
     it('on creation', (done) => {
       const pollData = {
-        title: 'What is your favourite colour',
         multiSelect: false,
         options: [{
           text: 'red',
@@ -124,7 +106,6 @@ describe('Polls', () => {
       };
 
       Poll.create(pollData, UserFactory.fred._id.toString()).then((result) => {
-        expect(result.title).to.equal(pollData.title);
         expect(result.multiSelect).to.equal(pollData.multiSelect);
         expect(result.options[0].text).to.equal(pollData.options[0].text);
         expect(result.options[1].text).to.equal(pollData.options[1].text);
@@ -145,7 +126,6 @@ describe('Polls', () => {
 
     it('by reurning an error when a user voted twice', (done) => {
       const poll = new Poll({
-        title: 'Colour?',
         multiSelect: false,
         options: [{
           text: 'red',
@@ -162,7 +142,6 @@ describe('Polls', () => {
 
     it('by retracting a vote', (done) => {
       const poll = new Poll({
-        title: 'Colour?',
         multiSelect: false,
         options: [{
           text: 'red',
@@ -185,6 +164,15 @@ describe('Polls', () => {
       samplePoll.addOption(newOption, UserFactory.fred._id.toString()).then((result) => {
         expect(result._id).to.equal(samplePoll._id);
         expect(result.options[1].text).to.equal(newOption);
+        done();
+      });
+    });
+
+    it('by removing an option', (done) => {
+      const initialOptionLength = samplePoll.options.length;
+      samplePoll.removeOption(samplePoll.options[0]).then((result) => {
+        expect(result._id).to.equal(samplePoll._id);
+        expect(result.options.length).to.equal(initialOptionLength - 1);
         done();
       });
     });
