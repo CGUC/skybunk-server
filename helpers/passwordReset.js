@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
-const config = require('../config/options');
 
 const url = 'https://www.skybunk.xyz';
 
@@ -14,7 +13,7 @@ module.exports = {
 			var mailOptions;
 			if(user.info.email == undefined || user.info.email == ''){ //send email to webmasters and tell them to verify the password reset was requested
 				mailOptions = {
-					to: config.webmasterEmail,
+					to: process.env.WEBMASTER_EMAIL,
 					subject: `Skybunk Password Reset for ${user.firstName} ${user.lastName}`,
 					text:
 					`You are receiving this because ${user.firstName} ${user.lastName} has requested the reset of the password for your Skybunk account. `
@@ -46,7 +45,10 @@ module.exports = {
 
 			const transporter = nodemailer.createTransport({
 				service:'gmail',
-				auth: config.skybunkEmail
+				auth: {
+					user: process.env.EMAIL_ADDRESS,
+					pass: process.env.EMAIL_PASSWORD,
+				  },
 			});
 
 			user.resetPasswordToken = token;
