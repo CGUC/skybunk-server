@@ -70,9 +70,8 @@ router.post('/reset', (req, res) => {
 });
 
 //Reset password from reset password link
-router.post('/reset/:id/:token', verifyPasswordResetToken, (req, res) => {
+router.post('/reset/:username/:token', verifyPasswordResetToken, (req, res) => {
   const user = req.user;
-  console.log(req)
   user.changePassword(req.body.password).then((password) => {
     res.json(password);
   }).catch((err) => {
