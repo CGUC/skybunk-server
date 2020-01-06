@@ -36,7 +36,7 @@ module.exports = {
 
   verifyPasswordResetToken(req, res, next) {
     const token = req.params.token;
-    User.findById(req.params.id).then((user) => {
+    User.findOne({username: req.params.username}).then((user) => {
       if(user == undefined){
         res.status(400).json("No user found");
       } else if(req.body.username.toLowerCase() != user.username.toLowerCase()){

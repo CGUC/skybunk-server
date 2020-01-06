@@ -9,11 +9,12 @@ module.exports = {
 	sendPasswordResetEmail(user, email){
 		return new Promise((res, rej) => {
 			const token = crypto.randomBytes(20).toString('hex');
-
+			console.log(process.env)
 			var mailOptions;
 			if(user.info.email == undefined || user.info.email == ''){ //send email to webmasters and tell them to verify the password reset was requested
 				mailOptions = {
 					to: process.env.WEBMASTER_EMAIL,
+					from: process.env.EMAIL_ADDRESS,
 					subject: `Skybunk Password Reset for ${user.firstName} ${user.lastName}`,
 					text:
 					`You are receiving this because ${user.firstName} ${user.lastName} has requested the reset of the password for your Skybunk account. `
@@ -22,7 +23,7 @@ module.exports = {
 					+ '-------------------------\n\n'
 					+ 'You are receiving this because you have requested the reset of the password for your Skybunk account.\n\n'
 					+ 'Please click on the following link, or paste this into your browser to complete the process within two days of receiving it:\n\n'
-					+ `${url}/users/reset/${user._id}/${token}\n\n`
+					+ `${url}/users/reset/${user.username}/${token}\n\n`
 					+ `Username: ${user.username}\n\n`
 					+ 'If you did not request this, please ignore this email and your password will remain unchanged.\n',
 				};
