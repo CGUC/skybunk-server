@@ -9,7 +9,7 @@ module.exports = {
 	sendPasswordResetEmail(user, email){
 		return new Promise((res, rej) => {
 			const token = crypto.randomBytes(20).toString('hex');
-
+			console.log(process.env)
 			var mailOptions;
 			if(user.info.email == undefined || user.info.email == ''){ //send email to webmasters and tell them to verify the password reset was requested
 				mailOptions = {
