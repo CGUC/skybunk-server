@@ -26,7 +26,7 @@ const ChannelSchema = new Schema({
 }, { timestamps: true });
 
 ChannelSchema.statics.create = function (channel) {
-  const channelName = channel.name.toLowerCase();
+  const channelName = channel.name;
   const formattedTags = formatTags(channel.tags);
 
   const channelData = {
@@ -108,7 +108,7 @@ ChannelSchema.statics.getPosts = function (id, page) {
 ChannelSchema.statics.updateChannel = function (id, updatedChannelObj) {
   id = ObjectId(id);
 
-  const name = updatedChannelObj.name.toLowerCase();
+  const name = updatedChannelObj.name;
   const formattedTags = formatTags(updatedChannelObj.tags);
 
   return new Promise((resolve, reject) => {
@@ -173,6 +173,16 @@ ChannelSchema.methods.notifyUsersOfPost = function (post, author) {
       NotificationManager.sendNotifications(messages);
     })
     .catch(err => console.log(err));
+};
+
+ChannelSchema.statics.count = function () {
+  return new Promise((resolve, reject) => {
+    this.countDocuments().then((count) => {
+      resolve(count);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
 };
 
 mongoose.model('Channel', ChannelSchema);
