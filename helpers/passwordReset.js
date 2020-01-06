@@ -14,6 +14,7 @@ module.exports = {
 			if(user.info.email == undefined || user.info.email == ''){ //send email to webmasters and tell them to verify the password reset was requested
 				mailOptions = {
 					to: process.env.WEBMASTER_EMAIL,
+					from: process.env.EMAIL_ADDRESS,
 					subject: `Skybunk Password Reset for ${user.firstName} ${user.lastName}`,
 					text:
 					`You are receiving this because ${user.firstName} ${user.lastName} has requested the reset of the password for your Skybunk account. `
