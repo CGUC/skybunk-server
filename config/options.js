@@ -24,7 +24,4 @@ if (process.env.WEBMASTER_EMAIL) {
 module.exports = {
   postCharacterLimit: 1000,
   commentCharacterLimit: 500,
-  authServerAddress,
-  webmasterEmail,
-  skybunkEmail,
 };
