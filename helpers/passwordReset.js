@@ -23,7 +23,7 @@ module.exports = {
 					+ '-------------------------\n\n'
 					+ 'You are receiving this because you have requested the reset of the password for your Skybunk account.\n\n'
 					+ 'Please click on the following link, or paste this into your browser to complete the process within two days of receiving it:\n\n'
-					+ `${url}/users/reset/${user._id}/${token}\n\n`
+					+ `${url}/users/reset/${user.username}/${token}\n\n`
 					+ `Username: ${user.username}\n\n`
 					+ 'If you did not request this, please ignore this email and your password will remain unchanged.\n',
 				};
