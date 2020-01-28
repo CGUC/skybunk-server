@@ -2,7 +2,7 @@ require('../models/GoldenTicket');
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const fetch = require('node-fetch');
-const { authServerAddress } = require('../config/options');
+const authServerAddress = process.env.AUTH_SERVER_URI || 'https://skybunk-auth-dev.herokuapp.com';
 const { accessKey } = require('../config/secrets');
 
 const GoldenTicket = mongoose.model('GoldenTicket');
