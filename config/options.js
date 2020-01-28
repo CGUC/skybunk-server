@@ -1,9 +1,3 @@
-let authServerAddress = 'https://skybunk-auth-dev.herokuapp.com';
-
-if (process.env.AUTH_SERVER_URI) {
-  authServerAddress = process.env.AUTH_SERVER_URI;
-}
-
 let webmasterEmail = 'webmasters@grebelife.com';
 let skybunkEmail = {
   user:"grebel_app@gmail.com",
