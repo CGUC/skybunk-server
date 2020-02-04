@@ -40,7 +40,7 @@ const createUserOnAuth = ({ username, password, goldenTicket }) =>
     }
 
     // Create user locally (may be removed when/if auth server handles it instead)
-    await User.create({ ...adminUser, goldenTicket: tickets[0], roles: ['admin'] });
+    await User.create({ ...adminUser, goldenTicket: tickets[0], role: ['admin'] });
     await GoldenTicket.deleteOne({ ticketNumber: tickets[0] });
 
     await mongoose.disconnect();
