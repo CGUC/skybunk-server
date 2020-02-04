@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 
-const AUTH_URL = 'http://819e7f03.ngrok.io';
+const AUTH_URL = 'http://localhost:3001';
 const SERVER_NAME = 'Test Server';
-const SERVER_URL = 'http://70e8a7cf.ngrok.io';
+const SERVER_URL = 'http://localhost:3000';
 
 const checkAuthIsRunning = async (authUrl) => {
     try {
