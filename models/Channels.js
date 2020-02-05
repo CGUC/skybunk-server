@@ -108,7 +108,7 @@ ChannelSchema.statics.getPosts = function (id, page) {
 ChannelSchema.statics.updateChannel = function (id, updatedChannelObj) {
   id = ObjectId(id);
 
-  const name = updatedChannelObj.name;
+  const { name } = updatedChannelObj;
   const formattedTags = formatTags(updatedChannelObj.tags);
 
   return new Promise((resolve, reject) => {

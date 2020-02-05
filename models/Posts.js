@@ -110,7 +110,8 @@ PostSchema.statics.get = function (id) {
       }).populate({
         path: 'comments.usersLiked',
         select: 'firstName lastName _id',
-      }).populate({
+      })
+      .populate({
         path: 'usersLiked',
         select: 'firstName lastName _id',
       })
@@ -187,7 +188,7 @@ PostSchema.statics.getUserPosts = function (userId, page) {
       .populate({
         path: 'comments.usersLiked',
         select: 'firstName lastName _id',
-    })
+      })
       .populate({
         path: 'media',
         select: 'type',
@@ -325,7 +326,7 @@ PostSchema.statics.getComments = function (id) {
       path: 'comments.usersLiked',
       select: 'firstName lastName _id',
     }).then((post) => {
-      console.log(post.comments)
+      console.log(post.comments);
       resolve(post.comments);
     })
       .catch((err) => {
@@ -448,7 +449,9 @@ PostSchema.statics.likeComment = function (postId, commentId, user, addLike) {
         }
       } else if (comment.usersLiked.some(e => e._id.toString() === user._id.toString())) {
         // remove every instance of user from list
-        comment.usersLiked = comment.usersLiked.filter(u => u._id.toString() !== user._id.toString());
+        comment.usersLiked = comment.usersLiked.filter(
+          u => u._id.toString() !== user._id.toString(),
+        );
         comment.likes = comment.usersLiked.length;
       } else {
         reject(Error('Already not liked'));
@@ -881,9 +884,9 @@ PostSchema.statics.countContributingUsers = function () {
     }).catch((err) => {
       reject(err);
     });
-   });
-  }
-                     
+  });
+};
+
 PostSchema.methods.getMedia = function (type) {
   return new Promise((resolve, reject) => {
     Media.findOne({ _id: this.media._id })
