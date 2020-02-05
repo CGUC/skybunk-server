@@ -27,6 +27,19 @@ const createUserOnAuth = ({ username, password, goldenTicket }) =>
     }).then((res) => res.json());
 
 (async () => {
+    if (!process.env.SERVER_ID) {
+        console.error('process.env.SERVER_ID must be set');
+        return;
+    }
+    if (!process.env.ACCESS_KEY) {
+        console.error('process.env.ACCESS_KEY must be set');
+        return;
+    }
+    if (!process.env.AUTH_SERVER_URI) {
+        console.error('process.env.AUTH_SERVER_URI must be set');
+        return;
+    }
+
     await mongoose.connect(mongoURI);
 
     //Create a golden ticket
