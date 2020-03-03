@@ -1,4 +1,4 @@
 module.exports = {
   postCharacterLimit: 1000,
-  commentCharacterLimit: 500,
+  commentCharacterLimit: 500
 };
