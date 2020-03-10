@@ -96,19 +96,16 @@ const UserSchema = new Schema({
 });
 
 // Create a new user
-UserSchema.statics.create = function (user) {
-  return new Promise((resolve, reject) => {
-    user.notificationTokens = [];
-    const newUser = new this(user);
+UserSchema.statics.create = async function (user) {
+  const Channel = mongoose.model('Channel');
+  user.notificationTokens = [];
+  const channels = await Channel.find({autoSubscribe: true}).exec();
+  user.subscribedChannels = channels.map(({_id}) => _id);
+  const newUser = new this(user);
 
-    // Encrypt the password and save
-    newUser.changePassword(newUser.password).then(() => {
-      resolve(newUser);
-    })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  // Encrypt the password and save
+  await newUser.changePassword(newUser.password);
+  return newUser;
 };
 
 // Authenticate user

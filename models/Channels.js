@@ -1,5 +1,6 @@
 require('./User');
 require('./Posts');
+const { pickBy, isNil, negate } = require('lodash');
 const mongoose = require('mongoose');
 const NotificationManager = require('../helpers/notificationManager');
 const { formatTags } = require('../helpers/formatters');
@@ -19,6 +20,10 @@ const ChannelSchema = new Schema({
     type: String,
     required: true,
   },
+  autoSubscribe: {
+    type: Boolean,
+    required: false,
+  },
   tags: [{
     type: String,
     required: true,
@@ -32,6 +37,7 @@ ChannelSchema.statics.create = function (channel) {
   const channelData = {
     name: channelName,
     description: channel.description,
+    autoSubscribe: channel.autoSubscribe || false,
     tags: formattedTags,
   };
 
@@ -105,30 +111,18 @@ ChannelSchema.statics.getPosts = function (id, page) {
   });
 };
 
-ChannelSchema.statics.updateChannel = function (id, updatedChannelObj) {
+ChannelSchema.statics.updateChannel = async function (id, {name, description, autoSubscribe, tags}) {
   id = ObjectId(id);
 
-  const { name } = updatedChannelObj;
-  const formattedTags = formatTags(updatedChannelObj.tags);
-
-  return new Promise((resolve, reject) => {
-    this.findById(id).then((channel) => {
-      if (channel) {
-        channel.description = updatedChannelObj.description;
-        channel.name = name;
-        channel.tags = formattedTags;
-
-        channel.save().then((updatedChannel) => {
-          resolve(updatedChannel);
-        })
-          .catch((err) => {
-            reject(err);
-          });
-      } else {
-        reject(Error('Couldn\t find a channel with that ID'));
-      }
-    });
-  });
+  const formattedTags = formatTags(tags);
+  const channel = await this.findById(id);
+  if (channel) {
+    const updatedAttributes = pickBy({name, description, autoSubscribe, formattedTags}, negate(isNil));
+    Object.assign(channel, updatedAttributes);
+    return await channel.save();
+  } else {
+    throw(Error('Couldn\'t find a channel with that ID'));
+  }
 };
 
 ChannelSchema.statics.delete = function (id) {
