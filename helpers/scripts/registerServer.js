@@ -26,7 +26,7 @@ const getTunnel = async () => {
     try {
         const responseRaw = await fetch(`${NGROK_URL}/tunnels`);
         if (responseRaw.ok) {
-            return (await responseRaw.json()).tunnels.find(({ proto }) => proto === 'http');
+            return (await responseRaw.json()).tunnels.find(({ proto }) => proto === 'https');
         }
     } catch (err) {
         // Could not reach ngrok
@@ -44,7 +44,7 @@ const getServerUrl = async (authUrl, existingServers) => {
 
         // Wait for user, then try again
         await promptForText('Press enter to continue...');
-        tunnel = await getTunnels();
+        tunnel = await getTunnel();
     }
     if (tunnel) defaultUrl = tunnel.public_url;
     const validate = (value) => !existingServers.includes(value) || 'A Server with this url already exists, try again';
