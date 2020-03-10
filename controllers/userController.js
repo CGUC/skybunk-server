@@ -31,37 +31,36 @@ router.get('/user/:id', verifyToken, (req, res) => {
 
 // Start password reset process by sending email
 router.post('/reset', (req, res) => {
-  var query;
-  const body = req.body;
+  let query;
+  const { body } = req;
 
-  //query by name or by username
-  if(body.username != undefined && body.username != ''){
-    query = {username: body.username};
-  }else if(body.lastName != undefined && body.firstName !=undefined && body.lastName != '' && body.firstName !=''){
-    query = {firstName: body.firstName, lastName: body.lastName};
-  }else{
-    res.status(400).json("No user found");
+  // query by name or by username
+  if (body.username !== undefined && body.username !== '') {
+    query = { username: body.username };
+  } else if (body.lastName !== undefined && body.firstName !== undefined && body.lastName !== '' && body.firstName !== '') {
+    query = { firstName: body.firstName, lastName: body.lastName };
+  } else {
+    res.status(400).json('No user found');
     return;
   }
 
   User.findOne(query).then((user) => {
-    if(user == undefined){
-      res.status(400).json("No user found");
+    if (user === undefined) {
+      res.status(400).json('No user found');
       return;
     }
-    if(user.info.email != undefined && user.info.email != '' && user.info.email.toLowerCase() != body.email.toLowerCase()){
-      //given email does not match stored email, so return forbidden
-      res.status(403).json("Given email is invalid");
-      return;
-    } else{
-      //either given email matches, or no email is on file
+    if (user.info.email !== undefined && user.info.email !== '' && user.info.email.toLowerCase() !== body.email.toLowerCase()) {
+      // given email does not match stored email, so return forbidden
+      res.status(403).json('Given email is invalid');
+    } else {
+      // either given email matches, or no email is on file
       user.sendPasswordResetEmail(body.email).then((response) => {
         res.json(response);
       })
-      .catch((err) =>{
-        console.error(err)
-        res.status(400).json(err);
-      });
+        .catch((err) => {
+          console.error(err);
+          res.status(400).json(err);
+        });
     }
   }).catch((err) => {
     console.error(err);
@@ -69,9 +68,9 @@ router.post('/reset', (req, res) => {
   });
 });
 
-//Reset password from reset password link
+// Reset password from reset password link
 router.post('/reset/:username/:token', verifyPasswordResetToken, (req, res) => {
-  const user = req.user;
+  const { user } = req;
   user.changePassword(req.body.password).then((password) => {
     res.json(password);
   }).catch((err) => {

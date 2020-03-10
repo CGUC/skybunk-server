@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/secrets');
 const mongoose = require('mongoose');
+const { jwtSecret } = require('../config/secrets');
+
 const User = mongoose.model('User');
 
 module.exports = {
@@ -35,23 +36,23 @@ module.exports = {
   },
 
   verifyPasswordResetToken(req, res, next) {
-    const token = req.params.token;
-    User.findOne({username: req.params.username}).then((user) => {
-      if(user == undefined){
-        res.status(400).json("No user found");
-      } else if(req.body.username.toLowerCase() != user.username.toLowerCase()){
-        res.status(403).json("Invalid username");
-      }else if(token !== user.resetPasswordToken){
-        res.status(403).json("Incorrect token");
-      } else if(Date.now() > user.resetPasswordExpiration){
-        res.status(403).json("Expired token");
-      }else{
-        //success!
+    const { token } = req.params;
+    User.findOne({ username: req.params.username }).then((user) => {
+      if (user === undefined) {
+        res.status(400).json('No user found');
+      } else if (req.body.username.toLowerCase() !== user.username.toLowerCase()) {
+        res.status(403).json('Invalid username');
+      } else if (token !== user.resetPasswordToken) {
+        res.status(403).json('Incorrect token');
+      } else if (Date.now() > user.resetPasswordExpiration) {
+        res.status(403).json('Expired token');
+      } else {
+        // success!
         req.user = user;
         next();
       }
     }).catch((err) => {
       res.json(err);
     });
-	},
+  },
 };
