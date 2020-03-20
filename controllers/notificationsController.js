@@ -1,25 +1,26 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const { verifyToken } = require('../helpers/authorization');
+const express = require("express");
+const mongoose = require("mongoose");
+const { verifyToken } = require("../helpers/authorization");
 
 const router = express.Router();
 
-require('../models/Notification');
+require("../models/Notification");
 
-const Notification = mongoose.model('Notification');
+const Notification = mongoose.model("Notification");
 
-router.post('/:id/markSeen', verifyToken, (req, res) => {
+router.post("/:id/markSeen", verifyToken, (req, res) => {
   Notification.findOne({ _id: req.params.id })
-    .then((notif) => {
-      notif.markSeen()
-        .then((seenNotif) => {
+    .then(notif => {
+      notif
+        .markSeen()
+        .then(seenNotif => {
           res.send(seenNotif);
         })
-        .catch((err) => {
+        .catch(err => {
           res.status(500).send(err);
         });
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       res.send(err);
     });

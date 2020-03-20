@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-require('../models/Channels');
+require("../models/Channels");
 
-const Channel = mongoose.model('Channel');
-const { verifyToken, verifyAdmin } = require('../helpers/authorization');
-const { classifyError } = require('../helpers/formatters');
+const Channel = mongoose.model("Channel");
+const { verifyToken, verifyAdmin } = require("../helpers/authorization");
+const { classifyError } = require("../helpers/formatters");
 
 /**
  * Methods:
@@ -18,15 +18,15 @@ const { classifyError } = require('../helpers/formatters');
  *  delete(/:id) => Deletes channel with given id
  */
 
-
 /**
  * Create a new channel
  */
-router.post('/', verifyToken, verifyAdmin, (req, res) => {
-  Channel.create(req.body).then((channel) => {
-    res.json(channel);
-  })
-    .catch((err) => {
+router.post("/", verifyToken, verifyAdmin, (req, res) => {
+  Channel.create(req.body)
+    .then(channel => {
+      res.json(channel);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -35,11 +35,12 @@ router.post('/', verifyToken, verifyAdmin, (req, res) => {
 /**
  * Get a channel by its id
  */
-router.get('/:id', verifyToken, (req, res) => {
-  Channel.get(req.params.id).then((channel) => {
-    res.json(channel);
-  })
-    .catch((err) => {
+router.get("/:id", verifyToken, (req, res) => {
+  Channel.get(req.params.id)
+    .then(channel => {
+      res.json(channel);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -48,11 +49,12 @@ router.get('/:id', verifyToken, (req, res) => {
 /**
  * Get all channels
  */
-router.get('/', verifyToken, (req, res) => {
-  Channel.getAll().then((channels) => {
-    res.json(channels);
-  })
-    .catch((err) => {
+router.get("/", verifyToken, (req, res) => {
+  Channel.getAll()
+    .then(channels => {
+      res.json(channels);
+    })
+    .catch(err => {
       res.status(500).json(err.message);
     });
 });
@@ -60,11 +62,12 @@ router.get('/', verifyToken, (req, res) => {
 /**
  * Get posts from a specific channel
  */
-router.get('/:id/posts', verifyToken, (req, res) => {
-  Channel.getPosts(req.params.id, req.get('page')).then((posts) => {
-    res.json(posts);
-  })
-    .catch((err) => {
+router.get("/:id/posts", verifyToken, (req, res) => {
+  Channel.getPosts(req.params.id, req.get("page"))
+    .then(posts => {
+      res.json(posts);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -73,11 +76,12 @@ router.get('/:id/posts', verifyToken, (req, res) => {
 /**
  * Update a channel
  */
-router.put('/:id', verifyToken, verifyAdmin, (req, res) => {
-  Channel.updateChannel(req.params.id, req.body).then((channel) => {
-    res.json(channel);
-  })
-    .catch((err) => {
+router.put("/:id", verifyToken, verifyAdmin, (req, res) => {
+  Channel.updateChannel(req.params.id, req.body)
+    .then(channel => {
+      res.json(channel);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -86,11 +90,12 @@ router.put('/:id', verifyToken, verifyAdmin, (req, res) => {
 /**
  * Delete a channel
  */
-router.delete('/:id', verifyToken, verifyAdmin, (req, res) => {
-  Channel.delete(req.params.id).then((msg) => {
-    res.json(msg);
-  })
-    .catch((err) => {
+router.delete("/:id", verifyToken, verifyAdmin, (req, res) => {
+  Channel.delete(req.params.id)
+    .then(msg => {
+      res.json(msg);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });

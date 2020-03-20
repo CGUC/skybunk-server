@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
@@ -7,23 +7,23 @@ const { Schema } = mongoose;
 const ExampleSchema = new Schema({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   counter: {
     type: Number,
     required: true,
-    default: 0,
-  },
+    default: 0
+  }
 });
 
 // All the business logic done on a model should be done in
 // the instance methods, and controllers should simply call
 // these instance methods.
-ExampleSchema.methods.incrementCounter = function () {
+ExampleSchema.methods.incrementCounter = function() {
   this.counter++;
   this.save()
-    .then(console.log('Document saved'))
-    .catch(console.log('Error saving document'));
+    .then(console.log("Document saved"))
+    .catch(console.log("Error saving document"));
 };
 
-mongoose.model('Example', ExampleSchema);
+mongoose.model("Example", ExampleSchema);

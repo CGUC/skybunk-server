@@ -1,28 +1,30 @@
-require('../../models/Media/Poll');
-require('sinon-mongoose');
-const mongoose = require('mongoose');
-const chai = require('chai');
-const sinon = require('sinon');
-const UserFactory = require('../factories/users');
+require("../../models/Media/Poll");
+require("sinon-mongoose");
+const mongoose = require("mongoose");
+const chai = require("chai");
+const sinon = require("sinon");
+const UserFactory = require("../factories/users");
 
 const { expect } = chai;
-const Poll = mongoose.model('Poll');
+const Poll = mongoose.model("Poll");
 
-describe('Polls', () => {
+describe("Polls", () => {
   let pollSave;
   let findStub;
   let samplePoll;
   before(() => {
     samplePoll = new Poll({
       multiSelect: false,
-      options: [{
-        text: 'red',
-        usersVoted: [],
-      }],
+      options: [
+        {
+          text: "red",
+          usersVoted: []
+        }
+      ]
     });
 
-    pollSave = sinon.stub(Poll.prototype, 'save').resolves(this);
-    findStub = sinon.stub(mongoose.Model, 'findById').resolves(samplePoll);
+    pollSave = sinon.stub(Poll.prototype, "save").resolves(this);
+    findStub = sinon.stub(mongoose.Model, "findById").resolves(samplePoll);
   });
 
   after(() => {
@@ -30,82 +32,94 @@ describe('Polls', () => {
     findStub.restore();
   });
 
-  describe('correctly validate', () => {
-    it('if poll does not specify multiSelect', (done) => {
+  describe("correctly validate", () => {
+    it("if poll does not specify multiSelect", done => {
       const poll = new Poll({
-        options: ['red', 'blue'],
+        options: ["red", "blue"]
       });
 
-      poll.validate((err) => {
-        expect(err.errors.multiSelect.message).to.equal('Path `multiSelect` is required.');
+      poll.validate(err => {
+        expect(err.errors.multiSelect.message).to.equal(
+          "Path `multiSelect` is required."
+        );
         done();
       });
     });
 
-    it('if poll has more than 10 options', (done) => {
+    it("if poll has more than 10 options", done => {
       const opt = {
-        text: 'hi',
-        usersVoted: [],
+        text: "hi",
+        usersVoted: []
       };
       const poll = new Poll({
         multiSelect: true,
-        options: [opt, opt, opt, opt, opt, opt, opt, opt, opt, opt, opt],
+        options: [opt, opt, opt, opt, opt, opt, opt, opt, opt, opt, opt]
       });
 
-      poll.validate((err) => {
-        expect(err.errors.options.message).to.equal('Cannot have more than 10 options on poll.');
+      poll.validate(err => {
+        expect(err.errors.options.message).to.equal(
+          "Cannot have more than 10 options on poll."
+        );
         done();
       });
     });
 
-    it('if users have voted for multiple options when poll is not multiselect', (done) => {
+    it("if users have voted for multiple options when poll is not multiselect", done => {
       const opt = {
-        text: 'hi',
-        usersVoted: [UserFactory.fred._id],
+        text: "hi",
+        usersVoted: [UserFactory.fred._id]
       };
 
       const poll = new Poll({
         multiSelect: false,
-        options: [opt, opt],
+        options: [opt, opt]
       });
 
-      poll.validate((err) => {
-        expect(err.errors.multiSelect.message).to.equal('Poll is not set to multiSelect, but users have selected multiple options.');
+      poll.validate(err => {
+        expect(err.errors.multiSelect.message).to.equal(
+          "Poll is not set to multiSelect, but users have selected multiple options."
+        );
         done();
       });
     });
 
-    it('if a valid poll', (done) => {
+    it("if a valid poll", done => {
       const poll = new Poll({
         multiSelect: false,
-        options: [{
-          text: 'Option 1',
-          usersVoted: [],
-        }],
+        options: [
+          {
+            text: "Option 1",
+            usersVoted: []
+          }
+        ]
       });
 
-      poll.validate((err) => {
+      poll.validate(err => {
         expect(err).to.equal(null);
         done();
       });
     });
   });
 
-  describe('can be modified', () => {
-    it('on creation', (done) => {
+  describe("can be modified", () => {
+    it("on creation", done => {
       const pollData = {
         multiSelect: false,
-        options: [{
-          text: 'red',
-        }, {
-          text: 'blue',
-          usersVoted: [UserFactory.fred._id],
-        }, {
-          text: 'yellow',
-        }],
+        options: [
+          {
+            text: "red"
+          },
+          {
+            text: "blue",
+            usersVoted: [UserFactory.fred._id]
+          },
+          {
+            text: "yellow"
+          }
+        ]
       };
 
-      Poll.create(pollData, UserFactory.fred._id.toString()).then((result) => {
+      Poll.create(pollData, UserFactory.fred._id.toString()).then(result => {
         expect(result.multiSelect).to.equal(pollData.multiSelect);
         expect(result.options[0].text).to.equal(pollData.options[0].text);
         expect(result.options[1].text).to.equal(pollData.options[1].text);
@@ -115,62 +129,71 @@ describe('Polls', () => {
       });
     });
 
-    it('by placing a vote', (done) => {
-      samplePoll.placeVote(UserFactory.fred._id, samplePoll.options[0]._id)
-        .then((result) => {
+    it("by placing a vote", done => {
+      samplePoll
+        .placeVote(UserFactory.fred._id, samplePoll.options[0]._id)
+        .then(result => {
           expect(result._id).to.equal(samplePoll._id);
-          expect(result.options[0].usersVoted[0]).to.equal(UserFactory.fred._id);
+          expect(result.options[0].usersVoted[0]).to.equal(
+            UserFactory.fred._id
+          );
           done();
         });
     });
 
-    it('by reurning an error when a user voted twice', (done) => {
+    it("by reurning an error when a user voted twice", done => {
       const poll = new Poll({
         multiSelect: false,
-        options: [{
-          text: 'red',
-          usersVoted: [UserFactory.fred._id],
-        }],
+        options: [
+          {
+            text: "red",
+            usersVoted: [UserFactory.fred._id]
+          }
+        ]
       });
 
-      poll.placeVote(UserFactory.fred._id, poll.options[0]._id)
-        .catch((err) => {
-          expect(err.message).to.equal('User has already voted for this option');
-          done();
-        });
+      poll.placeVote(UserFactory.fred._id, poll.options[0]._id).catch(err => {
+        expect(err.message).to.equal("User has already voted for this option");
+        done();
+      });
     });
 
-    it('by retracting a vote', (done) => {
+    it("by retracting a vote", done => {
       const poll = new Poll({
         multiSelect: false,
-        options: [{
-          text: 'red',
-          usersVoted: [UserFactory.fred._id],
-        }],
+        options: [
+          {
+            text: "red",
+            usersVoted: [UserFactory.fred._id]
+          }
+        ]
       });
 
       expect(poll.options.length).to.equal(1);
-      samplePoll.retractVote(UserFactory.fred._id, samplePoll.options[0]._id)
-        .then((result) => {
+      samplePoll
+        .retractVote(UserFactory.fred._id, samplePoll.options[0]._id)
+        .then(result => {
           expect(result._id).to.equal(samplePoll._id);
           expect(result.options[0].usersVoted.length).to.equal(0);
           done();
         });
     });
 
-    it('by adding an option', (done) => {
-      const newOption = 'This option was added on';
+    it("by adding an option", done => {
+      const newOption = "This option was added on";
 
-      samplePoll.addOption(newOption, UserFactory.fred._id.toString()).then((result) => {
-        expect(result._id).to.equal(samplePoll._id);
-        expect(result.options[1].text).to.equal(newOption);
-        done();
-      });
+      samplePoll
+        .addOption(newOption, UserFactory.fred._id.toString())
+        .then(result => {
+          expect(result._id).to.equal(samplePoll._id);
+          expect(result.options[1].text).to.equal(newOption);
+          done();
+        });
     });
 
-    it('by removing an option', (done) => {
+    it("by removing an option", done => {
       const initialOptionLength = samplePoll.options.length;
-      samplePoll.removeOption(samplePoll.options[0]).then((result) => {
+      samplePoll.removeOption(samplePoll.options[0]).then(result => {
         expect(result._id).to.equal(samplePoll._id);
         expect(result.options.length).to.equal(initialOptionLength - 1);
         done();

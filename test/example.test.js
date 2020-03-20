@@ -1,4 +1,4 @@
-const chai = require('chai');
+const chai = require("chai");
 
 const { expect } = chai;
 
@@ -18,8 +18,8 @@ const { expect } = chai;
  * Here's some more reading on testing with mocha:
  * - https://www.codementor.io/davidtang/unit-testing-and-tdd-in-node-js-part-1-8t714s877
  */
-describe('Example Test', () => {
-  it('Big Shaq should be right', () => {
+describe("Example Test", () => {
+  it("Big Shaq should be right", () => {
     expect(2 + 2).to.equal(4);
     expect(4 - 1).to.equal(3);
     // Quick maths!

@@ -1,17 +1,17 @@
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
-const mongoose = require('mongoose');
-const multer = require('multer');
+const mongoose = require("mongoose");
+const multer = require("multer");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-require('../models/Posts');
+require("../models/Posts");
 
-const Post = mongoose.model('Post');
-const { verifyToken } = require('../helpers/authorization');
-const { classifyError } = require('../helpers/formatters');
-const { requestValidator } = require('../helpers/formatters');
+const Post = mongoose.model("Post");
+const { verifyToken } = require("../helpers/authorization");
+const { classifyError } = require("../helpers/formatters");
+const { requestValidator } = require("../helpers/formatters");
 
 /**
  * Methods:
@@ -28,11 +28,12 @@ const { requestValidator } = require('../helpers/formatters');
 /**
  * Create new post
  */
-router.post('/', verifyToken, (req, res) => {
-  Post.create(req.body, req.user).then((post) => {
-    res.json(post);
-  })
-    .catch((err) => {
+router.post("/", verifyToken, (req, res) => {
+  Post.create(req.body, req.user)
+    .then(post => {
+      res.json(post);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -41,11 +42,12 @@ router.post('/', verifyToken, (req, res) => {
 /**
  * Get post by id
  */
-router.get('/:id', verifyToken, (req, res) => {
-  Post.get(req.params.id).then((post) => {
-    res.json(post);
-  })
-    .catch((err) => {
+router.get("/:id", verifyToken, (req, res) => {
+  Post.get(req.params.id)
+    .then(post => {
+      res.json(post);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -54,11 +56,12 @@ router.get('/:id', verifyToken, (req, res) => {
 /**
  * Get all posts
  */
-router.get('/', verifyToken, (req, res) => {
-  Post.getAllPaginated(req.get('page')).then((posts) => {
-    res.json(posts);
-  })
-    .catch((err) => {
+router.get("/", verifyToken, (req, res) => {
+  Post.getAllPaginated(req.get("page"))
+    .then(posts => {
+      res.json(posts);
+    })
+    .catch(err => {
       res.status(500).json(err.message);
     });
 });
@@ -66,23 +69,26 @@ router.get('/', verifyToken, (req, res) => {
 /**
  * Get all posts from a specific user
  */
-router.get('/user/:id', verifyToken, (req, res) => {
-  Post.getUserPosts(req.params.id, req.get('page')).then((posts) => {
-    res.json(posts);
-  }).catch((err) => {
-    const errRes = classifyError(err);
-    res.status(errRes.status).json(errRes.message);
-  });
+router.get("/user/:id", verifyToken, (req, res) => {
+  Post.getUserPosts(req.params.id, req.get("page"))
+    .then(posts => {
+      res.json(posts);
+    })
+    .catch(err => {
+      const errRes = classifyError(err);
+      res.status(errRes.status).json(errRes.message);
+    });
 });
 
 /**
  * Update a post
  */
-router.put('/:id', verifyToken, (req, res) => {
-  Post.updatePost(req.params.id, req.body).then((post) => {
-    res.json(post);
-  })
-    .catch((err) => {
+router.put("/:id", verifyToken, (req, res) => {
+  Post.updatePost(req.params.id, req.body)
+    .then(post => {
+      res.json(post);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -91,12 +97,12 @@ router.put('/:id', verifyToken, (req, res) => {
 /**
  * Like a post
  */
-router.post('/:pid/like', verifyToken, (req, res) => {
+router.post("/:pid/like", verifyToken, (req, res) => {
   Post.likePost(req.params.pid, req.user._id, req.body.addLike)
-    .then((post) => {
+    .then(post => {
       res.json(post);
     })
-    .catch((err) => {
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -105,11 +111,12 @@ router.post('/:pid/like', verifyToken, (req, res) => {
 /**
  * Delete a post
  */
-router.delete('/:id', verifyToken, (req, res) => {
-  Post.delete(req.params.id).then((msg) => {
-    res.json(msg);
-  })
-    .catch((err) => {
+router.delete("/:id", verifyToken, (req, res) => {
+  Post.delete(req.params.id)
+    .then(msg => {
+      res.json(msg);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -118,11 +125,12 @@ router.delete('/:id', verifyToken, (req, res) => {
 /**
  * Get all comments associated with the post
  */
-router.get('/:id/comments', verifyToken, (req, res) => {
-  Post.getComments(req.params.id).then((comments) => {
-    res.json(200, comments);
-  })
-    .catch((err) => {
+router.get("/:id/comments", verifyToken, (req, res) => {
+  Post.getComments(req.params.id)
+    .then(comments => {
+      res.json(200, comments);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -132,11 +140,12 @@ router.get('/:id/comments', verifyToken, (req, res) => {
  * Add a new comment to the post
  * @returns all comments for post
  */
-router.post('/:id/comment', verifyToken, (req, res) => {
-  Post.addComment(req.params.id, req.body, req.user).then((comment) => {
-    res.json(comment);
-  })
-    .catch((err) => {
+router.post("/:id/comment", verifyToken, (req, res) => {
+  Post.addComment(req.params.id, req.body, req.user)
+    .then(comment => {
+      res.json(comment);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -147,11 +156,12 @@ router.post('/:id/comment', verifyToken, (req, res) => {
  * @param {string} pid - post's id
  * @param {string} cid - comment's id
  */
-router.put('/:pid/comment/:cid', verifyToken, (req, res) => {
-  Post.updateComment(req.params.pid, req.params.cid, req.body).then((comment) => {
-    res.json(comment);
-  })
-    .catch((err) => {
+router.put("/:pid/comment/:cid", verifyToken, (req, res) => {
+  Post.updateComment(req.params.pid, req.params.cid, req.body)
+    .then(comment => {
+      res.json(comment);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -162,12 +172,12 @@ router.put('/:pid/comment/:cid', verifyToken, (req, res) => {
  * @param {string} pid - post's id
  * @param {string} cid - comment's id
  */
-router.post('/:pid/comment/:cid/like', verifyToken, (req, res) => {
+router.post("/:pid/comment/:cid/like", verifyToken, (req, res) => {
   Post.likeComment(req.params.pid, req.params.cid, req.user, req.body.addLike)
-    .then((post) => {
+    .then(post => {
       res.json(post);
     })
-    .catch((err) => {
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -176,11 +186,12 @@ router.post('/:pid/comment/:cid/like', verifyToken, (req, res) => {
 /**
  * Delete a comment
  */
-router.delete('/:pid/comment/:cid', verifyToken, (req, res) => {
-  Post.deleteComment(req.params.pid, req.params.cid).then((msg) => {
-    res.json(msg);
-  })
-    .catch((err) => {
+router.delete("/:pid/comment/:cid", verifyToken, (req, res) => {
+  Post.deleteComment(req.params.pid, req.params.cid)
+    .then(msg => {
+      res.json(msg);
+    })
+    .catch(err => {
       const errRes = classifyError(err);
       res.status(errRes.status).json(errRes.message);
     });
@@ -189,21 +200,25 @@ router.delete('/:pid/comment/:cid', verifyToken, (req, res) => {
 /**
  * Add an image
  */
-router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
+router.post("/:id/image", verifyToken, upload.single("image"), (req, res) => {
   Post.findOne({ _id: req.params.id })
-    .populate('author')
-    .then((post) => {
+    .populate("author")
+    .then(post => {
       if (post.author._id.toString() !== req.user._id.toString()) {
         res.status(403);
         return;
       }
 
-      post.addMedia('image', req.file.buffer).then((media) => {
-        res.json(media.image.buffer.toString('base64'));
-      }).catch((err) => {
-        res.json(err);
-      });
-    }).catch((err) => {
+      post
+        .addMedia("image", req.file.buffer)
+        .then(media => {
+          res.json(media.image.buffer.toString("base64"));
+        })
+        .catch(err => {
+          res.json(err);
+        });
+    })
+    .catch(err => {
       res.json(err);
     });
 });
@@ -211,13 +226,14 @@ router.post('/:id/image', verifyToken, upload.single('image'), (req, res) => {
 /**
  * Get the image
  */
-router.get('/:id/image', verifyToken, (req, res) => {
+router.get("/:id/image", verifyToken, (req, res) => {
   Post.findOne({ _id: req.params.id })
-    .then((post) => {
-      post.getMedia('image').then((image) => {
+    .then(post => {
+      post.getMedia("image").then(image => {
         res.json(image);
       });
-    }).catch((err) => {
+    })
+    .catch(err => {
       console.log(err);
       res.json(err);
     });
@@ -226,21 +242,28 @@ router.get('/:id/image', verifyToken, (req, res) => {
 /**
  * Delete the image
  */
-router.delete('/:id/image', verifyToken, (req, res) => {
+router.delete("/:id/image", verifyToken, (req, res) => {
   Post.findOne({ _id: req.params.id })
-    .populate('author')
-    .then((post) => {
-      if (!req.user.role.includes('admin') && post.author._id.toString() !== req.user._id.toString()) {
+    .populate("author")
+    .then(post => {
+      if (
+        !req.user.role.includes("admin") &&
+        post.author._id.toString() !== req.user._id.toString()
+      ) {
         res.status(403);
         return;
       }
-      post.removeMedia().then(() => {
-        res.json();
-      }).catch((err) => {
-        console.error(err);
-        res.json(err);
-      });
-    }).catch((err) => {
+      post
+        .removeMedia()
+        .then(() => {
+          res.json();
+        })
+        .catch(err => {
+          console.error(err);
+          res.json(err);
+        });
+    })
+    .catch(err => {
       console.error(err);
       res.json(err);
     });
@@ -249,167 +272,188 @@ router.delete('/:id/image', verifyToken, (req, res) => {
 // /////////////////////
 //      POLLS
 // /////////////////////
-router.get('/:id/poll', verifyToken, (req, res) => {
+router.get("/:id/poll", verifyToken, (req, res) => {
   Post.findById(req.params.id)
-    .populate('author')
+    .populate("author")
     .populate({
-      path: 'media',
+      path: "media",
       populate: {
-        path: 'poll',
+        path: "poll",
         populate: {
-          path: 'usersVoted',
-        },
-      },
+          path: "usersVoted"
+        }
+      }
     })
-    .then((post) => {
+    .then(post => {
       if (!post.media.poll) {
         res.status(404).json();
         return;
       }
       res.json(post.media.poll);
     })
-    .catch((err) => {
+    .catch(err => {
       res.status(500).json(err.toString());
     });
 });
 
-router.post('/:id/poll', verifyToken, (req, res) => {
+router.post("/:id/poll", verifyToken, (req, res) => {
   Post.findById(req.params.id)
-    .populate('author')
-    .then((post) => {
+    .populate("author")
+    .then(post => {
       if (post.author._id.toString() !== req.user._id.toString()) {
         res.status(403).json({});
         return;
       }
 
-      const validation = requestValidator(['options', 'multiSelect'], req.body);
+      const validation = requestValidator(["options", "multiSelect"], req.body);
       if (validation.status !== 200) {
         res.status(validation.status).json(validation.message);
         return;
       }
 
-      post.addMedia('poll', { ...req.body, userID: req.user._id }).then((media) => {
-        res.json(media.poll);
-      }).catch((err) => {
-        res.status(500).json(err.toString());
-      });
-    }).catch((err) => {
+      post
+        .addMedia("poll", { ...req.body, userID: req.user._id })
+        .then(media => {
+          res.json(media.poll);
+        })
+        .catch(err => {
+          res.status(500).json(err.toString());
+        });
+    })
+    .catch(err => {
       res.status(500).json(err.toString());
     });
 });
 
-router.post('/:id/poll/option', verifyToken, (req, res) => {
+router.post("/:id/poll/option", verifyToken, (req, res) => {
   Post.findById(req.params.id)
-    .populate('author')
+    .populate("author")
     .populate({
-      path: 'media',
+      path: "media",
       populate: {
-        path: 'poll',
-      },
+        path: "poll"
+      }
     })
-    .then((post) => {
+    .then(post => {
       if (!post.media.poll) {
         res.status(404).json();
         return;
       }
 
-      if (!post.media.poll.open && post.author._id.toString() !== req.user._id.toString()) {
+      if (
+        !post.media.poll.open &&
+        post.author._id.toString() !== req.user._id.toString()
+      ) {
         res.status(403).json({});
         return;
       }
 
-      const validation = requestValidator(['option'], req.body);
+      const validation = requestValidator(["option"], req.body);
       if (validation.status !== 200) {
         res.status(validation.status).json(validation.message);
       }
 
-      post.media.poll.addOption(req.body.option, req.user._id).then((poll) => {
-        res.json(poll);
-      })
-        .catch((err) => {
+      post.media.poll
+        .addOption(req.body.option, req.user._id)
+        .then(poll => {
+          res.json(poll);
+        })
+        .catch(err => {
           res.status(500).json(err.toString());
         });
     })
-    .catch((err) => {
+    .catch(err => {
       res.status(500).json(err.toString());
     });
 });
 
-router.post('/:id/poll/option/delete', verifyToken, (req, res) => {
+router.post("/:id/poll/option/delete", verifyToken, (req, res) => {
   Post.findById(req.params.id)
-    .populate('author')
+    .populate("author")
     .populate({
-      path: 'media',
+      path: "media",
       populate: {
-        path: 'poll',
-      },
+        path: "poll"
+      }
     })
-    .then((post) => {
+    .then(post => {
       if (!post.media.poll) {
         res.status(404).json();
         return;
       }
 
-      if (post.author._id.toString() !== req.user._id.toString() && !req.user.role.includes('admin')
-          && !(req.body.creator && req.body.creator.toString() === req.user._id.toString())) {
+      if (
+        post.author._id.toString() !== req.user._id.toString() &&
+        !req.user.role.includes("admin") &&
+        !(
+          req.body.creator &&
+          req.body.creator.toString() === req.user._id.toString()
+        )
+      ) {
         res.status(403).json({});
         return;
       }
 
-      const validation = requestValidator(['_id', 'creator'], req.body);
+      const validation = requestValidator(["_id", "creator"], req.body);
       if (validation.status !== 200) {
         res.status(validation.status).json(validation.message);
       }
 
-      post.media.poll.removeOption(req.body).then((poll) => {
-        res.json(poll);
-      })
-        .catch((err) => {
+      post.media.poll
+        .removeOption(req.body)
+        .then(poll => {
+          res.json(poll);
+        })
+        .catch(err => {
           res.status(500).json(err.toString());
         });
     })
-    .catch((err) => {
+    .catch(err => {
       res.status(500).json(err.toString());
     });
 });
 
-router.post('/:id/poll/vote', verifyToken, (req, res) => {
+router.post("/:id/poll/vote", verifyToken, (req, res) => {
   Post.findById(req.params.id)
-    .populate('author')
+    .populate("author")
     .populate({
-      path: 'media',
+      path: "media",
       populate: {
-        path: 'poll',
-      },
+        path: "poll"
+      }
     })
-    .then((post) => {
+    .then(post => {
       if (!post.media.poll) {
         res.json(404);
         return;
       }
 
-      const validation = requestValidator(['optionId'], req.body);
+      const validation = requestValidator(["optionId"], req.body);
       if (validation.status !== 200) {
         res.status(validation.status).json(validation.message);
       }
 
       if (req.body.retract) {
-        post.media.poll.retractVote(req.user._id, req.body.optionId).then((poll) => {
-          res.json(poll);
-        })
-          .catch((err) => {
+        post.media.poll
+          .retractVote(req.user._id, req.body.optionId)
+          .then(poll => {
+            res.json(poll);
+          })
+          .catch(err => {
             res.status(500).json(err.toString());
           });
       } else {
-        post.media.poll.placeVote(req.user._id, req.body.optionId).then((poll) => {
-          res.json(poll);
-        })
-          .catch((err) => {
+        post.media.poll
+          .placeVote(req.user._id, req.body.optionId)
+          .then(poll => {
+            res.json(poll);
+          })
+          .catch(err => {
             res.status(500).json(err.toString());
           });
       }
     })
-    .catch((err) => {
+    .catch(err => {
       res.status(500).json(err.toString());
     });
 });
@@ -417,21 +461,28 @@ router.post('/:id/poll/vote', verifyToken, (req, res) => {
 /**
  * Delete the poll
  */
-router.delete('/:id/poll', verifyToken, (req, res) => {
+router.delete("/:id/poll", verifyToken, (req, res) => {
   Post.findOne({ _id: req.params.id })
-    .populate('author')
-    .then((post) => {
-      if (!req.user.role.includes('admin') && post.author._id.toString() !== req.user._id.toString()) {
+    .populate("author")
+    .then(post => {
+      if (
+        !req.user.role.includes("admin") &&
+        post.author._id.toString() !== req.user._id.toString()
+      ) {
         res.status(403);
         return;
       }
 
-      post.removeMedia().then(() => {
-        res.status(200);
-      }).catch((err) => {
-        res.json(err);
-      });
-    }).catch((err) => {
+      post
+        .removeMedia()
+        .then(() => {
+          res.status(200);
+        })
+        .catch(err => {
+          res.json(err);
+        });
+    })
+    .catch(err => {
       res.json(err);
     });
 });
