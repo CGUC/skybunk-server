@@ -26,12 +26,15 @@ const GoldenTicket = mongoose.model('GoldenTicket');
 
 
 /**
- * @api {get} /users Return all Users
+ * @api {get} /users Get all Users
  * @apiName GetUsers
  * @apiGroup User
  * 
  * @apiHeader {String} authorization Valid auth token from user login
+ * 
  * @apiPermission user
+ * 
+ * @apiSuccess {Object[]} users All User objects
  */
 router.get('/', verifyToken, (req, res) => {
   User.find().select('-password -notificationTokens -notifications').then((users) => {
@@ -48,6 +51,8 @@ router.get('/', verifyToken, (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission user
+ * 
+ * @apiSuccess {Object} user User object
  */
 router.get('/user/:id', verifyToken, (req, res) => {
   User.findOne({ _id: req.params.id }).select('-password -notificationTokens -notifications').then((user) => {
@@ -116,6 +121,8 @@ router.post('/reset', (req, res) => {
  * @apiParam {String} username Target user's username
  * @apiParam {String} token Token obtained from password reset email
  * @apiParam {Object} body User object with new <code>password</code>
+ * 
+ * @apiSuccess {String} password New password
  */
 router.post('/reset/:username/:token', verifyPasswordResetToken, (req, res) => {
   const user = req.user;
@@ -144,6 +151,31 @@ router.post('/reset/:username/:token', verifyPasswordResetToken, (req, res) => {
  * }
  * 
  * @apiPermission none
+ * 
+ * @apiSuccess {Object} user User Object
+ * @apiSuccess {String} user.username
+ * @apiSuccess {String} user.firstName
+ * @apiSuccess {String} user.lastName
+ * @apiSuccess {String} user.password (encrypted)
+ * @apiSuccess {Object[]} user.notifications
+ * @apiSuccess {String[]} user.notificationTokens
+ * @apiSuccess {String[]} user.role
+ * @apiSuccess {Buffer} user.profilePicture
+ * @apiSuccess {Object[]} user.subscribedChannels
+ * @apiSuccess {String} user.resetPasswordToken
+ * @apiSuccess {Date} user.resetPasswordExpiration
+ * @apiSuccess {Object[]} user.info
+ * @apiSuccess {String} user.info.program
+ * @apiSuccess {String} user.info.address
+ * @apiSuccess {String} user.info.affiliation
+ * @apiSuccess {String} user.info.bio
+ * @apiSuccess {String} user.info.phone
+ * @apiSuccess {String} user.info.email
+ * @apiSuccess {Object[]} user.donInfo
+ * @apiSuccess {Boolean} user.donInfo.isOn
+ * @apiSuccess {Boolean} user.donInfo.isOnLateSupper
+ * @apiSuccess {String} user.donInfo.clockOut
+ * @apiSuccess {String} user.donInfo.location
  */
 router.post('/', (req, res) => {
   GoldenTicket.verifyTicket(req.body.goldenTicket).then((ticket) => {
@@ -164,7 +196,7 @@ router.post('/', (req, res) => {
 });
 
 /**
- * @api {delete} /users/:id Delete
+ * @api {delete} /users/:id Delete User
  * @apiName DeleteUser
  * @apiGroup User
  * 
@@ -172,6 +204,8 @@ router.post('/', (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission admin
+ * 
+ * @apiSuccess {String} success Success message
  */
 // Deletes a user
 router.delete('/:id', verifyToken, (req, res) => {
@@ -188,7 +222,7 @@ router.delete('/:id', verifyToken, (req, res) => {
 });
 
 /**
- * @api {put} /user/:id Update
+ * @api {put} /user/:id Update User
  * @apiDescription Callable by admin or user themself.
  * @apiName UpdateUser
  * @apiGroup User
@@ -198,6 +232,8 @@ router.delete('/:id', verifyToken, (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission admin
+ * 
+ * @apiSuccess {Object} user Updated User object
  */
 router.put('/:id', verifyToken, (req, res) => {
   if (!req.user.role.includes('admin') && req.params.id.toString() !== req.user._id.toString()) {
@@ -227,8 +263,9 @@ router.put('/:id', verifyToken, (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission self
+ * 
+ * @apiSuccess {String} password New password
  */
-// Changes a user password
 router.post('/:id/password', verifyToken, (req, res) => {
   if (req.params.id.toString() !== req.user._id.toString()) {
     res.status(403);
@@ -290,6 +327,8 @@ router.post('/:id/doninfo', verifyToken, (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission user
+ * 
+ * @apiSuccess {Object} user User object
  */
 router.get('/loggedInUser', verifyToken, (req, res) => {
   User.findOne({ _id: req.user._id })
@@ -323,6 +362,8 @@ router.get('/loggedInUser', verifyToken, (req, res) => {
  * @apiParam {Object} body Must include <code>username</code> and <code>password</code> fields.
  * 
  * @apiPermission none
+ * 
+ * @apiSuccess {String} token Auth token to be used in subsequent API calls
  */
 router.post('/login', (req, res) => {
   User.authenticate(req.body.username, req.body.password).then((user) => {
@@ -348,6 +389,8 @@ router.post('/login', (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission self
+ * 
+ * @apiSuccess {String} pic base64-encoded buffer string
  */
 router.put('/:id/profilePicture', verifyToken, upload.single('profilePicture'), (req, res) => {
   if (req.params.id.toString() !== req.user._id.toString()) {
@@ -377,6 +420,8 @@ router.put('/:id/profilePicture', verifyToken, upload.single('profilePicture'), 
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission user
+ * 
+ * @apiSuccess {String} pic base64-encoded buffer string
  */
 router.get('/:id/profilePicture', verifyToken, (req, res) => {
   User.findOne({ _id: req.params.id })
@@ -398,6 +443,8 @@ router.get('/:id/profilePicture', verifyToken, (req, res) => {
  * @apiHeader {Number} page Pagination index
  * 
  * @apiPermission none
+ * 
+ * @apiSuccess {Object[]} posts Post objects
  */
 router.get('/:id/subscribedChannels/posts', (req, res) => {
   User.findOne({ _id: req.params.id })
@@ -424,6 +471,8 @@ router.get('/:id/subscribedChannels/posts', (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission user
+ * 
+ * @apiSuccess {String} token Registered notification token
  */
 router.post('/:id/notificationToken', verifyToken, (req, res) => {
   if (req.params.id.toString() !== req.user._id.toString()) {
@@ -453,6 +502,8 @@ router.post('/:id/notificationToken', verifyToken, (req, res) => {
  * @apiHeader {String} authorization Valid auth token from user login
  * 
  * @apiPermission self
+ * 
+ * @apiSuccess {Boolean} success
  */
 router.post('/:id/markNotifsSeen', verifyToken, (req, res) => {
   if (req.params.id.toString() !== req.user._id.toString()) {

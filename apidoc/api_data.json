@@ -31,6 +31,180 @@
         "name": "none"
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>User Object</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.firstName",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.lastName",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.password",
+            "description": "<p>(encrypted)</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "user.notifications",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "user.notificationTokens",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "user.role",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Buffer",
+            "optional": false,
+            "field": "user.profilePicture",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "user.subscribedChannels",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.resetPasswordToken",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Date",
+            "optional": false,
+            "field": "user.resetPasswordExpiration",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "user.info",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.info.program",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.info.address",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.info.affiliation",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.info.bio",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.info.phone",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.info.email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "user.donInfo",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "user.donInfo.isOn",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "user.donInfo.isOnLateSupper",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.donInfo.clockOut",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user.donInfo.location",
+            "description": ""
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -38,7 +212,7 @@
   {
     "type": "delete",
     "url": "/users/:id",
-    "title": "Delete",
+    "title": "Delete User",
     "name": "DeleteUser",
     "group": "User",
     "parameter": {
@@ -74,6 +248,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "success",
+            "description": "<p>Success message</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -105,6 +292,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>User object</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -148,6 +348,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Registered notification token</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -191,6 +404,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "pic",
+            "description": "<p>base64-encoded buffer string</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -233,6 +459,19 @@
         "name": "none"
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "posts",
+            "description": "<p>Post objects</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -276,6 +515,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>User object</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -283,7 +535,7 @@
   {
     "type": "get",
     "url": "/users",
-    "title": "Return all Users",
+    "title": "Get all Users",
     "name": "GetUsers",
     "group": "User",
     "header": {
@@ -306,6 +558,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "users",
+            "description": "<p>All User objects</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -350,6 +615,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "success",
+            "description": ""
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -384,6 +662,19 @@
             "optional": false,
             "field": "body",
             "description": "<p>User object with new <code>password</code></p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>New password</p>"
           }
         ]
       }
@@ -468,6 +759,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>New password</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -518,6 +822,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "pic",
+            "description": "<p>base64-encoded buffer string</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -525,7 +842,7 @@
   {
     "type": "put",
     "url": "/user/:id",
-    "title": "Update",
+    "title": "Update User",
     "description": "<p>Callable by admin or user themself.</p>",
     "name": "UpdateUser",
     "group": "User",
@@ -569,6 +886,19 @@
         "description": ""
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>Updated User object</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
@@ -598,6 +928,19 @@
         "name": "none"
       }
     ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Auth token to be used in subsequent API calls</p>"
+          }
+        ]
+      }
+    },
     "version": "0.0.0",
     "filename": "controllers/userController.js",
     "groupTitle": "User"
